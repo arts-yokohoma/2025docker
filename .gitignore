@@ -1,0 +1,9 @@
+# Docker
+*.log
+*.pid
+*.sock
+.env
+__pycache__/
+.env/
+.docker/
+*.pyc

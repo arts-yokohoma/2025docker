@@ -1,6 +1,6 @@
 <?php
 echo "<h1>Team 6 - PHP + PostgreSQL</h1>";
-echo "<p>Hello from Team 6!</p>";
+echo "<p>Hello from ooo !</p>";
 
 try {
     $pdo = new PDO("pgsql:host=team_6_db;dbname=team_6_db", "team_6", "team6pass");

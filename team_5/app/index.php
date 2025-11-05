@@ -1,7 +1,8 @@
 <?php
 echo "<h1>Team 5 - PHP + PostgreSQL</h1>";
 echo "<p>Hello from CyberEdge!
-Cloning done!</p>";
+Cloning done!
+HI</p>";
 
 try {
     $pdo = new PDO("pgsql:host=team_5_db;dbname=team_5_db", "team_5", "team5pass");

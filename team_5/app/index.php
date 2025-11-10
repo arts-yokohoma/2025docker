@@ -3,7 +3,7 @@ echo "<h1>Team 5 - PHP + PostgreSQL</h1>";
 echo "<p>Hello from CyberEdge!
 Cloning done!
 HI,
-This is an update for action test</p>";
+This is an update for action test 11/10</p>";
 
 try {
     $pdo = new PDO("pgsql:host=team_5_db;dbname=team_5_db", "team_5", "team5pass");

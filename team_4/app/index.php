@@ -1,6 +1,6 @@
 <?php
 echo "<h1>Team 4 - PHP + PostgreSQL</h1>";
-echo "<p>Hello from Team 4!</p>";
+echo "<p>this is for MYTEAM!</p>";
 
 // PostgreSQL connection test
 try {

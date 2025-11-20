@@ -1,6 +1,6 @@
 <?php
-echo "<h1>Team 1 - PHP + MySQL</h1>";
-echo "<p>Hello from Team 1!</p>";
+echo "<h1>Team 2 - PHP + MySQL</h1>";
+echo "<p>Hello from Team 2!</p>";
 
 // MySQL connection test
 $mysqli = new mysqli("team_1_db", "team_1", "team1pass", "team_1_db");

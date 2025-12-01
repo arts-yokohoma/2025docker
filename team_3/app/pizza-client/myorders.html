@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注文確認 - Pizza Paradise</title>
+    <link rel="stylesheet" href="pizza.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-menu">
+            <a href="pizza.html" class="logo">
+                <img src="photo/main.png" alt="logo">
+            </a>
+            <div class="nav-cards">
+                <a href="pizza.html" class="nav-card">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">トップ</span>
+                </a>
+                <a href="home.html" class="nav-card">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-label">店舗情報</span>
+                </a>
+                <a href="menu.html" class="nav-card">
+                    <span class="nav-icon">🍕</span>
+                    <span class="nav-label">メニュー</span>
+                </a>
+                <a href="about.html" class="nav-card">
+                    <span class="nav-icon">ℹ️</span>
+                    <span class="nav-label">会社概要</span>
+                </a>
+                <a href="myorders.html" class="nav-card">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-label">注文確認</span>
+                </a>
+                <a id="authLink" href="login.html" class="nav-card">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">ログイン</span>
+                </a>
+                <a id="logoutLink" href="#" onclick="handleLogout(event)" class="nav-card" style="display: none;">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label" id="userNameDisplay">ログアウト</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="content">
+        <section style="padding:2rem; max-width:900px; margin:0 auto;">
+            <h2>注文内容確認</h2>
+            <div id="orderList" class="order-list">
+                <!-- Orders will be displayed here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pizza Paradise. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const CART_KEY = 'pizza_cart_v1';
+            const orderList = document.getElementById('orderList');
+
+            function formatYen(n) { 
+                return '¥' + n.toLocaleString(); 
+            }
+
+            // Read cart from localStorage
+            function readCart() {
+                try {
+                    return JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+                } catch (e) { 
+                    return []; 
+                }
+            }
+
+            // Display orders
+            function displayOrders() {
+                const cart = readCart();
+                if (cart.length === 0) {
+                    orderList.innerHTML = `
+                        <div class="empty-cart">
+                            <p>カートには商品が入っていません。</p>
+                        </div>
+                         <div class="empty-cart">
+                            <a href="menu.html" class="order-btn">ピザを注文する</a>
+                       </div>
+                    `;
+                    return;
+                }
+
+                let total = 0;
+                let html = '<div class="order-items">';
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.qty;
+                    total += itemTotal;
+                    html += `
+                        <div class="order-item">
+                            <div class="order-item-details">
+                                <h3>${item.name}</h3>
+                                <p>数量: ${item.qty}</p>
+                                <p>単価: ${formatYen(item.price)}</p>
+                            </div>
+                            <div class="order-item-total">
+                                ${formatYen(itemTotal)}
+                                <div style="margin-top:8px; text-align:right;">
+                                    <button class="remove-order" data-id="${item.id}" style="background:#fff;border:1px solid #ddd;padding:6px 8px;border-radius:4px;cursor:pointer;">削除</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div class="order-total">
+                        <h3>合計金額</h3>
+                        <div class="total-amount">${formatYen(total)}</div>
+                    </div>
+                    <div class="order-actions">
+                        <a href="pizza.html" class="control-btn secondary">買い物を続ける</a>
+                        <button id="checkoutBtn" class="control-btn">注文を確定する</button>
+                    </div>
+                </div>`;
+
+                orderList.innerHTML = html;
+
+                // Add checkout handler
+                document.getElementById('checkoutBtn')?.addEventListener('click', function() {
+                    if (confirm('注文を確定しますか？')) {
+                        alert('ご注文ありがとうございます！');
+                        localStorage.removeItem(CART_KEY);
+                        displayOrders();
+                    }
+                });
+
+                // Delegate remove button on orderList
+                orderList.querySelectorAll('.remove-order').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        const id = e.currentTarget.dataset.id;
+                        if (confirm('この商品をカートから削除しますか？')) {
+                            removeFromCart(id);
+                        }
+                    });
+                });
+            }
+
+            // Remove an item from cart by id
+            function removeFromCart(id) {
+                try {
+                    const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+                    const newCart = cart.filter(i => i.id !== id);
+                    localStorage.setItem(CART_KEY, JSON.stringify(newCart));
+                    displayOrders();
+                } catch (e) {
+                    console.error('Failed to remove item', e);
+                }
+            }
+
+            displayOrders();
+        });
+    </script>
+
+    <script>
+        // Auth management
+        const CURRENT_USER_KEY = 'pizza_current_user';
+
+        function updateAuthUI() {
+            const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+            const authLink = document.getElementById('authLink');
+            const logoutLink = document.getElementById('logoutLink');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                authLink.style.display = 'none';
+                logoutLink.style.display = 'flex';
+                userNameDisplay.textContent = user.name + ' | ログアウト';
+            } else {
+                authLink.style.display = 'flex';
+                logoutLink.style.display = 'none';
+            }
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            if (confirm('ログアウトしますか？')) {
+                localStorage.removeItem(CURRENT_USER_KEY);
+                updateAuthUI();
+                window.location.href = 'myorders.html';
+            }
+        }
+
+        // Update auth UI on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateAuthUI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Pizza Paradise</title>
+    <link rel="stylesheet" href="pizza.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-menu">
+            <a href="pizza.html" class="logo">
+                <img src="photo/main.png" alt="logo">
+            </a>
+            <div class="nav-cards">
+                <a href="pizza.html" class="nav-card">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">トップ</span>
+                </a>
+                <a href="home.html" class="nav-card">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-label">店舗情報</span>
+                </a>
+                <a href="menu.html" class="nav-card">
+                    <span class="nav-icon">🍕</span>
+                    <span class="nav-label">メニュー</span>
+                </a>
+                <a href="about.html" class="nav-card">
+                    <span class="nav-icon">ℹ️</span>
+                    <span class="nav-label">会社概要</span>
+                </a>
+                <a href="myorders.html" class="nav-card">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-label">注文確認</span>
+                </a>
+                <a id="authLink" href="login.html" class="nav-card">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">ログイン</span>
+                </a>
+                <a id="logoutLink" href="#" onclick="handleLogout(event)" class="nav-card" style="display: none;">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label" id="userNameDisplay">ログアウト</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="content">
+        <section style="padding:2rem; max-width:900px; margin:0 auto;">
+            <h2>About Us</h2>
+            <p>Pizza Paradiseは、シンプルで美味しいマルゲリータを追求する小さなお店です。経験豊かなピッツァ職人が一枚一枚丁寧に焼き上げます。</p>
+            <h3>お問い合わせ</h3>
+            <p>電話: 03-1234-5678</p>
+            <p>メール: info@pizzaparadise.example</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pizza Paradise. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Auth management
+        const CURRENT_USER_KEY = 'pizza_current_user';
+
+        function updateAuthUI() {
+            const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+            const authLink = document.getElementById('authLink');
+            const logoutLink = document.getElementById('logoutLink');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                authLink.style.display = 'none';
+                logoutLink.style.display = 'flex';
+                userNameDisplay.textContent = user.name + ' | ログアウト';
+            } else {
+                authLink.style.display = 'flex';
+                logoutLink.style.display = 'none';
+            }
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            if (confirm('ログアウトしますか？')) {
+                localStorage.removeItem(CURRENT_USER_KEY);
+                updateAuthUI();
+                window.location.href = 'about.html';
+            }
+        }
+
+        // Update auth UI on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateAuthUI();
+        });
+    </script>
+</body>
+</html>

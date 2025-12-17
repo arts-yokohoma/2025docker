@@ -51,7 +51,6 @@
         <div class="tabs">
             <div class="tab active" onclick="switchTab('sales')">Sales Analysis</div>
             <div class="tab" onclick="switchTab('shifts')">Shift Management</div>
-            <div class="tab" onclick="switchTab('capacity')">Production Capacity</div>
         </div>
         
         <!-- Sales Analysis Tab -->
@@ -65,7 +64,9 @@
                 </select>
                 <label>Pizza Type:</label>
                 <select id="pizzaSelect">
-                    <option value="">All Pizzas</option>
+                    <option value="">small size</option>
+                    <option value="">medium</option>
+                    <option value="">local</option>
                 </select>
                 <button onclick="loadSalesData()">Load Data</button>
                 <button onclick="generateReport()">Generate Python Report</button>
@@ -105,15 +106,6 @@
                                 <label>Chefs:</label>
                                 <input type="number" id="morningChefs" min="0" value="2" onchange="calculateCapacity()">
                             </div>
-                            <div class="form-group">
-                                <label>Assistants:</label>
-                                <input type="number" id="morningAssistants" min="0" value="2" onchange="calculateCapacity()">
-                            </div>
-                            <div class="form-group">
-                                <label>Expected Efficiency (%):</label>
-                                <input type="range" id="morningEfficiency" min="50" max="100" value="85" onchange="calculateCapacity()">
-                                <span id="morningEfficiencyValue">85%</span>
-                            </div>
                         </div>
                         
                         <!-- Evening Shift -->
@@ -123,34 +115,8 @@
                                 <label>Chefs:</label>
                                 <input type="number" id="eveningChefs" min="0" value="3" onchange="calculateCapacity()">
                             </div>
-                            <div class="form-group">
-                                <label>Assistants:</label>
-                                <input type="number" id="eveningAssistants" min="0" value="3" onchange="calculateCapacity()">
-                            </div>
-                            <div class="form-group">
-                                <label>Expected Efficiency (%):</label>
-                                <input type="range" id="eveningEfficiency" min="50" max="100" value="90" onchange="calculateCapacity()">
-                                <span id="eveningEfficiencyValue">90%</span>
-                            </div>
                         </div>
                         
-                        <!-- Night Shift -->
-                        <div class="shift-slot">
-                            <h4>Night Shift (12AM - 8AM)</h4>
-                            <div class="form-group">
-                                <label>Chefs:</label>
-                                <input type="number" id="nightChefs" min="0" value="1" onchange="calculateCapacity()">
-                            </div>
-                            <div class="form-group">
-                                <label>Assistants:</label>
-                                <input type="number" id="nightAssistants" min="0" value="1" onchange="calculateCapacity()">
-                            </div>
-                            <div class="form-group">
-                                <label>Expected Efficiency (%):</label>
-                                <input type="range" id="nightEfficiency" min="50" max="100" value="75" onchange="calculateCapacity()">
-                                <span id="nightEfficiencyValue">75%</span>
-                            </div>
-                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -160,7 +126,6 @@
                     
                     <button onclick="saveShiftSchedule()" style="background: #28a745;">Save Shift Schedule</button>
                     <button onclick="loadShiftSchedule()" style="background: #6c757d;">Load Saved Schedule</button>
-                    <button onclick="calculateOptimalStaffing()" style="background: #17a2b8;">Calculate Optimal Staffing</button>
                 </div>
             </div>
             
@@ -323,73 +288,6 @@
                     }
                 }
             });
-        }
-        
-        function calculateCapacity(showDetailed = false) {
-            // Constants for capacity calculation
-            const PIZZAS_PER_CHEF_PER_HOUR = 12; // Average pizzas a chef can make per hour
-            const PIZZAS_PER_ASSISTANT_PER_HOUR = 8; // Assistant capacity
-            const SHIFT_HOURS = 8; // Each shift is 8 hours
-            
-            // Get values from form
-            const morningChefs = parseInt(document.getElementById('morningChefs').value) || 0;
-            const morningAssistants = parseInt(document.getElementById('morningAssistants').value) || 0;
-            const morningEfficiency = parseInt(document.getElementById('morningEfficiency').value) || 85;
-            
-            const eveningChefs = parseInt(document.getElementById('eveningChefs').value) || 0;
-            const eveningAssistants = parseInt(document.getElementById('eveningAssistants').value) || 0;
-            const eveningEfficiency = parseInt(document.getElementById('eveningEfficiency').value) || 90;
-            
-            const nightChefs = parseInt(document.getElementById('nightChefs').value) || 0;
-            const nightAssistants = parseInt(document.getElementById('nightAssistants').value) || 0;
-            const nightEfficiency = parseInt(document.getElementById('nightEfficiency').value) || 75;
-            
-            // Calculate capacity for each shift
-            const morningCapacity = Math.floor(
-                (morningChefs * PIZZAS_PER_CHEF_PER_HOUR + 
-                 morningAssistants * PIZZAS_PER_ASSISTANT_PER_HOUR) * 
-                SHIFT_HOURS * (morningEfficiency / 100)
-            );
-            
-            const eveningCapacity = Math.floor(
-                (eveningChefs * PIZZAS_PER_CHEF_PER_HOUR + 
-                 eveningAssistants * PIZZAS_PER_ASSISTANT_PER_HOUR) * 
-                SHIFT_HOURS * (eveningEfficiency / 100)
-            );
-            
-            const nightCapacity = Math.floor(
-                (nightChefs * PIZZAS_PER_CHEF_PER_HOUR + 
-                 nightAssistants * PIZZAS_PER_ASSISTANT_PER_HOUR) * 
-                SHIFT_HOURS * (nightEfficiency / 100)
-            );
-            
-            const totalCapacity = morningCapacity + eveningCapacity + nightCapacity;
-            const totalStaff = morningChefs + morningAssistants + 
-                              eveningChefs + eveningAssistants + 
-                              nightChefs + nightAssistants;
-            
-            // Update capacity summary
-            const summary = `
-                <h4>Production Capacity Summary</h4>
-                <p><strong>Total Daily Capacity:</strong> ${totalCapacity} pizzas</p>
-                <p><strong>Total Staff:</strong> ${totalStaff} employees</p>
-                <p><strong>Shift Breakdown:</strong></p>
-                <ul>
-                    <li>Morning Shift: ${morningCapacity} pizzas (${morningChefs} chefs + ${morningAssistants} assistants)</li>
-                    <li>Evening Shift: ${eveningCapacity} pizzas (${eveningChefs} chefs + ${eveningAssistants} assistants)</li>
-                    <li>Night Shift: ${nightCapacity} pizzas (${nightChefs} chefs + ${nightAssistants} assistants)</li>
-                </ul>
-                <p><strong>Average Efficiency:</strong> ${((morningEfficiency + eveningEfficiency + nightEfficiency) / 3).toFixed(1)}%</p>
-            `;
-            
-            document.getElementById('capacitySummary').innerHTML = summary;
-            
-            // If showing detailed view (capacity tab)
-            if (showDetailed) {
-                updateDetailedCapacity(totalCapacity, morningCapacity, eveningCapacity, nightCapacity);
-                updateCapacityChart(morningCapacity, eveningCapacity, nightCapacity);
-                generatePizzaEstimates(totalCapacity);
-            }
         }
         
         function updateDetailedCapacity(total, morning, evening, night) {

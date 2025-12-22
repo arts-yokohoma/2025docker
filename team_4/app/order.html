@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Pizza</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<style>
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #fff7ed;
+}
+
+.order-page {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 80px;
+}
+
+.pizza-list {
+  width: 55%;
+}
+
+.pizza-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.pizza-item img {
+  width: 200px;
+}
+
+.qty {
+  margin-left: 40px;
+  background: #f5b38b;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+}
+
+.qty button {
+  border: none;
+  background: #b1352f;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.qty span {
+  margin: 0 14px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.order-summary {
+  width: 35%;
+  background: #f6b47c;
+  border: 6px solid #b1352f;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.order-summary h2 {
+  font-size: 28px;
+}
+
+.date {
+  letter-spacing: 3px;
+  margin-bottom: 30px;
+}
+
+.order-summary h1 {
+  font-size: 60px;
+  margin: 20px 0;
+}
+
+.sizes {
+  text-align: left;
+  margin: 40px 0;
+  font-size: 18px;
+}
+
+.sizes p {
+  display: flex;
+  justify-content: space-between;
+}
+
+.confirm-btn {
+  border: none;
+  background: white;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Pizza</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="order-page">
+
+  <!-- LEFT : PIZZA LIST -->
+  <div class="pizza-list">
+
+    <div class="pizza-item">
+      <img src="https://images.unsplash.com/photo-1601924638867-3ec62c7e5c79">
+      <div class="qty">
+        <button onclick="changeQty('small',-1)">−</button>
+        <span id="smallQty">1</span>
+        <button onclick="changeQty('small',1)">+</button>
+      </div>
+    </div>
+
+    <div class="pizza-item">
+      <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65">
+      <div class="qty">
+        <button onclick="changeQty('medium',-1)">−</button>
+        <span id="mediumQty">2</span>
+        <button onclick="changeQty('medium',1)">+</button>
+      </div>
+    </div>
+
+    <div class="pizza-item">
+      <img src="https://images.unsplash.com/photo-1548365328-9f547fb095d8">
+      <div class="qty">
+        <button>−</button>
+        <span>1</span>
+        <button>+</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT : ORDER DETAILS -->
+  <div class="order-summary">
+    <h2>Order Details</h2>
+    <p class="date">NOVEMBER 2019</p>
+
+    <h1>¥ <span id="total">1286</span></h1>
+
+    <div class="sizes">
+      <p>中 <span>-----</span> <span id="mCount">1</span></p>
+      <p>大 <span>-----</span> <span id="lCount">2</span></p>
+    </div>
+
+    <button class="confirm-btn" onclick="confirmOrder()">
+      本文を追加 →
+    </button>
+  </div>
+
+</div>
+
+<script src="js/order.js"></script>
+</body>
+</html>

@@ -4,7 +4,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Sales Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/adminstyle.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #F5F5F5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: #333; color: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .controls { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .chart-container { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        select, button, input { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007BFF; color: white; cursor: pointer; }
+        button:hover { background: #0056B3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #F8F9FA; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; background: #ddd; margin-right: 5px; border-radius: 5px 5px 0 0; }
+        .tab.active { background: white; border-bottom: 2px solid #007BFF; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .capacity-summary { 
+            background: #e8f4f8; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 15px 0;
+            border-left: 4px solid #007BFF;
+        }
+        .shift-form { background: #f9f9f9; padding: 20px; border-radius: 5px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .shift-slots { display: flex; gap: 10px; flex-wrap: wrap; }
+        .shift-slot { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border: 1px solid #ddd;
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">

@@ -143,7 +143,6 @@
 <header>
   <div class="logo"><img src="8.png" alt="pizzaMach" class="logo-img"></div>
   <nav>
-    <a href="#">Menu</a>
     <a href="#">About</a>
     <a href="#">Contact</a>
   </nav>
@@ -177,7 +176,7 @@
 </section>
 
 <div class="order-btn">
-  <button>Order Now</button>
+  <button>注文</button>
 </div>
 
 <section class="about" id="about">

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - Pizza Paradise</title>
+    <link rel="stylesheet" href="pizza.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-menu">
+            <a href="pizza.html" class="logo">
+                <img src="photo/main.png" alt="logo">
+            </a>
+            <div class="nav-cards">
+                <a href="pizza.html" class="nav-card">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">トップ</span>
+                </a>
+                <a href="home.html" class="nav-card">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-label">店舗情報</span>
+                </a>
+                <a href="menu.html" class="nav-card">
+                    <span class="nav-icon">🍕</span>
+                    <span class="nav-label">メニュー</span>
+                </a>
+                <a href="about.html" class="nav-card">
+                    <span class="nav-icon">ℹ️</span>
+                    <span class="nav-label">会社概要</span>
+                </a>
+                <a href="myorders.html" class="nav-card">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-label">注文確認</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="content">
+        <div class="auth-container">
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h2>ログイン</h2>
+                <div class="error-message" id="loginError"></div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">メールアドレス</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">パスワード</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">ログイン</button>
+                </form>
+                <div class="toggle-link">
+                    アカウントをお持ちでない方は <a href="#" onclick="toggleForm(event)">登録</a>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <h2>新規登録</h2>
+                <div class="error-message" id="registerError"></div>
+                <div class="success-message" id="registerSuccess"></div>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="registerName">お名前</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">メールアドレス</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">パスワード</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword2">パスワード（確認）</label>
+                        <input type="password" id="registerPassword2" required minlength="6">
+                    </div>
+                    <button type="submit" class="submit-btn">登録</button>
+                </form>
+                <div class="toggle-link">
+                    既にアカウントをお持ちの方は <a href="#" onclick="toggleForm(event)">ログイン</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pizza Paradise. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const USERS_KEY = 'pizza_users';
+        const CURRENT_USER_KEY = 'pizza_current_user';
+
+        // Toggle between login and register forms
+        function toggleForm(e) {
+            e.preventDefault();
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+
+        // Get all registered users
+        function getUsers() {
+            try {
+                return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // Save users
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        // Handle login
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            const users = getUsers();
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+                errorDiv.style.display = 'none';
+                alert('ログインしました！');
+                window.location.href = 'myorders.html';
+            } else {
+                errorDiv.textContent = 'メールアドレスまたはパスワードが正しくありません。';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Handle registration
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const password2 = document.getElementById('registerPassword2').value;
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+
+            if (password !== password2) {
+                errorDiv.textContent = 'パスワードが一致しません。';
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.email === email)) {
+                errorDiv.textContent = 'このメールアドレスは既に登録されています。';
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            saveUsers(users);
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
+
+            errorDiv.style.display = 'none';
+            successDiv.textContent = '登録が完了しました！ログインしました。';
+            successDiv.style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = 'myorders.html';
+            }, 2000);
+        }
+
+        // Redirect to myorders if already logged in
+        window.addEventListener('load', function() {
+            const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+            if (currentUser) {
+                window.location.href = 'myorders.html';
+            }
+        });
+    </script>
+</body>
+</html>

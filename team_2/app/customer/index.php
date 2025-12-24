@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="ピザマッハ_ロゴ.png" type="image/x-icon">
+    <link rel="icon" href="ピザマッハ_ロゴ.png" type="image/x-icon">
     <title>ピザマック</title>
 </head>
 <body>

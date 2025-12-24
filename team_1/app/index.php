@@ -16,70 +16,114 @@ $menu = require __DIR__ . '/../data/menu_stub.php';
 </header>
 
 <main class="menu">
-    <?php foreach ($menu as $pizza): ?>
-        <div
-            class="pizza-card"
-            data-id="<?= $pizza['id'] ?>"
-            data-price="<?= $pizza['price'] ?>"
-        >
-            <img src="<?= $pizza['image'] ?>" alt="<?= htmlspecialchars($pizza['name']) ?>">
+<?php foreach ($menu as $pizza): ?>
+    <div
+        class="pizza-card"
+        data-id="<?= $pizza['id'] ?>"
+        data-name="<?= htmlspecialchars($pizza['name']) ?>"
+        data-price="<?= $pizza['price'] ?>"
+    >
+        <img src="<?= $pizza['image'] ?>" alt="<?= htmlspecialchars($pizza['name']) ?>">
 
-            <h3><?= htmlspecialchars($pizza['name']) ?></h3>
-            <p><?= htmlspecialchars($pizza['desc']) ?></p>
+        <h3><?= htmlspecialchars($pizza['name']) ?></h3>
+        <p><?= htmlspecialchars($pizza['desc']) ?></p>
 
-            <div class="card-bottom">
-                <span class="price">¥<?= number_format($pizza['price']) ?></span>
+        <div class="card-bottom">
+            <span class="price">¥<?= number_format($pizza['price']) ?></span>
 
-                <div class="qty">
-                    <button type="button" class="minus">−</button>
-                    <span class="count">0</span>
-                    <button type="button" class="plus">＋</button>
-                </div>
+            <div class="qty">
+                <button type="button" class="minus">−</button>
+                <span class="count">0</span>
+                <button type="button" class="plus">＋</button>
             </div>
         </div>
-    <?php endforeach; ?>
+    </div>
+<?php endforeach; ?>
 </main>
 
-<!-- Нижняя панель корзины -->
+<!--lower panel/ Нижняя панель корзины -->
 <div class="cart-bar">
     <div class="total">
         合計金額：<span id="totalPrice">¥0</span>
     </div>
-    <a href="/cart.php" class="go-cart">
+    <a href="./cart.php" class="go-cart">
         カートに進む
     </a>
 </div>
 
 <script>
-let total = 0;
+const CART_KEY = 'cart';
+let cart = {};
 
+/* ---------- cart load/загрузка корзины ---------- */
+const savedCart = localStorage.getItem(CART_KEY);
+if (savedCart) {
+    cart = JSON.parse(savedCart);
+}
+
+/* ---------- helpers ---------- */
+function saveCart() {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+function calcTotal() {
+    let sum = 0;
+    for (const id in cart) {
+        sum += cart[id].price * cart[id].qty;
+    }
+    return sum;
+}
+
+function updateTotal() {
+    document.getElementById('totalPrice').textContent =
+        '¥' + calcTotal().toLocaleString();
+}
+
+/* ---------- synchron UI ---------- */
+function syncUI() {
+    document.querySelectorAll('.pizza-card').forEach(card => {
+        const id = card.dataset.id;
+        const countEl = card.querySelector('.count');
+        countEl.textContent = cart[id]?.qty ?? 0;
+    });
+    updateTotal();
+}
+
+/* ---------- обработчики ---------- */
 document.querySelectorAll('.pizza-card').forEach(card => {
+    const id = card.dataset.id;
+    const name = card.dataset.name;
     const price = parseInt(card.dataset.price, 10);
+
     const countEl = card.querySelector('.count');
 
     card.querySelector('.plus').addEventListener('click', () => {
-        let count = parseInt(countEl.textContent, 10);
-        count++;
-        countEl.textContent = count;
-        total += price;
+        if (!cart[id]) {
+            cart[id] = { id, name, price, qty: 0 };
+        }
+        cart[id].qty++;
+        countEl.textContent = cart[id].qty;
+        saveCart();
         updateTotal();
     });
 
     card.querySelector('.minus').addEventListener('click', () => {
-        let count = parseInt(countEl.textContent, 10);
-        if (count > 0) {
-            count--;
-            countEl.textContent = count;
-            total -= price;
-            updateTotal();
+        if (!cart[id]) return;
+
+        cart[id].qty--;
+        if (cart[id].qty <= 0) {
+            delete cart[id];
+            countEl.textContent = 0;
+        } else {
+            countEl.textContent = cart[id].qty;
         }
+        saveCart();
+        updateTotal();
     });
 });
 
-function updateTotal() {
-    document.getElementById('totalPrice').textContent =
-        '¥' + total.toLocaleString();
-}
+/* ---------- старт ---------- */
+syncUI();
 </script>
 
 </body>

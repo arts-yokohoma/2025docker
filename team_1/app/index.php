@@ -124,6 +124,19 @@ document.querySelectorAll('.pizza-card').forEach(card => {
 
 /* ---------- старт ---------- */
 syncUI();
+/* ---------- переход в корзину ---------- */
+document.querySelector('.go-cart').addEventListener('click', (e) => {
+    if (Object.keys(cart).length === 0) {
+        e.preventDefault();
+        alert('カートは空です 🍃');
+        return;
+    }
+
+    // подготовка данных для cart.php
+    const cartArray = Object.values(cart);
+    localStorage.setItem('pizza_cart', JSON.stringify(cartArray));
+});
+
 </script>
 
 </body>

@@ -1,0 +1,155 @@
+/* ===== Reset ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    padding-bottom: 88px; /* место под cart-bar */
+}
+
+/* ===== Header ===== */
+.header {
+    height: 56px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.logo {
+    width: 36px;
+    height: 36px;
+    background: #000;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+/* ===== Menu grid ===== */
+.menu {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    .menu {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+}
+
+/* ===== Pizza card ===== */
+.pizza-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+}
+
+.pizza-card img {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+}
+
+.pizza-card h3 {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.pizza-card p {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+/* ===== Card bottom ===== */
+.card-bottom {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ===== Quantity ===== */
+.qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #1e6d32;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.qty button:active {
+    background: #f0f0f0;
+}
+
+.count {
+    min-width: 14px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ===== Cart bar ===== */
+.cart-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: #fff;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+}
+
+.total {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.go-cart {
+    background: #27ae60;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.go-cart:active {
+    opacity: .85;
+}

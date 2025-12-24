@@ -16,6 +16,7 @@
         <?php
         echo "<h2>Team 2 - PHP + MySQL Test</h2>";
         echo "<p>Hello from Team 2!</p>";
+        echo "<p>Current server time: " . date('Y-m-d H:i:s') . "</p>";
 
         // Error တွေ အကုန်ပြခိုင်းမယ် (ဗြောင်မဖြစ်အောင်)
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);

@@ -1,3 +1,20 @@
+<?php
+include_once 'api/db.php'; // လမ်းကြောင်းမှန်အောင် စစ်ပါ
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Postal code ရှာတဲ့ Form ဖြစ်ရင်
+    if (isset($_POST['postal_code'])) {
+        $p_code = $_POST['postal_code'];
+        // ရှာဖွေတဲ့ Logic ရေးရန်
+    }
+    
+    // Order ရှာတဲ့ Form ဖြစ်ရင် (Phone number နဲ့)
+    if (isset($_POST['phonenumber'])) {
+        $phone = $_POST['phonenumber'];
+        // Database ကနေ ဆွဲထုတ်ပြမယ့် Logic
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

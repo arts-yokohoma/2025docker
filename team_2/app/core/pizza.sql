@@ -2,12 +2,13 @@
 USE team_2_db;
 
 -- Orders table ဆောက်ခြင်း
-CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name='orders')
+CREATE TABLE orders (
+    id INT IDENTITY(1,1) PRIMARY KEY,
     postal_code VARCHAR(20) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
     order_status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- စမ်းသပ်ရန် Data အချို့ ထည့်ခြင်း

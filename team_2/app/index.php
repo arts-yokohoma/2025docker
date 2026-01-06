@@ -19,19 +19,8 @@
         echo "<p>Current server time: " . date('Y-m-d H:i:s') . "</p>";
 
         // Error တွေ အကုန်ပြခိုင်းမယ် (ဗြောင်မဖြစ်အောင်)
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-        try {
-            // Host ကို team_2_mysql လို့ ပြောင်းလိုက်ပါတယ်
-            $mysqli = new mysqli("team_2_mysql", "user", "password", "pizza_db");
-
-            echo "<p style='color: green;'>✅ MySQL Connection successful!</p>";
-            echo "<p>Server time: " . date('Y-m-d H:i:s') . "</p>";
-
-        } catch (Exception $e) {
-            echo "<p style='color: red;'>❌ MySQL Connection failed: " . $e->getMessage() . "</p>";
-        }
-        ?>
+      include_once __DIR__ . '/core/db.php';
+        ?> 
     </main>
 </body>
 </html>

@@ -1,8 +1,6 @@
-<<<<<<< Updated upstream
-version: '3.8'
+version: "3.8"
 
 services:
-  # Main NGINX Reverse Proxy
   nginx_proxy:
     image: nginx:alpine
     container_name: main_nginx_proxy
@@ -20,7 +18,6 @@ services:
     networks:
       - teams-network
 
-  # Apache Server for Teams 1-2 (PHP)
   apache_server:
     image: php:8.0-apache
     container_name: apache_teams
@@ -33,7 +30,6 @@ services:
     networks:
       - teams-network
 
-  # Team 1 Database (MySQL)
   team_1_db:
     image: mysql:8.0
     container_name: team_1_mysql
@@ -47,7 +43,6 @@ services:
     networks:
       - teams-network
 
-  # Team 2 Database (MySQL)
   team_2_db:
     image: mysql:8.0
     container_name: team_2_mysql
@@ -61,7 +56,6 @@ services:
     networks:
       - teams-network
 
-  # Team 3 Application (Python FastAPI + PostgreSQL)
   team_3_app:
     image: python:3.9
     container_name: team_3_python
@@ -76,7 +70,6 @@ services:
     networks:
       - teams-network
 
-  # Team 3 Database (PostgreSQL)
   team_3_db:
     image: postgres:13
     container_name: team_3_postgres
@@ -89,9 +82,10 @@ services:
     networks:
       - teams-network
 
-  # Team 4 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_4_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_4_apache
     volumes:
       - ./team_4/app:/var/www/html
@@ -100,7 +94,6 @@ services:
     networks:
       - teams-network
 
-  # Team 4 Database (PostgreSQL)
   team_4_db:
     image: postgres:13
     container_name: team_4_postgres
@@ -113,9 +106,10 @@ services:
     networks:
       - teams-network
 
-  # Team 5 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_5_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_5_apache
     volumes:
       - ./team_5/app:/var/www/html
@@ -124,7 +118,6 @@ services:
     networks:
       - teams-network
 
-  # Team 5 Database (PostgreSQL)
   team_5_db:
     image: postgres:13
     container_name: team_5_postgres
@@ -137,9 +130,10 @@ services:
     networks:
       - teams-network
 
-  # Team 6 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_6_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_6_apache
     volumes:
       - ./team_6/app:/var/www/html
@@ -148,7 +142,6 @@ services:
     networks:
       - teams-network
 
-  # Team 6 Database (PostgreSQL)
   team_6_db:
     image: postgres:13
     container_name: team_6_postgres
@@ -161,7 +154,6 @@ services:
     networks:
       - teams-network
 
-  # Team 7 Application (Python + PostgreSQL)
   team_7_app:
     image: python:3.9
     container_name: team_7_python
@@ -176,7 +168,6 @@ services:
     networks:
       - teams-network
 
-  # Team 7 Database (PostgreSQL)
   team_7_db:
     image: postgres:13
     container_name: team_7_postgres
@@ -201,213 +192,4 @@ volumes:
   team_5_pg_data:
   team_6_pg_data:
   team_7_pg_data:
-=======
-version: '3.8'
 
-services:
-  # Main NGINX Reverse Proxy
-  nginx_proxy:
-    image: nginx:alpine
-    container_name: main_nginx_proxy
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    depends_on:
-      - apache_server
-      - team_3_app
-      - team_4_app
-      - team_5_app
-      - team_6_app
-      - team_7_app
-    networks:
-      - teams-network
-
-  # Apache Server for Teams 1-2 (PHP)
-  apache_server:
-    image: php:8.0-apache
-    container_name: apache_teams
-    volumes:
-      - ./team_1/app:/var/www/html/team_1
-      - ./team_2/app:/var/www/html/team_2
-    depends_on:
-      - team_1_db
-      - team_2_db
-    networks:
-      - teams-network
-
-  # Team 1 Database (MySQL)
-  team_1_db:
-    image: mysql:8.0
-    container_name: team_1_mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: team_1_db
-      MYSQL_USER: team_1
-      MYSQL_PASSWORD: team1pass
-    volumes:
-      - team_1_mysql_data:/var/lib/mysql
-    networks:
-      - teams-network
-
-  # Team 2 Database (MySQL)
-  team_2_db:
-    image: mysql:8.0
-    container_name: team_2_mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: team_2_db
-      MYSQL_USER: team_2
-      MYSQL_PASSWORD: team2pass
-    volumes:
-      - team_2_mysql_data:/var/lib/mysql
-    networks:
-      - teams-network
-
-  # Team 3 Application (Python FastAPI + PostgreSQL)
-  team_3_app:
-    image: python:3.9
-    container_name: team_3_python
-    working_dir: /app
-    volumes:
-      - ./team_3/app:/app
-    command: >
-      bash -c "pip install fastapi uvicorn psycopg2-binary &&
-               uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-    depends_on:
-      - team_3_db
-    networks:
-      - teams-network
-
-  # Team 3 Database (PostgreSQL)
-  team_3_db:
-    image: postgres:13
-    container_name: team_3_postgres
-    environment:
-      POSTGRES_DB: team_3_db
-      POSTGRES_USER: team_3
-      POSTGRES_PASSWORD: team3pass
-    volumes:
-      - team_3_pg_data:/var/lib/postgresql/data
-    networks:
-      - teams-network
-
-  # Team 4 Application (PHP + PostgreSQL) - FIXED
-  team_4_app:
-    build:
-      context: .
-      dockerfile: php-apache-pgsql/Dockerfile
-    container_name: team_4_apache
-    volumes:
-      - ./team_4/app:/var/www/html
-    depends_on:
-      - team_4_db
-    networks:
-      - teams-network
-
-  # Team 4 Database (PostgreSQL)
-  team_4_db:
-    image: postgres:13
-    container_name: team_4_postgres
-    environment:
-      POSTGRES_DB: team_4_db
-      POSTGRES_USER: team_4
-      POSTGRES_PASSWORD: team4pass
-    volumes:
-      - team_4_pg_data:/var/lib/postgresql/data
-    networks:
-      - teams-network
-
-  # Team 5 Application (PHP + PostgreSQL) - FIXED
-  team_5_app:
-    build:
-      context: .
-      dockerfile: php-apache-pgsql/Dockerfile
-    container_name: team_5_apache
-    volumes:
-      - ./team_5/app:/var/www/html
-    depends_on:
-      - team_5_db
-    networks:
-      - teams-network
-
-  # Team 5 Database (PostgreSQL)
-  team_5_db:
-    image: postgres:13
-    container_name: team_5_postgres
-    environment:
-      POSTGRES_DB: team_5_db
-      POSTGRES_USER: team_5
-      POSTGRES_PASSWORD: team5pass
-    volumes:
-      - team_5_pg_data:/var/lib/postgresql/data
-    networks:
-      - teams-network
-
-  # Team 6 Application (PHP + PostgreSQL) - FIXED
-  team_6_app:
-    build:
-      context: .
-      dockerfile: php-apache-pgsql/Dockerfile
-    container_name: team_6_apache
-    volumes:
-      - ./team_6/app:/var/www/html
-    depends_on:
-      - team_6_db
-    networks:
-      - teams-network
-
-  # Team 6 Database (PostgreSQL)
-  team_6_db:
-    image: postgres:13
-    container_name: team_6_postgres
-    environment:
-      POSTGRES_DB: team_6_db
-      POSTGRES_USER: team_6
-      POSTGRES_PASSWORD: team6pass
-    volumes:
-      - team_6_pg_data:/var/lib/postgresql/data
-    networks:
-      - teams-network
-
-  # Team 7 Application (Python + PostgreSQL)
-  team_7_app:
-    image: python:3.9
-    container_name: team_7_python
-    working_dir: /app
-    volumes:
-      - ./team_7/app:/app
-    command: >
-      bash -c "pip install flask psycopg2-binary &&
-               python app.py"
-    depends_on:
-      - team_7_db
-    networks:
-      - teams-network
-
-  # Team 7 Database (PostgreSQL)
-  team_7_db:
-    image: postgres:13
-    container_name: team_7_postgres
-    environment:
-      POSTGRES_DB: team_7_db
-      POSTGRES_USER: team_7
-      POSTGRES_PASSWORD: team7pass
-    volumes:
-      - team_7_pg_data:/var/lib/postgresql/data
-    networks:
-      - teams-network
-
-networks:
-  teams-network:
-    driver: bridge
-
-volumes:
-  team_1_mysql_data:
-  team_2_mysql_data:
-  team_3_pg_data:
-  team_4_pg_data:
-  team_5_pg_data:
-  team_6_pg_data:
-  team_7_pg_data:
->>>>>>> Stashed changes

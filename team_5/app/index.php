@@ -12,3 +12,4 @@ try {
     echo "<p>PostgreSQL Connection failed: " . $e->getMessage() . "</p>";
 }
 ?>
+

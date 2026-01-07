@@ -1,6 +1,5 @@
 <?php
-include_once 'api/db.php'; // လမ်းကြောင်းမှန်အောင် စစ်ပါ
-
+include 'core/db.php'; // လမ်းကြောင်းမှန်အောင် စစ်ပါ
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Postal code ရှာတဲ့ Form ဖြစ်ရင်
     if (isset($_POST['postal_code'])) {
@@ -14,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Database ကနေ ဆွဲထုတ်ပြမယ့် Logic
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <header>
         <h1>ピザマックへようこそ！</h1>
     </header>
+    <a href="admin/viewdb.php">Admin Dashboard  </a>
         <nav>
             <form action="" method="post" name="postalForm">
                 <label>Search for a postal code:</label>

@@ -33,7 +33,7 @@
 
     <div id="cart-summary" class="cart-summary hidden">
         <p>合計: <span id="cart-total">0</span> 円</p>
-        <button class="btn-primary">注文へ進む</button>
+        <a href="user_info.php">注文へ進む</a>
     </div>
 </main>
 

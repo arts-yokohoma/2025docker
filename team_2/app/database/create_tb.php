@@ -1,5 +1,5 @@
 <?php
-$servername = "team_2_sql"; // container_name　を　使う ကို host အဖြစ်သုံးရပါမယ်
+$servername = "team_2_mysql"; // container_name　を　使う ကို host အဖြစ်သုံးရပါမယ်
 $username = "team_2";       // MYSQL
 $password = "team2pass";    // MYSQL_PASSWORD
 $dbname = "team_2_db";  // これを　必ず使う　MYSQL_DATABASE

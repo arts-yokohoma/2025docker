@@ -1,7 +1,20 @@
 <?php
 session_start();
 
+// ✅ CHANGED: handle POST here and save user into session
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { // 
+    $_SESSION['order']['user'] = [            // 
+        'name'  => $_POST['name'] ?? '',      // 
+        'email' => $_POST['email'] ?? '',     // 
+        'phone' => $_POST['phone'] ?? ''      // 
+    ];                                        // 
+
+    header('Location: address.php');          
+    exit;                                     //
+}
+
 $user = $_SESSION['order']['user'] ?? [
+    'name'  => '',
     'email' => '',
     'phone' => ''
 ];
@@ -17,7 +30,16 @@ $user = $_SESSION['order']['user'] ?? [
 
 <h2>お客様情報</h2>
 
-<form method="post" action="address.php">
+<!-- ✅ CHANGED: post back to user_info.php so the code above runs -->
+<form method="post" action="user_info.php"> <!-- ✅ CHANGED -->
+
+    <label>
+        お名前<br>
+        <input type="text" name="name" required
+               value="<?= htmlspecialchars($user['name']) ?>">
+    </label>
+    <br><br>
+
     <label>
         メールアドレス<br>
         <input type="email" name="email" required

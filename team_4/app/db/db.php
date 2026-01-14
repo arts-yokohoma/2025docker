@@ -1,17 +1,11 @@
 <?php
 try {
-    $host = "team_4_db"; 
-    $db   = "team_4_db";
-    $user = "team_4";
-    $pass = "team4pass";
-
     $pdo = new PDO(
-        "pgsql:host=$host;dbname=$db",
-        $user,
-        $pass,
+        "pgsql:host=localhost;port=5432;dbname=team_4_db",
+        "team_4",
+        "team4pass",
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
-
 } catch (PDOException $e) {
-    die("Database connection error");
+    die("DB ERROR: " . $e->getMessage());
 }

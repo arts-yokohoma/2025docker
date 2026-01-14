@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO users (username, password)
 SELECT
     'admin',
-    '$2y$12$9.QvtP8LQe8mNb1Dn6/PTe6pYege7kQ9j7.HDL8YbruJmVBxdrWCK'
+    '$2y$12$f3e0hPilqmyGG8k2yF.K/OC5D0yVSpQIYNlC0mtea2CVyXVFQcyVq' -- bcrypt hash for 'admin123'
 WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE username = 'admin'
 );

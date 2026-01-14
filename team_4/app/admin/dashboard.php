@@ -6,10 +6,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 ?>
-
-=======
-<<<<<<< HEAD
->>>>>>> 2fb135d29009ffd8b26fc0b83ccd44d7aa3d6d3e:team_4/app/admin/admin.html
 <html lang="en">
 <head>
     <meta charset="UTF-8">

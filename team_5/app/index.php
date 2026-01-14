@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -25,6 +26,8 @@
 		</div>
 	</nav>
     <!-- navbar -->
+
+
 
     <!-- hero -->
 	<header class="hero-section d-flex align-items-center">
@@ -77,6 +80,5 @@
         </div>
     </footer>
 
-    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

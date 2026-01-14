@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Main NGINX Reverse Proxy
   nginx_proxy:
     image: nginx:alpine
     container_name: main_nginx_proxy
@@ -19,7 +18,6 @@ services:
     networks:
       - teams-network
 
-  # Apache Server for Teams 1-2 (PHP)
   apache_server:
     image: php:8.0-apache
     container_name: apache_teams
@@ -32,7 +30,6 @@ services:
     networks:
       - teams-network
 
-  # Team 1 Database (MySQL)
   team_1_db:
     image: mysql:8.0
     container_name: team_1_mysql
@@ -46,7 +43,6 @@ services:
     networks:
       - teams-network
 
-  # Team 2 Database (MySQL)
   team_2_db:
     image: mysql:8.0
     container_name: team_2_mysql
@@ -60,7 +56,6 @@ services:
     networks:
       - teams-network
 
-  # Team 3 Application (Python FastAPI + PostgreSQL)
   team_3_app:
     image: python:3.9
     container_name: team_3_python
@@ -75,7 +70,6 @@ services:
     networks:
       - teams-network
 
-  # Team 3 Database (PostgreSQL)
   team_3_db:
     image: postgres:13
     container_name: team_3_postgres
@@ -88,9 +82,10 @@ services:
     networks:
       - teams-network
 
-  # Team 4 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_4_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_4_apache
     volumes:
       - ./team_4/app:/var/www/html
@@ -99,7 +94,6 @@ services:
     networks:
       - teams-network
 
-  # Team 4 Database (PostgreSQL)
   team_4_db:
     image: postgres:13
     container_name: team_4_postgres
@@ -112,9 +106,10 @@ services:
     networks:
       - teams-network
 
-  # Team 5 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_5_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_5_apache
     volumes:
       - ./team_5/app:/var/www/html
@@ -123,7 +118,6 @@ services:
     networks:
       - teams-network
 
-  # Team 5 Database (PostgreSQL)
   team_5_db:
     image: postgres:13
     container_name: team_5_postgres
@@ -136,9 +130,10 @@ services:
     networks:
       - teams-network
 
-  # Team 6 Application (USE APACHE INSTEAD OF PHP-FPM)
   team_6_app:
-    image: php:8.0-apache
+    build:
+      context: .
+      dockerfile: php-apache-pgsql/Dockerfile
     container_name: team_6_apache
     volumes:
       - ./team_6/app:/var/www/html
@@ -147,7 +142,6 @@ services:
     networks:
       - teams-network
 
-  # Team 6 Database (PostgreSQL)
   team_6_db:
     image: postgres:13
     container_name: team_6_postgres
@@ -160,7 +154,6 @@ services:
     networks:
       - teams-network
 
-  # Team 7 Application (Python + PostgreSQL)
   team_7_app:
     image: python:3.9
     container_name: team_7_python
@@ -175,7 +168,6 @@ services:
     networks:
       - teams-network
 
-  # Team 7 Database (PostgreSQL)
   team_7_db:
     image: postgres:13
     container_name: team_7_postgres
@@ -200,3 +192,4 @@ volumes:
   team_5_pg_data:
   team_6_pg_data:
   team_7_pg_data:
+

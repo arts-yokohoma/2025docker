@@ -1,9 +1,18 @@
+<<<<<<< HEAD:team_4/app/admin/dashboard.php
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Sales Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/adminstyle.css">
 </head>
 <body>
     <div class="container">
@@ -585,3 +594,4 @@
     </script>
 </body>
 </html>
+

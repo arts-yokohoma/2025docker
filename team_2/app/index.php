@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <h1>ピザマックへようこそ！</h1>
+        <h1>ピザマックへようこそ！ lee</h1>
     </header>
 
     <main style="padding: 20px;">
@@ -21,7 +21,7 @@
         // DB ချိတ်ဆက်မှု စစ်ဆေးခြင်း
         
             // Docker Compose မှာ သတ်မှတ်ထားတဲ့ အချက်အလက်များ
-            $host = "team_2_db"; // container_name ကို host အဖြစ်သုံးရပါမယ်
+            $host = "team_2_mysql"; // container_name ကို host အဖြစ်သုံးရပါမယ်
             $user = "team_2";       // MYSQL_USER
             $pass = "team2pass";    // MYSQL_PASSWORD
             $dbname = "team_2_db";  // MYSQL_DATABASE

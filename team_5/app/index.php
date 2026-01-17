@@ -72,7 +72,7 @@
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/location.php">店舗情報</a></li>
-                        <li class="list-inline-item"><a href="/time.php">Login</a></li>
+                        <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
                     </ul>
                 </div>

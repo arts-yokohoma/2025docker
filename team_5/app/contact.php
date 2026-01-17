@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,39 +20,52 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto">
-                    <button class="btn btn-contact rounded-pill px-4">お問い合わせ</button>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-contact rounded-pill px-4 me-2" href="location.php">店舗情報</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-filled-custom rounded-pill px-4" href="time.php">今すぐ注文</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
     <!-- navbar -->
 
-    form
+
     <form action="contact_send.php" method="post">
         <div class="container-fluid mt-1">
+            <?php if (isset($_GET['success'])): ?>
+                <div class="alert alert-success text-center" role="alert">送信が完了しました。</div>
+            <?php elseif (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+                <div class="alert alert-warning text-center" role="alert">この電話番号は既に登録されています。</div>
+            <?php elseif (isset($_GET['error'])): ?>
+                <div class="alert alert-danger text-center" role="alert">送信中にエラーが発生しました。もう一度お試しください。</div>
+            <?php endif; ?>
+
             <div class="contact_form ">
                 <h2 class="text-center mb-0">お問い合わせ</h2>
                 <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label" id="name">名前</label>
-                    <input type="text" class="form-control" id="exampleFormControlInput1" name="name" placeholder="名前を入力してください" required>
+                    <label for="name" class="form-label fw-bold" id="name">名前</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="名前を入力してください" required>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label" id="phone">電話番号</label>
-                    <input class="form-control" id="exampleFormControlInput1" name="phone" placeholder="電話番号を入力してください" required>
+                    <label for="phone" class="form-label fw-bold" id="phone">電話番号</label>
+                    <input class="form-control" id="phone" name="phone" placeholder="電話番号を入力してください" required>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label" id="mail">メールアドレス</label>
-                    <input type="email" class="form-control" id="exampleFormControlInput1" name="email" placeholder="メールアドレスを入力してください" required>
+                    <label for="email" class="form-label fw-bold" id="email">メールアドレス</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="メールアドレスを入力してください" required>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">内容</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" name="message" rows="3" data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" spellcheck="false"></textarea><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local origin" style="position: absolute; contain: layout;"></grazie-editor-wrapper><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local visual" style="position: absolute; contain: layout;"></grazie-editor-wrapper>
+                    <label for="message" class="form-label fw-bold" id="message">内容</label>
+                    <textarea class="form-control" id="message" name="message" rows="1" data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" spellcheck="false"></textarea><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local origin" style="position: absolute; contain: layout;"></grazie-editor-wrapper><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local visual" style="position: absolute; contain: layout;"></grazie-editor-wrapper>
                 </div>
 
             </div>
         </div>
         <div class="text-center mb-0">
-            <button type="submit" class="btn btn-outline-success btn-lg">送信</button>
+            <button type="submit" class="btn btn-outline-success btn-lg fw-bold">送信</button>
         </div>
     </form>
 
@@ -76,7 +88,7 @@
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
-                        <li class="list-inline-item"><a href="/time.php">Login</a></li>
+                        <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
                     </ul>
                 </div>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Team 5 App</title>
+	<title>店舗情報</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
@@ -19,13 +19,328 @@
             </button>
 			<div class="collapse navbar-collapse" id="navMenu">
 				<ul class="navbar-nav ms-auto">
-					<button class="btn btn-contact rounded-pill px-4">お問い合わせ</button>
+					<button class="btn btn-contact rounded-pill px-4 mx-2">ホーム</button>
+                    <button class="btn btn-contact rounded-pill px-4 mx-2">お問い合わせ</button>
 				</ul>
 			</div>
 		</div>
 	</nav>
     <!-- navbar -->
-    
+     
+    <!-- ================= LOCATION SECTION ================= -->
+<section class="location-section d-flex align-items-center">
+  <div class="container-fluid position-relative">
+    <div class="row align-items-center justify-content-center">
+
+      <!-- INFO CARD -->
+      <div class="col-md-7">
+        <div class="location-card">
+          <p class="fw-bold fs-4">
+            住所: 〒220-0072<br>
+            神奈川県横浜市西区浅間町2-105-8
+          </p>
+
+          <p class="fw-bold fs-4">電話番号：
+            <br>045-324-0011</p>
+
+          <div class="icon-row mt-4">
+            <div class="icon-circle">📞</div>
+            <div class="icon-circle">📍
+               ,<div class="
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               "></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIZZA IMAGE -->
+      <div class="col-md-5 position-relative">
+        <img src="img/slice.png"
+             alt="Pizza Slice"
+             class="pizza-slice">
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ================= LOCATION SECTION END ================= -->
+
 
 
 

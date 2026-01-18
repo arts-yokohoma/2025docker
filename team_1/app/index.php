@@ -5,7 +5,7 @@ require __DIR__ . '/../config/db.php';
 $menu = [];
 $query = "SELECT id, name, photo_path, description, price_s, price_m, price_l 
           FROM menu 
-          WHERE active = 1 
+          WHERE active = 1 AND deleted = 0
           ORDER BY id ASC";
 
 $result = $mysqli->query($query);

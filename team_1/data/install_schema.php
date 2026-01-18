@@ -39,9 +39,11 @@ CREATE TABLE IF NOT EXISTS menu (
   price_m INT NOT NULL DEFAULT 0,
   price_l INT NOT NULL DEFAULT 0,
   active TINYINT(1) NOT NULL DEFAULT 1,
-  create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_menu_active (active)
+  deleted TINYINT(1) NOT NULL DEFAULT 0,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_menu_active (active),
+  INDEX idx_menu_deleted (deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 ";
 
@@ -53,6 +55,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT NOT NULL,
   delivery_address TEXT NOT NULL,
+  delivery_comment TEXT NULL,
   delivery_time VARCHAR(50) NULL,
   total_price INT NOT NULL,
   status VARCHAR(30) NOT NULL DEFAULT 'NEW',
@@ -75,7 +78,7 @@ $queries[] = "
 CREATE TABLE IF NOT EXISTS order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
-  menu_id INT NOT NULL,
+  menu_id INT NULL,
   size VARCHAR(2) NOT NULL DEFAULT 'M',
   quantity INT NOT NULL,
   price INT NOT NULL,
@@ -88,8 +91,41 @@ CREATE TABLE IF NOT EXISTS order_items (
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_items_menu
     FOREIGN KEY (menu_id) REFERENCES menu(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+";
+
+/* =========================
+   5) store_hours
+   - время работы магазина и смены
+   - всегда одна запись с id=1
+   ========================= */
+$queries[] = "
+CREATE TABLE IF NOT EXISTS store_hours (
+  id INT NOT NULL PRIMARY KEY,
+  open_time TIME NULL,
+  close_time TIME NULL,
+  last_order_offset_min INT NOT NULL DEFAULT 30,
+  early_shift_start TIME NULL,
+  early_shift_end TIME NULL,
+  late_shift_start TIME NULL,
+  late_shift_end TIME NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+";
+
+/* =========================
+   Initial Data
+   ========================= */
+
+// Вставляем дефолтные значения времени работы магазина (если еще нет)
+$queries[] = "
+INSERT IGNORE INTO store_hours 
+  (id, open_time, close_time, last_order_offset_min, active)
+VALUES 
+  (1, '11:00:00', '22:00:00', 30, 1)
 ";
 
 /* =========================
@@ -108,5 +144,5 @@ foreach ($queries as $i => $sql) {
     echo "✅ OK query #" . ($i + 1) . "\n";
 }
 
-echo "\n🎉 Schema ready: customer, menu, orders, order_items\n";
+echo "\n🎉 Schema ready: customer, menu, orders, order_items, store_hours\n";
 echo "</pre>";

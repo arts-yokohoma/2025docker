@@ -18,15 +18,16 @@ if (!$user || !$address) {
     exit;
 }
 
-/* ===== build delivery address string ===== */
+/* ===== build delivery address string (без comment) ===== */
 $deliveryAddress = trim(implode(' ', array_filter([
     !empty($address['zip']) ? '〒' . $address['zip'] : '',
     $address['pref'] ?? '',
     $address['city'] ?? '',
-    $address['street'] ?? '',
-    $address['comment'] ?? ''
+    $address['street'] ?? ''
 ])));
 
+// Сохраняем comment отдельно для использования в адресе доставки
+$deliveryComment = trim($address['comment'] ?? '');
 
 $totalPrice = 0;
 foreach ($cart as $item) {
@@ -39,9 +40,81 @@ if ($totalPrice <= 0) {
     exit;
 }
 
-/* ===== meta ===== */
-// Получаем время доставки из сессии или используем ASAP
-$deliveryTime = $_SESSION['delivery_time'] ?? 'ASAP';
+/* ===== Вычисляем время доставки ===== */
+date_default_timezone_set('Asia/Tokyo');
+$now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
+$deliveryTimeRaw = $_SESSION['delivery_time'] ?? 'ASAP';
+$deliveryTime = null; // Будет в формате DATETIME или строки
+
+// Получаем время работы магазина для вычисления ASAP
+$storeHours = null;
+$res = $mysqli->query("SELECT open_time, close_time FROM store_hours WHERE id=1 AND active=1 LIMIT 1");
+if ($res && $row = $res->fetch_assoc()) {
+    $storeHours = [
+        'open_time' => substr((string)$row['open_time'], 0, 5),
+        'close_time' => substr((string)$row['close_time'], 0, 5)
+    ];
+    $res->free();
+}
+
+if ($deliveryTimeRaw === 'ASAP') {
+    if ($storeHours) {
+        // Есть данные о времени работы - вычисляем нормально
+        [$openH, $openM] = explode(':', $storeHours['open_time']);
+        [$closeH, $closeM] = explode(':', $storeHours['close_time']);
+        
+        // Вычисляем ASAP: текущее время + 30-45 минут (берем среднее 37 минут)
+        $asapTime = clone $now;
+        $asapTime->modify('+37 minutes');
+        
+        // Проверяем, работает ли магазин сейчас
+        $currentMinutes = (int)$now->format('H') * 60 + (int)$now->format('i');
+        $openMinutes = (int)$openH * 60 + (int)$openM;
+        $closeMinutes = (int)$closeH * 60 + (int)$closeM;
+        $isStoreOpen = ($currentMinutes >= $openMinutes && $currentMinutes < $closeMinutes);
+        
+        if (!$isStoreOpen) {
+            // Если магазин закрыт, доставка будет после открытия + 30 минут
+            $todayOpen = clone $now;
+            $todayOpen->setTime((int)$openH, (int)$openM, 0);
+            if ($todayOpen < $now) {
+                $todayOpen->modify('+1 day');
+            }
+            $asapTime = clone $todayOpen;
+            $asapTime->modify('+30 minutes');
+        }
+        
+        $deliveryTime = $asapTime->format('Y-m-d H:i:s');
+    } else {
+        // Нет данных о времени работы - магазин считается закрытым
+        // Для ASAP используем завтра 11:30 (дефолтное время открытия + 30 минут)
+        $asapTime = clone $now;
+        $asapTime->modify('+1 day');
+        $asapTime->setTime(11, 30, 0);
+        $deliveryTime = $asapTime->format('Y-m-d H:i:s');
+    }
+    
+} else if (preg_match('/^(today|tomorrow|day_after)_(\d{2}):(\d{2})$/', $deliveryTimeRaw, $matches)) {
+    // Формат: "today_14:30" или "tomorrow_18:00"
+    $dateKey = $matches[1];
+    $hour = (int)$matches[2];
+    $minute = (int)$matches[3];
+    
+    $targetDate = clone $now;
+    if ($dateKey === 'tomorrow') {
+        $targetDate->modify('+1 day');
+    } else if ($dateKey === 'day_after') {
+        $targetDate->modify('+2 days');
+    }
+    
+    $targetDate->setTime($hour, $minute, 0);
+    $deliveryTime = $targetDate->format('Y-m-d H:i:s');
+    
+} else {
+    // Fallback: сохраняем как есть (строка)
+    $deliveryTime = $deliveryTimeRaw;
+}
+
 $status = 'NEW';
 
 /* ===== transaction ===== */
@@ -66,12 +139,12 @@ try {
 
     /* 2) orders */
     $stmt = $mysqli->prepare("
-        INSERT INTO orders (customer_id, delivery_address, delivery_time, total_price, status)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO orders (customer_id, delivery_address, delivery_comment, delivery_time, total_price, status)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
     if (!$stmt) throw new Exception($mysqli->error);
 
-    $stmt->bind_param("issis", $customerId, $deliveryAddress, $deliveryTime, $totalPrice, $status);
+    $stmt->bind_param("isssis", $customerId, $deliveryAddress, $deliveryComment, $deliveryTime, $totalPrice, $status);
     $stmt->execute();
     $orderId = $stmt->insert_id;
     $stmt->close();

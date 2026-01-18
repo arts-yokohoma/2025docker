@@ -13,8 +13,9 @@ if (!$user || !$address) {
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ご注文内容の確認</title>
+    <title>Pizza Match | ご注文内容の確認</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assets/css/style.css">
     <style>
         .item { margin: 10px 0; display:flex; gap:10px; align-items:center; }
         .item .name { flex: 1; }
@@ -24,6 +25,13 @@ if (!$user || !$address) {
     </style>
 </head>
 <body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="logo">PM</div>
+        <h1 class="header-title">Pizza Match</h1>
+    </div>
+</header>
 
 <h2>ご注文内容の確認</h2>
 
@@ -49,6 +57,21 @@ if (!$user || !$address) {
     <?= htmlspecialchars($address['comment'] ?? '') ?>
 </p>
 <p><a href="address.php">住所を変更</a></p>
+
+<hr>
+
+<h3>配達時間</h3>
+<p id="delivery-time-display">
+    <?php
+    $deliveryTime = $_SESSION['delivery_time'] ?? 'ASAP';
+    if ($deliveryTime === 'ASAP') {
+        echo 'できるだけ早く（最短30分後）';
+    } else {
+        echo '指定時間: ' . htmlspecialchars($deliveryTime);
+    }
+    ?>
+</p>
+<p><a href="cart.php">配達時間を変更</a></p>
 
 <hr>
 

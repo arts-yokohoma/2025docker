@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+// Сохраняем время доставки из localStorage в сессию (если есть)
+if (isset($_GET['delivery_time'])) {
+    $_SESSION['delivery_time'] = $_GET['delivery_time'];
+}
+
 // ✅ CHANGED: handle POST here and save user into session
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { // 
     $_SESSION['order']['user'] = [            // 
@@ -23,10 +28,18 @@ $user = $_SESSION['order']['user'] ?? [
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>お客様情報</title>
+    <title>Pizza Match | お客様情報</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="logo">PM</div>
+        <h1 class="header-title">Pizza Match</h1>
+    </div>
+</header>
 
 <h2>お客様情報</h2>
 

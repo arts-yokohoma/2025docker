@@ -14,10 +14,18 @@ unset($_SESSION['last_order_id']);
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>注文完了</title>
+    <title>Pizza Match | 注文完了</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="logo">PM</div>
+        <h1 class="header-title">Pizza Match</h1>
+    </div>
+</header>
 
 <h1>ご注文ありがとうございました！</h1>
 

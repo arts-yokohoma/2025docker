@@ -1,5 +1,72 @@
 <?php
-$menu = require __DIR__ . '/../data/menu_stub.php';
+require __DIR__ . '/../config/db.php';
+
+// Загрузка меню из базы данных
+$menu = [];
+$query = "SELECT id, name, photo_path, description, price_s, price_m, price_l 
+          FROM menu 
+          WHERE active = 1 
+          ORDER BY id ASC";
+
+$result = $mysqli->query($query);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $menuId = (int)$row['id'];
+        $name = $row['name'];
+        $desc = $row['description'] ?? '';
+        $image = $row['photo_path'];
+        
+        $priceS = (int)$row['price_s'];
+        $priceM = (int)$row['price_m'];
+        $priceL = (int)$row['price_l'];
+        
+        // Создаем отдельную карточку для каждого размера, если цена > 0
+        // Важно: все цены не обязательны, но должна быть заполнена хотя бы одна
+        // Если указана только одна цена (например, только S), выведется только одна карточка
+        if ($priceS > 0) {
+            $menu[] = [
+                'id' => $menuId . '_S',  // Уникальный ID: menu_id + размер
+                'menu_id' => $menuId,    // Оригинальный ID меню
+                'name' => $name . ' (S)',
+                'desc' => $desc,
+                'price' => $priceS,
+                'image' => $image,
+                'size' => 'S',
+            ];
+        }
+        
+        if ($priceM > 0) {
+            $menu[] = [
+                'id' => $menuId . '_M',
+                'menu_id' => $menuId,
+                'name' => $name . ' (M)',
+                'desc' => $desc,
+                'price' => $priceM,
+                'image' => $image,
+                'size' => 'M',
+            ];
+        }
+        
+        if ($priceL > 0) {
+            $menu[] = [
+                'id' => $menuId . '_L',
+                'menu_id' => $menuId,
+                'name' => $name . ' (L)',
+                'desc' => $desc,
+                'price' => $priceL,
+                'image' => $image,
+                'size' => 'L',
+            ];
+        }
+    }
+    $result->free();
+}
+
+// Если база пуста, можно использовать заглушку (опционально)
+// if (empty($menu)) {
+//     $menu = require __DIR__ . '/../data/menu_stub.php';
+// }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -12,16 +79,25 @@ $menu = require __DIR__ . '/../data/menu_stub.php';
 <body>
 
 <header class="header">
-    <div class="logo">PM</div>
+    <div class="header-content">
+        <div class="logo">PM</div>
+        <h1 class="header-title">Pizza Match</h1>
+    </div>
 </header>
 
-<main class="menu">
+<div class="welcome-section">
+    <h1 class="welcome-title">ピーザマッハへ<span class="no-wrap">ようこそ！</span></h1>
+</div>
+
+<main class="menu<?= count($menu) <= 3 ? ' menu--few-items' : '' ?>">
 <?php foreach ($menu as $pizza): ?>
     <div
         class="pizza-card"
         data-id="<?= $pizza['id'] ?>"
+        data-menu-id="<?= $pizza['menu_id'] ?? $pizza['id'] ?>"
         data-name="<?= htmlspecialchars($pizza['name']) ?>"
         data-price="<?= $pizza['price'] ?>"
+        data-size="<?= $pizza['size'] ?? 'M' ?>"
     >
         <img src="<?= $pizza['image'] ?>" alt="<?= htmlspecialchars($pizza['name']) ?>">
 
@@ -43,12 +119,15 @@ $menu = require __DIR__ . '/../data/menu_stub.php';
 
 <!--lower panel/ Нижняя панель корзины -->
 <div class="cart-bar">
-    <div class="total">
-        合計金額：<span id="totalPrice">¥0</span>
+    <div class="cart-bar-content">
+        <div class="total">
+            <span class="total-label">合計金額：</span>
+            <span class="total-amount" id="totalPrice">¥0</span>
+        </div>
+        <a href="./cart.php" class="go-cart">
+            カートに進む
+        </a>
     </div>
-    <a href="./cart.php" class="go-cart">
-        カートに進む
-    </a>
 </div>
 
 <script>
@@ -58,7 +137,29 @@ let cart = {};
 /* ---------- cart load/загрузка корзины ---------- */
 const savedCart = localStorage.getItem(CART_KEY);
 if (savedCart) {
-    cart = JSON.parse(savedCart);
+    try {
+        const parsed = JSON.parse(savedCart);
+        // Проверяем, что корзина не пустая и имеет правильный формат
+        if (parsed && typeof parsed === 'object') {
+            cart = parsed;
+            // Очищаем записи с qty = 0 или отсутствующими данными
+            for (const id in cart) {
+                if (!cart[id] || !cart[id].qty || cart[id].qty <= 0) {
+                    delete cart[id];
+                }
+            }
+            // Если корзина очистилась полностью, обновляем localStorage
+            if (Object.keys(cart).length === 0) {
+                localStorage.removeItem(CART_KEY);
+            } else {
+                saveCart(); // Сохраняем очищенную корзину
+            }
+        }
+    } catch (e) {
+        // Если ошибка парсинга, очищаем
+        localStorage.removeItem(CART_KEY);
+        cart = {};
+    }
 }
 
 /* ---------- helpers ---------- */
@@ -92,14 +193,24 @@ function syncUI() {
 /* ---------- обработчики ---------- */
 document.querySelectorAll('.pizza-card').forEach(card => {
     const id = card.dataset.id;
+    const menuId = parseInt(card.dataset.menuId || card.dataset.id, 10);
     const name = card.dataset.name;
     const price = parseInt(card.dataset.price, 10);
+    const size = card.dataset.size || 'M';
 
     const countEl = card.querySelector('.count');
 
     card.querySelector('.plus').addEventListener('click', () => {
         if (!cart[id]) {
-            cart[id] = { id, name, price, qty: 0 };
+            // Сохраняем menu_id и size для будущей отправки на сервер
+            cart[id] = { 
+                id, 
+                menu_id: menuId,  // Оригинальный ID меню из БД
+                name, 
+                price, 
+                size,             // Размер S/M/L
+                qty: 0 
+            };
         }
         cart[id].qty++;
         countEl.textContent = cart[id].qty;
@@ -131,10 +242,7 @@ document.querySelector('.go-cart').addEventListener('click', (e) => {
         alert('カートは空です 🍃');
         return;
     }
-
-    // подготовка данных для cart.php
-    const cartArray = Object.values(cart);
-    localStorage.setItem('pizza_cart', JSON.stringify(cartArray));
+    // корзина уже сохранена через saveCart(), дополнительное сохранение не нужно
 });
 
 </script>

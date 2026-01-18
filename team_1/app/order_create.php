@@ -27,7 +27,7 @@ $deliveryAddress = trim(implode(' ', array_filter([
     $address['comment'] ?? ''
 ])));
 
-/* ===== calc total_price (NO tax, NO fee) ===== */
+
 $totalPrice = 0;
 foreach ($cart as $item) {
     $price = (int)($item['price'] ?? 0);
@@ -40,7 +40,8 @@ if ($totalPrice <= 0) {
 }
 
 /* ===== meta ===== */
-$deliveryTime = 'ASAP'; // позже заменим на выбор времени
+// Получаем время доставки из сессии или используем ASAP
+$deliveryTime = $_SESSION['delivery_time'] ?? 'ASAP';
 $status = 'NEW';
 
 /* ===== transaction ===== */
@@ -77,13 +78,20 @@ try {
 
     /* 3) order_items */
     $itemStmt = $mysqli->prepare("
-        INSERT INTO order_items (order_id, menu_id, quantity, price)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO order_items (order_id, menu_id, size, quantity, price)
+        VALUES (?, ?, ?, ?, ?)
     ");
     if (!$itemStmt) throw new Exception($mysqli->error);
 
     foreach ($cart as $key => $item) {
-        $menuId = (int)($item['id'] ?? $item['menu_id'] ?? (is_numeric($key) ? $key : 0));
+        // Извлекаем menu_id (оригинальный ID из БД, без суффикса _S/_M/_L)
+        $menuId = (int)($item['menu_id'] ?? $item['id'] ?? 0);
+        // Если id содержит "_S", "_M", "_L", извлекаем число
+        if (preg_match('/^(\d+)_[SML]$/', $item['id'] ?? $key, $matches)) {
+            $menuId = (int)$matches[1];
+        }
+        
+        $size   = (string)($item['size'] ?? 'M'); // Размер по умолчанию M
         $qty    = (int)($item['qty'] ?? 0);
         $price  = (int)($item['price'] ?? 0);
 
@@ -91,7 +99,7 @@ try {
             throw new Exception('Invalid cart item');
         }
 
-        $itemStmt->bind_param("iiii", $orderId, $menuId, $qty, $price);
+        $itemStmt->bind_param("issii", $orderId, $menuId, $size, $qty, $price);
         $itemStmt->execute();
     }
 

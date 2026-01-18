@@ -1,12 +1,19 @@
 <?php
+/**
+ * Customer information page (checkout step 2)
+ * 
+ * Collects customer name, email, and phone number.
+ * Requires privacy consent checkbox (checked by default).
+ * Uses PRG pattern to prevent duplicate submissions.
+ */
 session_start();
 
-// Сохраняем время доставки из localStorage в сессию (если есть)
+// Store delivery time from cart page if provided
 if (isset($_GET['delivery_time'])) {
     $_SESSION['delivery_time'] = $_GET['delivery_time'];
 }
 
-// ✅ CHANGED: handle POST here and save user into session
+// Handle form submission: save user data to session and redirect
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['order']['user'] = [
         'name'  => $_POST['name'] ?? '',
@@ -18,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Load existing user data from session for form pre-fill
 $user = $_SESSION['order']['user'] ?? [
     'name'  => '',
     'email' => '',
@@ -106,10 +114,13 @@ $user = $_SESSION['order']['user'] ?? [
 </div>
 
 <script>
+/**
+ * Validate privacy consent before form submission
+ * Privacy checkbox is required but checked by default
+ */
 const form = document.getElementById('userInfoForm');
 const privacyCheckbox = document.getElementById('privacy-agree');
 
-// Проверка чекбокса перед отправкой
 form.addEventListener('submit', function(e) {
     if (!privacyCheckbox.checked) {
         e.preventDefault();

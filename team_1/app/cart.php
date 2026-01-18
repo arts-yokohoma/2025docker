@@ -1,7 +1,17 @@
 <?php
 require __DIR__ . '/../config/db.php';
 
-// Получаем время работы магазина
+/**
+ * Shopping cart page with delivery time selection
+ * 
+ * Business logic:
+ * - Calculates available delivery time slots based on store hours
+ * - Supports ASAP and scheduled delivery options
+ * - Time slots are generated in 15-minute intervals
+ * - Last order time = closing time - last_order_offset_min
+ */
+
+// Load store hours from database (with defaults)
 $storeHours = [
     'open_time' => '11:00',
     'close_time' => '22:00',
@@ -17,25 +27,26 @@ if ($res && $row = $res->fetch_assoc()) {
     $res->free();
 }
 
-// Используем японское время для всех вычислений
+// Use Japan timezone for all time calculations
 date_default_timezone_set('Asia/Tokyo');
 $now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
 $currentTime = $now->format('H:i');
 $currentMinutes = (int)$now->format('H') * 60 + (int)$now->format('i');
 
-// Парсим время работы из БД
+// Parse store hours into minutes for comparison
 [$openH, $openM] = explode(':', $storeHours['open_time']);
 [$closeH, $closeM] = explode(':', $storeHours['close_time']);
 $openMinutes = (int)$openH * 60 + (int)$openM;
 $closeMinutes = (int)$closeH * 60 + (int)$closeM;
 
-// Проверяем, работает ли магазин сейчас (по японскому времени)
+// Check if store is currently open
 $isStoreOpen = ($currentMinutes >= $openMinutes && $currentMinutes < $closeMinutes);
 
-// Вычисляем минимальное время доставки
+// Calculate minimum delivery time (current time + 30 min preparation)
 $minDeliveryTime = clone $now;
 $minDeliveryTime->modify('+30 minutes');
 
+// If store is closed, set minimum time to next opening + 30 minutes
 if (!$isStoreOpen) {
     $todayOpen = clone $now;
     $todayOpen->setTime((int)$openH, (int)$openM, 0);
@@ -46,19 +57,19 @@ if (!$isStoreOpen) {
     $minDeliveryTime->modify('+30 minutes');
 }
 
-// Последний заказ сегодня
+// Calculate last order time for today
 $todayClose = clone $now;
 $todayClose->setTime((int)$closeH, (int)$closeM, 0);
 $lastOrderTime = clone $todayClose;
 $lastOrderTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
 
-// Формируем доступные временные слоты для сегодня, завтра и послезавтра
+// Generate available time slots for today, tomorrow, and day after tomorrow
 $availableTimesByDate = [];
 $dates = ['today' => clone $now, 'tomorrow' => clone $now, 'day_after' => clone $now];
 $dates['tomorrow']->modify('+1 day');
 $dates['day_after']->modify('+2 days');
 
-// Время доставки (минимальное время на приготовление и доставку)
+// Minimum preparation and delivery time
 $deliveryTimeMinutes = 30;
 
 foreach ($dates as $key => $date) {
@@ -67,16 +78,15 @@ foreach ($dates as $key => $date) {
     $dayEnd = clone $date;
     $dayEnd->setTime((int)$closeH, (int)$closeM, 0);
     
-    // Последний слот доставки = время закрытия - last_order_offset_min
+    // Last delivery slot = closing time - last_order_offset_min
     $lastDeliveryTime = clone $dayEnd;
     $lastDeliveryTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
     
-    // Для сегодня: минимальное время = сейчас + время доставки или время открытия + время доставки
+    // For today: use calculated minimum time; for future days: use opening + prep time
     if ($key === 'today') {
         $dayMinTime = clone $minDeliveryTime;
-        // Если минимальное время уже завтра, значит сегодня уже поздно
+        // If minimum time is already tomorrow, skip today
         if ($dayMinTime->format('Y-m-d') !== $date->format('Y-m-d')) {
-            // Сегодня слотов нет, пропускаем
             continue;
         }
     } else {
@@ -86,7 +96,7 @@ foreach ($dates as $key => $date) {
     
     $times = [];
     
-    // Проверяем, что минимальное время не превышает последний слот (до округления)
+    // Skip if minimum time exceeds last delivery slot
     if ($dayMinTime > $lastDeliveryTime) {
         continue;
     }
@@ -94,7 +104,7 @@ foreach ($dates as $key => $date) {
     $current = clone $dayMinTime;
     $interval = new DateInterval('PT15M');
     
-    // Округляем минимальное время до ближайших 15 минут вверх (если не кратно 15)
+    // Round up to nearest 15-minute interval
     $currentMinutes = (int)$current->format('i');
     $remainder = $currentMinutes % 15;
     if ($remainder > 0) {
@@ -102,21 +112,17 @@ foreach ($dates as $key => $date) {
         $current->modify('+' . $roundUp . ' minutes');
     }
     
-    // Если после округления время все еще в пределах, генерируем слоты
-    // Если округление вывело за пределы, но было близко, добавляем последний слот
+    // Generate time slots in 15-minute intervals
     if ($current <= $lastDeliveryTime) {
-        // Генерируем слоты доставки до последнего доступного времени
-        // Важно: проверяем <=, чтобы включить последний слот
         while ($current <= $lastDeliveryTime) {
             $times[] = $current->format('H:i');
             $current->add($interval);
             
-            // Защита от бесконечного цикла
+            // Safety check to prevent infinite loop
             if (count($times) > 100) break;
         }
     } else if ($dayMinTime <= $lastDeliveryTime) {
-        // Если округление вывело за пределы, но исходное время было в пределах,
-        // добавляем последний доступный слот
+        // If rounding pushed us over, but original time was valid, add last slot
         $times[] = $lastDeliveryTime->format('H:i');
     }
     
@@ -125,10 +131,10 @@ foreach ($dates as $key => $date) {
     }
 }
 
-// Для обратной совместимости: сегодняшние слоты
+// For backward compatibility: today's slots
 $availableTimes = $availableTimesByDate['today'] ?? [];
 
-// Загружаем данные о меню для отображения изображений и описаний
+// Load menu data for displaying item images and descriptions
 $menuData = [];
 $menuRes = $mysqli->query("SELECT id, name, photo_path, description FROM menu WHERE active = 1 AND deleted = 0");
 if ($menuRes) {

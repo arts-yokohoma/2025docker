@@ -1,7 +1,14 @@
 <?php
 require __DIR__ . '/../config/db.php';
 
-// Загрузка меню из базы данных
+/**
+ * Main menu page - displays pizza items from database
+ * 
+ * Business logic:
+ * - Each menu item can have prices for S, M, L sizes (all optional, but at least one required)
+ * - Creates separate card for each available size (price > 0)
+ * - Uses composite ID format: {menu_id}_{size} for cart management
+ */
 $menu = [];
 $query = "SELECT id, name, photo_path, description, price_s, price_m, price_l 
           FROM menu 
@@ -21,13 +28,12 @@ if ($result) {
         $priceM = (int)$row['price_m'];
         $priceL = (int)$row['price_l'];
         
-        // Создаем отдельную карточку для каждого размера, если цена > 0
-        // Важно: все цены не обязательны, но должна быть заполнена хотя бы одна
-        // Если указана только одна цена (например, только S), выведется только одна карточка
+        // Create separate card for each size if price is set
+        // Composite ID format allows tracking both menu_id and size in cart
         if ($priceS > 0) {
             $menu[] = [
-                'id' => $menuId . '_S',  // Уникальный ID: menu_id + размер
-                'menu_id' => $menuId,    // Оригинальный ID меню
+                'id' => $menuId . '_S',  // Composite ID for cart: menu_id + size
+                'menu_id' => $menuId,     // Original menu ID from database
                 'name' => $name . ' (S)',
                 'desc' => $desc,
                 'price' => $priceS,
@@ -62,11 +68,6 @@ if ($result) {
     }
     $result->free();
 }
-
-// Если база пуста, можно использовать заглушку (опционально)
-// if (empty($menu)) {
-//     $menu = require __DIR__ . '/../data/menu_stub.php';
-// }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -117,7 +118,7 @@ if ($result) {
 <?php endforeach; ?>
 </main>
 
-<!--lower panel/ Нижняя панель корзины -->
+<!-- Shopping cart summary bar (sticky footer) -->
 <div class="cart-bar">
     <div class="cart-bar-content">
         <div class="total">
@@ -134,39 +135,46 @@ if ($result) {
 const CART_KEY = 'cart';
 let cart = {};
 
-/* ---------- cart load/загрузка корзины ---------- */
+/**
+ * Load cart from localStorage and validate data
+ * Removes invalid entries (qty <= 0 or missing data)
+ */
 const savedCart = localStorage.getItem(CART_KEY);
 if (savedCart) {
     try {
         const parsed = JSON.parse(savedCart);
-        // Проверяем, что корзина не пустая и имеет правильный формат
         if (parsed && typeof parsed === 'object') {
             cart = parsed;
-            // Очищаем записи с qty = 0 или отсутствующими данными
+            // Clean up invalid entries
             for (const id in cart) {
                 if (!cart[id] || !cart[id].qty || cart[id].qty <= 0) {
                     delete cart[id];
                 }
             }
-            // Если корзина очистилась полностью, обновляем localStorage
+            // Update localStorage if cart was cleaned
             if (Object.keys(cart).length === 0) {
                 localStorage.removeItem(CART_KEY);
             } else {
-                saveCart(); // Сохраняем очищенную корзину
+                saveCart();
             }
         }
     } catch (e) {
-        // Если ошибка парсинга, очищаем
+        // Invalid JSON - clear corrupted data
         localStorage.removeItem(CART_KEY);
         cart = {};
     }
 }
 
-/* ---------- helpers ---------- */
+/**
+ * Persist cart to localStorage
+ */
 function saveCart() {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
+/**
+ * Calculate total price from all cart items
+ */
 function calcTotal() {
     let sum = 0;
     for (const id in cart) {
@@ -175,12 +183,18 @@ function calcTotal() {
     return sum;
 }
 
+/**
+ * Update total price display in UI
+ */
 function updateTotal() {
     document.getElementById('totalPrice').textContent =
         '¥' + calcTotal().toLocaleString();
 }
 
-/* ---------- synchron UI ---------- */
+/**
+ * Synchronize UI with cart state
+ * Updates quantity displays and total price
+ */
 function syncUI() {
     document.querySelectorAll('.pizza-card').forEach(card => {
         const id = card.dataset.id;
@@ -190,7 +204,10 @@ function syncUI() {
     updateTotal();
 }
 
-/* ---------- обработчики ---------- */
+/**
+ * Setup event handlers for quantity controls
+ * Stores menu_id and size for server-side order processing
+ */
 document.querySelectorAll('.pizza-card').forEach(card => {
     const id = card.dataset.id;
     const menuId = parseInt(card.dataset.menuId || card.dataset.id, 10);
@@ -202,13 +219,13 @@ document.querySelectorAll('.pizza-card').forEach(card => {
 
     card.querySelector('.plus').addEventListener('click', () => {
         if (!cart[id]) {
-            // Сохраняем menu_id и size для будущей отправки на сервер
+            // Initialize cart item with menu_id and size for order processing
             cart[id] = { 
                 id, 
-                menu_id: menuId,  // Оригинальный ID меню из БД
+                menu_id: menuId,  // Original menu ID from database
                 name, 
                 price, 
-                size,             // Размер S/M/L
+                size,             // Size: S/M/L
                 qty: 0 
             };
         }
@@ -233,16 +250,16 @@ document.querySelectorAll('.pizza-card').forEach(card => {
     });
 });
 
-/* ---------- старт ---------- */
+// Initialize UI on page load
 syncUI();
-/* ---------- переход в корзину ---------- */
+
+// Prevent navigation to cart if empty
 document.querySelector('.go-cart').addEventListener('click', (e) => {
     if (Object.keys(cart).length === 0) {
         e.preventDefault();
         alert('カートは空です 🍃');
         return;
     }
-    // корзина уже сохранена через saveCart(), дополнительное сохранение не нужно
 });
 
 </script>

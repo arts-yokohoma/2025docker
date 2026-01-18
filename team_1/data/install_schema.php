@@ -1,15 +1,25 @@
 <?php
-// app/create_schema.php
+/**
+ * Database schema installation script
+ * 
+ * Creates all required tables for the pizza delivery application:
+ * - customer: Customer information
+ * - menu: Menu items with S/M/L pricing
+ * - orders: Order records with delivery info
+ * - order_items: Individual items in each order
+ * - store_hours: Store operating hours and shift configuration
+ * 
+ * Note: DDL statements auto-commit in MySQL, but we stop on first error
+ */
 require __DIR__ . '/../config/db.php';
 
-// Safety: ensure InnoDB + utf8mb4
+// Ensure UTF-8 encoding for Japanese text
 $mysqli->set_charset('utf8mb4');
 
-// Run in a transaction-like way (DDL auto-commits in MySQL, но мы хотя бы остановимся на ошибке)
 $queries = [];
 
 /* =========================
-   1) customer
+   1) customer table
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS customer (
@@ -27,7 +37,9 @@ CREATE TABLE IF NOT EXISTS customer (
 ";
 
 /* =========================
-   2) menu (A: price_s/m/l)
+   2) menu table
+   Supports S/M/L pricing - at least one price must be set
+   Uses soft deletion (deleted flag) to preserve order history
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS menu (
@@ -48,7 +60,9 @@ CREATE TABLE IF NOT EXISTS menu (
 ";
 
 /* =========================
-   3) orders
+   3) orders table
+   Stores order information with delivery details
+   delivery_comment stored separately from delivery_address
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS orders (
@@ -70,9 +84,11 @@ CREATE TABLE IF NOT EXISTS orders (
 ";
 
 /* =========================
-   4) order_items
-   - добавил size, потому что у тебя S/M/L
-   - price = unit price at order time
+   4) order_items table
+   Stores individual items in each order
+   - size: S/M/L (defaults to M)
+   - price: unit price at time of order (price snapshot)
+   - menu_id is nullable with SET NULL on delete (preserves order history)
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS order_items (
@@ -96,9 +112,9 @@ CREATE TABLE IF NOT EXISTS order_items (
 ";
 
 /* =========================
-   5) store_hours
-   - время работы магазина и смены
-   - всегда одна запись с id=1
+   5) store_hours table
+   Store operating hours and shift configuration
+   Single record with id=1 (singleton pattern)
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS store_hours (
@@ -120,7 +136,7 @@ CREATE TABLE IF NOT EXISTS store_hours (
    Initial Data
    ========================= */
 
-// Вставляем дефолтные значения времени работы магазина (если еще нет)
+// Insert default store hours if not exists
 $queries[] = "
 INSERT IGNORE INTO store_hours 
   (id, open_time, close_time, last_order_offset_min, active)

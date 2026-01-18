@@ -1,12 +1,37 @@
 <?php
+/**
+ * Admin panel - Store management page
+ * 
+ * Manages:
+ * - Store operating hours and last order time
+ * - Shift schedules (early/late shifts)
+ * - Menu items (CRUD operations with inline editing)
+ * - Menu item images (upload via modal)
+ * 
+ * Features:
+ * - Separate save buttons for each section
+ * - Inline editing for menu items
+ * - Image upload with preview
+ * - Soft deletion (deleted flag) for menu items
+ */
 declare(strict_types=1);
 session_start();
 
-require_once __DIR__ . '/../../config/db.php'; // provides $mysqli (mysqli)
+require_once __DIR__ . '/../../config/db.php';
 
-// --- helpers ---
+/**
+ * Helper functions
+ */
+
+/**
+ * HTML escape for output
+ */
 function h(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
+/**
+ * Convert time string to TIME format (HH:MM -> HH:MM:SS)
+ * Handles input[type=time] format which typically omits seconds
+ */
 function toTimeOrNull(?string $s): ?string {
     if ($s === null) return null;
     $s = trim($s);
@@ -16,14 +41,25 @@ function toTimeOrNull(?string $s): ?string {
     return $s; // already has seconds
 }
 
+/**
+ * Convert value to integer with default fallback
+ */
 function toInt($v, int $default = 0): int {
     if ($v === null || $v === '') return $default;
     if (!is_numeric($v)) return $default;
     return (int)$v;
 }
 
+/**
+ * Validate store hours and shift configuration
+ * Returns [bool ok, ?string error]
+ * 
+ * Rules:
+ * - Store hours are required (open_time < close_time)
+ * - Shifts are optional but must be within store hours
+ * - If both shifts exist, early shift must end before late shift starts
+ */
 function validateStoreHours(array $d): array {
-    // returns [bool ok, ?string error]
     $open  = $d['open_time'];
     $close = $d['close_time'];
     $es = $d['early_shift_start'];
@@ -32,14 +68,14 @@ function validateStoreHours(array $d): array {
     $le = $d['late_shift_end'];
     $offset = $d['last_order_offset_min'];
 
-    // Обязательные поля: время работы и last_order_offset_min
+    // Required: store hours and last order offset
     if (!$open || !$close) {
         return [false, '営業時間が未入力です。'];
     }
     if (!($open < $close)) return [false, '営業時間が正しくありません。'];
     if ($offset < 0) return [false, 'ラストオーダー設定が正しくありません。'];
 
-    // Смены опциональны, но если заполнены - проверяем
+    // Shifts are optional, but if filled must be validated
     $hasEarlyShift = $es && $ee;
     $hasLateShift = $ls && $le;
 
@@ -53,7 +89,7 @@ function validateStoreHours(array $d): array {
         if (!($open <= $ls && $le <= $close)) return [false, '遅番は営業時間内に設定してください。'];
     }
 
-    // Если обе смены заполнены, проверяем что они не пересекаются
+    // If both shifts exist, ensure they don't overlap
     if ($hasEarlyShift && $hasLateShift) {
         if (!($ee <= $ls)) return [false, '早番の終了は遅番の開始以前にしてください。'];
     }

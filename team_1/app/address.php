@@ -1,7 +1,14 @@
 <?php
+/**
+ * Delivery address page (checkout step 3)
+ * 
+ * Collects Japanese postal code, prefecture, city, street address, and delivery comment.
+ * Features postal code autofill using zipcloud API.
+ * Uses PRG pattern to prevent duplicate submissions.
+ */
 session_start();
 
-// ✅ CHANGED: handle POST here, save address to session, then redirect to confirm.php (PRG)
+// Handle form submission: save address to session and redirect
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['order']['address'] = [
         'zip'     => $_POST['zip'] ?? '',
@@ -15,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Load existing address data from session for form pre-fill
 $address = $_SESSION['order']['address'] ?? [
     'zip'     => '',
     'pref'    => '',
@@ -122,8 +130,16 @@ $address = $_SESSION['order']['address'] ?? [
 </div>
 
 <script>
-// Японский API для автозаполнения адреса по почтовому индексу
-// Используем zipcloud API: https://zipcloud.ibsnet.co.jp/api/search
+/**
+ * Japanese postal code autofill using zipcloud API
+ * API: https://zipcloud.ibsnet.co.jp/api/search
+ * 
+ * Features:
+ * - Auto-formats postal code (1234567 -> 123-4567)
+ * - Debounced lookup (500ms delay after typing stops)
+ * - Auto-fills prefecture and city fields
+ * - Focuses street field after successful lookup
+ */
 
 const zipInput = document.getElementById('zip-input');
 const prefInput = document.getElementById('pref-input');
@@ -133,9 +149,11 @@ const zipStatus = document.getElementById('zip-status');
 
 let lookupTimeout = null;
 
-// Форматирование почтового индекса: 1234567 -> 123-4567
+/**
+ * Format postal code: 1234567 -> 123-4567
+ * Removes non-digit characters and adds hyphen
+ */
 function formatZipCode(value) {
-    // Удаляем все нецифровые символы
     const digits = value.replace(/\D/g, '');
     
     if (digits.length <= 3) {
@@ -147,30 +165,32 @@ function formatZipCode(value) {
     }
 }
 
-// Автоматическое форматирование при вводе
+/**
+ * Handle postal code input with auto-formatting and debounced lookup
+ */
 zipInput.addEventListener('input', function(e) {
     const formatted = formatZipCode(e.target.value);
     if (formatted !== e.target.value) {
         e.target.value = formatted;
     }
     
-    // Очищаем статус при изменении
+    // Clear status on input change
     zipStatus.textContent = '';
     zipStatus.className = 'zip-lookup-status';
     
-    // Очищаем предыдущий таймаут
+    // Clear previous timeout
     if (lookupTimeout) {
         clearTimeout(lookupTimeout);
     }
     
-    // Запускаем поиск через 500ms после остановки ввода
+    // Trigger lookup 500ms after user stops typing (debounce)
     const zipCode = e.target.value.replace(/\D/g, '');
     if (zipCode.length === 7) {
         lookupTimeout = setTimeout(() => {
             lookupAddress(zipCode);
         }, 500);
     } else if (zipCode.length > 0) {
-        // Если индекс неполный, очищаем поля
+        // Clear address fields if postal code is incomplete
         if (zipCode.length < 7) {
             prefInput.value = '';
             cityInput.value = '';
@@ -178,7 +198,10 @@ zipInput.addEventListener('input', function(e) {
     }
 });
 
-// Функция поиска адреса по почтовому индексу
+/**
+ * Lookup address by postal code using zipcloud API
+ * Auto-fills prefecture and city fields on success
+ */
 async function lookupAddress(zipCode) {
     if (zipCode.length !== 7) {
         return;
@@ -194,11 +217,11 @@ async function lookupAddress(zipCode) {
         if (data.status === 200 && data.results && data.results.length > 0) {
             const result = data.results[0];
             
-            // Заполняем поля адреса
+            // Auto-fill prefecture and city
             prefInput.value = result.address1 || '';
             cityInput.value = result.address2 || '';
             
-            // Если есть address3, добавляем его к city
+            // Append address3 to city if present
             if (result.address3) {
                 cityInput.value += (cityInput.value ? ' ' : '') + result.address3;
             }
@@ -206,7 +229,7 @@ async function lookupAddress(zipCode) {
             zipStatus.textContent = '✓ 住所が見つかりました';
             zipStatus.className = 'zip-lookup-status success';
             
-            // Фокус на поле street для ввода номера дома
+            // Focus street field for user to enter building number
             setTimeout(() => {
                 streetInput.focus();
             }, 100);
@@ -224,7 +247,9 @@ async function lookupAddress(zipCode) {
     }
 }
 
-// Обработка Enter в поле почтового индекса
+/**
+ * Handle Enter key in postal code field to trigger lookup
+ */
 zipInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         e.preventDefault();

@@ -2,14 +2,25 @@
 session_start();
 require __DIR__ . '/../config/db.php';
 
-/* ===== guard: cart ===== */
+/**
+ * Order creation endpoint
+ * 
+ * Processes order submission using database transaction:
+ * 1. Creates customer record
+ * 2. Creates order with delivery time and comment
+ * 3. Creates order items with menu_id and size
+ * 
+ * Uses PRG (Post-Redirect-Get) pattern to prevent duplicate submissions
+ */
+
+// Validate cart data
 $cart = json_decode($_POST['cart_json'] ?? '{}', true);
 if (empty($cart)) {
     header('Location: index.php');
     exit;
 }
 
-/* ===== guard: session ===== */
+// Validate session data (user info and address)
 $user = $_SESSION['order']['user'] ?? null;
 $address = $_SESSION['order']['address'] ?? null;
 
@@ -18,7 +29,7 @@ if (!$user || !$address) {
     exit;
 }
 
-/* ===== build delivery address string (без comment) ===== */
+// Build delivery address string (without comment - stored separately)
 $deliveryAddress = trim(implode(' ', array_filter([
     !empty($address['zip']) ? '〒' . $address['zip'] : '',
     $address['pref'] ?? '',
@@ -26,9 +37,10 @@ $deliveryAddress = trim(implode(' ', array_filter([
     $address['street'] ?? ''
 ])));
 
-// Сохраняем comment отдельно для использования в адресе доставки
+// Store delivery comment separately in database
 $deliveryComment = trim($address['comment'] ?? '');
 
+// Calculate total price
 $totalPrice = 0;
 foreach ($cart as $item) {
     $price = (int)($item['price'] ?? 0);
@@ -40,13 +52,19 @@ if ($totalPrice <= 0) {
     exit;
 }
 
-/* ===== Вычисляем время доставки ===== */
+/**
+ * Calculate delivery time
+ * 
+ * Supports two formats:
+ * - "ASAP": Calculates based on current time and store hours
+ * - "today_14:30" / "tomorrow_18:00" / "day_after_12:00": Scheduled delivery
+ */
 date_default_timezone_set('Asia/Tokyo');
 $now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
 $deliveryTimeRaw = $_SESSION['delivery_time'] ?? 'ASAP';
-$deliveryTime = null; // Будет в формате DATETIME или строки
+$deliveryTime = null;
 
-// Получаем время работы магазина для вычисления ASAP
+// Load store hours for ASAP calculation
 $storeHours = null;
 $res = $mysqli->query("SELECT open_time, close_time FROM store_hours WHERE id=1 AND active=1 LIMIT 1");
 if ($res && $row = $res->fetch_assoc()) {
@@ -59,22 +77,22 @@ if ($res && $row = $res->fetch_assoc()) {
 
 if ($deliveryTimeRaw === 'ASAP') {
     if ($storeHours) {
-        // Есть данные о времени работы - вычисляем нормально
+        // Calculate ASAP based on store hours
         [$openH, $openM] = explode(':', $storeHours['open_time']);
         [$closeH, $closeM] = explode(':', $storeHours['close_time']);
         
-        // Вычисляем ASAP: текущее время + 30-45 минут (берем среднее 37 минут)
+        // ASAP = current time + 37 minutes (average prep + delivery time)
         $asapTime = clone $now;
         $asapTime->modify('+37 minutes');
         
-        // Проверяем, работает ли магазин сейчас
+        // Check if store is currently open
         $currentMinutes = (int)$now->format('H') * 60 + (int)$now->format('i');
         $openMinutes = (int)$openH * 60 + (int)$openM;
         $closeMinutes = (int)$closeH * 60 + (int)$closeM;
         $isStoreOpen = ($currentMinutes >= $openMinutes && $currentMinutes < $closeMinutes);
         
         if (!$isStoreOpen) {
-            // Если магазин закрыт, доставка будет после открытия + 30 минут
+            // If closed, delivery = next opening + 30 minutes
             $todayOpen = clone $now;
             $todayOpen->setTime((int)$openH, (int)$openM, 0);
             if ($todayOpen < $now) {
@@ -86,8 +104,7 @@ if ($deliveryTimeRaw === 'ASAP') {
         
         $deliveryTime = $asapTime->format('Y-m-d H:i:s');
     } else {
-        // Нет данных о времени работы - магазин считается закрытым
-        // Для ASAP используем завтра 11:30 (дефолтное время открытия + 30 минут)
+        // No store hours data - default to tomorrow 11:30
         $asapTime = clone $now;
         $asapTime->modify('+1 day');
         $asapTime->setTime(11, 30, 0);
@@ -95,7 +112,7 @@ if ($deliveryTimeRaw === 'ASAP') {
     }
     
 } else if (preg_match('/^(today|tomorrow|day_after)_(\d{2}):(\d{2})$/', $deliveryTimeRaw, $matches)) {
-    // Формат: "today_14:30" или "tomorrow_18:00"
+    // Parse scheduled delivery time: "today_14:30", "tomorrow_18:00", etc.
     $dateKey = $matches[1];
     $hour = (int)$matches[2];
     $minute = (int)$matches[3];
@@ -111,17 +128,20 @@ if ($deliveryTimeRaw === 'ASAP') {
     $deliveryTime = $targetDate->format('Y-m-d H:i:s');
     
 } else {
-    // Fallback: сохраняем как есть (строка)
+    // Fallback: store as-is (string)
     $deliveryTime = $deliveryTimeRaw;
 }
 
 $status = 'NEW';
 
-/* ===== transaction ===== */
+/**
+ * Database transaction: create customer, order, and order items
+ * All operations must succeed or entire transaction is rolled back
+ */
 $mysqli->begin_transaction();
 
 try {
-    /* 1) customer */
+    // 1) Create customer record
     $stmt = $mysqli->prepare("
         INSERT INTO customer (name, email, phone, address, active)
         VALUES (?, ?, ?, ?, 1)
@@ -137,7 +157,7 @@ try {
     $customerId = $stmt->insert_id;
     $stmt->close();
 
-    /* 2) orders */
+    // 2) Create order record
     $stmt = $mysqli->prepare("
         INSERT INTO orders (customer_id, delivery_address, delivery_comment, delivery_time, total_price, status)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -149,7 +169,7 @@ try {
     $orderId = $stmt->insert_id;
     $stmt->close();
 
-    /* 3) order_items */
+    // 3) Create order items
     $itemStmt = $mysqli->prepare("
         INSERT INTO order_items (order_id, menu_id, size, quantity, price)
         VALUES (?, ?, ?, ?, ?)
@@ -157,14 +177,14 @@ try {
     if (!$itemStmt) throw new Exception($mysqli->error);
 
     foreach ($cart as $key => $item) {
-        // Извлекаем menu_id (оригинальный ID из БД, без суффикса _S/_M/_L)
+        // Extract menu_id from composite ID (format: "123_S" -> 123)
         $menuId = (int)($item['menu_id'] ?? $item['id'] ?? 0);
-        // Если id содержит "_S", "_M", "_L", извлекаем число
+        // If ID contains size suffix, extract numeric part
         if (preg_match('/^(\d+)_[SML]$/', $item['id'] ?? $key, $matches)) {
             $menuId = (int)$matches[1];
         }
         
-        $size   = (string)($item['size'] ?? 'M'); // Размер по умолчанию M
+        $size   = (string)($item['size'] ?? 'M'); // Default size is M
         $qty    = (int)($item['qty'] ?? 0);
         $price  = (int)($item['price'] ?? 0);
 
@@ -184,8 +204,11 @@ try {
     exit('注文処理に失敗しました');
 }
 
-/* ===== PRG: store id once, redirect to complete ===== */
-$_SESSION['last_order_id'] = $orderId;   // чтобы complete знала, что показывать
-unset($_SESSION['order']);               // очищаем промежуточные данные
-header('Location: order_complete.php');  // финальная страница
+/**
+ * PRG Pattern: Store order ID in session and redirect
+ * Prevents duplicate submissions on page refresh
+ */
+$_SESSION['last_order_id'] = $orderId;
+unset($_SESSION['order']); // Clear intermediate session data
+header('Location: order_complete.php');
 exit;

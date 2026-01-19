@@ -1,9 +1,13 @@
 <?php
-// config/db.php
+/**
+ * Database configuration
+ * 
+ * Automatically detects environment (local XAMPP vs Docker) and uses appropriate credentials
+ */
 
 $localDbName = 'team_1_db';
 
-// Remote credentials (your original)
+// Remote Docker credentials
 $remoteHost = 'team_1_db';
 $remoteUser = 'team_1';
 $remotePass = 'team1pass';
@@ -14,11 +18,11 @@ $localHost = 'localhost';
 $localUser = 'root';
 $localPass = '';
 
-// Detect environment by host
+// Detect environment by HTTP host
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $isLocal = in_array($host, ['localhost', '127.0.0.1', '::1']);
 
-// Pick credentials
+// Select credentials based on environment
 if ($isLocal) {
     $dbHost = $localHost;
     $dbUser = $localUser;
@@ -31,12 +35,12 @@ if ($isLocal) {
     $dbName = $remoteDb;
 }
 
-// Create mysqli connection
+// Create database connection
 $mysqli = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
 
 if ($mysqli->connect_error) {
     die('DB connection failed');
 }
 
-// Important for Japanese text etc.
+// Set charset for proper Japanese text handling
 $mysqli->set_charset('utf8mb4');

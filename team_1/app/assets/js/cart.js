@@ -1,7 +1,8 @@
-const CART_KEY = 'pizza_cart';
+const CART_KEY = 'cart';
 
 function getCart() {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    const cartJson = localStorage.getItem(CART_KEY);
+    return cartJson ? JSON.parse(cartJson) : {};
 }
 
 function saveCart(cart) {
@@ -19,7 +20,8 @@ function renderCart() {
     tbody.innerHTML = '';
     let total = 0;
 
-    if (cart.length === 0) {
+    const cartKeys = Object.keys(cart);
+    if (cartKeys.length === 0) {
         empty.classList.remove('hidden');
         table.classList.add('hidden');
         summary.classList.add('hidden');
@@ -30,39 +32,50 @@ function renderCart() {
     table.classList.remove('hidden');
     summary.classList.remove('hidden');
 
-    cart.forEach((item, index) => {
+    cartKeys.forEach(id => {
+        const item = cart[id];
+        if (!item || !item.qty || !item.price) return;
+
         const subtotal = item.price * item.qty;
         total += subtotal;
 
-        tbody.innerHTML += `
-            <tr>
-                <td>${item.name}</td>
-                <td>${item.price}円</td>
-                <td>
-                    <input type="number" min="1" value="${item.qty}"
-                        onchange="updateQty(${index}, this.value)">
-                </td>
-                <td>${subtotal}円</td>
-                <td>
-                    <button onclick="removeItem(${index})">✖</button>
-                </td>
-            </tr>
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name || '商品'}</td>
+            <td>¥${item.price.toLocaleString()}</td>
+            <td>
+                <button type="button" onclick="updateQty('${id}', -1)">−</button>
+                <span>${item.qty}</span>
+                <button type="button" onclick="updateQty('${id}', 1)">＋</button>
+            </td>
+            <td>¥${subtotal.toLocaleString()}</td>
+            <td>
+                <button type="button" onclick="removeItem('${id}')">✖</button>
+            </td>
         `;
+        tbody.appendChild(row);
     });
 
-    totalEl.textContent = total;
+    totalEl.textContent = '¥' + total.toLocaleString();
 }
 
-function updateQty(index, qty) {
+function updateQty(id, diff) {
     const cart = getCart();
-    cart[index].qty = parseInt(qty);
+    if (!cart[id]) return;
+
+    cart[id].qty = parseInt(cart[id].qty) + diff;
+    if (cart[id].qty <= 0) {
+        delete cart[id];
+    } else {
+        cart[id].qty = Math.max(1, cart[id].qty);
+    }
     saveCart(cart);
     renderCart();
 }
 
-function removeItem(index) {
+function removeItem(id) {
     const cart = getCart();
-    cart.splice(index, 1);
+    delete cart[id];
     saveCart(cart);
     renderCart();
 }

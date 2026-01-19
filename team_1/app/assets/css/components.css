@@ -1,0 +1,208 @@
+/* ===== Checkout Progress Bar ===== */
+.checkout-progress {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.progress-steps-text {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #666;
+}
+
+.progress-step {
+    display: inline;
+    color: #999;
+    font-weight: 500;
+}
+
+.progress-step.active {
+    color: #ff8c42;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: #ff8c42;
+}
+
+.progress-step-separator {
+    margin: 0 8px;
+    color: #ccc;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #ff8c42;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* ===== Forms ===== */
+.user-info-form {
+    background: #fff;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.user-info-form label {
+    display: block;
+    margin-bottom: 24px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-info-form label span.required {
+    color: #e74c3c;
+    margin-left: 4px;
+}
+
+.user-info-form input[type="text"],
+.user-info-form input[type="email"],
+.user-info-form input[type="tel"] {
+    width: 100%;
+    padding: 14px 16px;
+    margin-top: 8px;
+    font-size: 18px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.3s;
+}
+
+.user-info-form input:focus {
+    outline: none;
+    border-color: #ff8c42;
+}
+
+.privacy-section {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.privacy-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.privacy-checkbox input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.privacy-checkbox label {
+    font-size: 16px;
+    font-weight: 400;
+    color: #333;
+    line-height: 1.5;
+    cursor: pointer;
+    margin: 0;
+}
+
+.privacy-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ff8c42;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.privacy-link:hover {
+    text-decoration: underline;
+}
+
+.privacy-icon {
+    width: 20px;
+    height: 20px;
+    background: #ff8c42;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 40px;
+}
+
+/* ===== Buttons ===== */
+.btn-back-cart {
+    padding: 14px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #666;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.btn-back-cart:hover {
+    background: #d0d0d0;
+}
+
+.btn-proceed {
+    padding: 14px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    background: #ff8c42;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(255, 140, 66, 0.3);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-proceed:hover {
+    background: #ff7a2e;
+    box-shadow: 0 4px 8px rgba(255, 140, 66, 0.4);
+}
+
+.btn-proceed:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (max-width: 767px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-back-cart,
+    .btn-proceed {
+        width: 100%;
+        text-align: center;
+    }
+}

@@ -1,0 +1,89 @@
+/* ===== Address Page ===== */
+.address-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 16px 140px;
+}
+
+.address-page h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.address-form {
+    background: #fff;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.address-form label {
+    display: block;
+    margin-bottom: 24px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.address-form label span.required {
+    color: #e74c3c;
+    margin-left: 4px;
+}
+
+.address-form input[type="text"],
+.address-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    margin-top: 8px;
+    font-size: 18px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.3s;
+    font-family: inherit;
+}
+
+.address-form input:focus,
+.address-form textarea:focus {
+    outline: none;
+    border-color: #ff8c42;
+}
+
+.address-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.zip-lookup-status {
+    margin-top: 8px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+.zip-lookup-status.loading {
+    color: #ff8c42;
+}
+
+.zip-lookup-status.error {
+    color: #e74c3c;
+}
+
+.zip-lookup-status.success {
+    color: #27ae60;
+}
+
+@media (max-width: 767px) {
+    .address-page {
+        padding: 24px 16px 140px;
+    }
+    
+    .address-form {
+        padding: 24px 16px;
+    }
+    
+    .address-page h2 {
+        font-size: 28px;
+    }
+}

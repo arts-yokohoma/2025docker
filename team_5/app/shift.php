@@ -34,7 +34,12 @@
     <!-- navbar -->
     <!-- body -->
     <div class="container text-center mt-5 mx-auto">
-        <form action="shift_process.php" method="post">
+        <form id="shiftForm" action="shift_process.php" method="post">
+            <?php if (isset($_GET['success'])): ?>
+                <div class="alert alert-success text-center" role="alert">シフトを保存しました。タイムスロットを生成しました。</div>
+            <?php elseif (isset($_GET['error'])): ?>
+                <div class="alert alert-danger text-center" role="alert">シフト保存中にエラーが発生しました。</div>
+            <?php endif; ?>
             <div class=" container_def justify-content-center mx-auto w-50">
                 <h2 class="fw-bolder">今日のシフトを入力する</h2>
 
@@ -44,10 +49,20 @@
                 </div>
 
                 <div class="row text-center mb-4 mx-auto justify-content-center">
+                    <div class="col-12 mb-3">
+                        <label class="form-label fs-4 fw-bold d-block">勤務区分</label>
+                        <div class="btn-group" role="group" aria-label="shift period">
+                            <input type="radio" class="btn-check" name="shift_period" id="period_morning" value="morning" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="period_morning">日勤（10:00〜16:00）</label>
+
+                            <input type="radio" class="btn-check" name="shift_period" id="period_evening" value="evening" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="period_evening">夕勤（16:00〜22:00）</label>
+                        </div>
+                    </div>
                     <!-- Kitchen -->
                     <div class="col-md-4 mb-3">
                         <label class="form-label fs-3 fw-bold">キッチン</label>
-                        <select class="form-select form-select-lg">
+                        <select class="form-select form-select-lg" name="kitchen_count">
                             <option selected disabled>選択してください</option>
                             <option value="1">1人</option>
                             <option value="2">2人</option>
@@ -60,7 +75,7 @@
                     <!-- Driver -->
                     <div class="col-md-4 mb-3">
                         <label class="form-label fs-3 fw-bold">ドライバー</label>
-                        <select class="form-select form-select-lg">
+                        <select class="form-select form-select-lg" name="driver_count">
                             <option selected disabled>選択してください</option>
                             <option value="1">1人</option>
                             <option value="2">2人</option>
@@ -92,6 +107,39 @@
     </div>
 
     <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Confirmation before submitting the shift form (generates time slots)
+        (function() {
+            var form = document.getElementById('shiftForm');
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var ok = confirm('シフトを保存してタイムスロットを生成します。よろしいですか？');
+                if (!ok) {
+                    return false;
+                }
+
+                // show transient info alert before submit
+                var info = document.createElement('div');
+                info.className = 'alert alert-info text-center';
+                info.role = 'alert';
+                info.textContent = '送信中… シフトを保存しています。少々お待ちください。';
+                form.parentNode.insertBefore(info, form);
+
+                // prevent double submit
+                var btn = form.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                }
+
+                // submit after short delay so user sees the message
+                setTimeout(function() {
+                    form.submit();
+                }, 400);
+                return true;
+            });
+        })();
+    </script>
 
     <!-- Site footer -->
     <footer class="site-footer mt-5">

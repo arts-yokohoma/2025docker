@@ -32,16 +32,17 @@ if (!empty($errors)) {
 }
 
 try {
-    $sql = "INSERT INTO contacts (name, phone, email, message, created_at) VALUES (:name, :phone, :email, :message, NOW())";
+    // Table in repo is named `customer` (see create_contacts.sql)
+    $sql = "INSERT INTO customer (phone, name, email, message) VALUES (:phone, :name, :email, :message)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ':name' => $name,
         ':phone' => $phone,
+        ':name' => $name,
         ':email' => $email,
         ':message' => $message,
     ]);
 
-    header('Location: contact.php?success=1');
+    header('Location: contact_success.php');
     exit;
 } catch (PDOException $e) {
     // PostgreSQL unique_violation SQLSTATE is 23505
@@ -49,7 +50,6 @@ try {
         header('Location: contact.php?error=duplicate');
         exit;
     }
-    // In production, log $e->getMessage() to a secure error log.
     header('Location: contact.php?error=1');
     exit;
 }

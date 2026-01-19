@@ -1,8 +1,0 @@
--- PostgreSQL table for storing daily shifts
-CREATE TABLE IF NOT EXISTS shifts (
-  shift_date DATE PRIMARY KEY,
-  kitchen_count INTEGER NOT NULL,
-  driver_count INTEGER NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);

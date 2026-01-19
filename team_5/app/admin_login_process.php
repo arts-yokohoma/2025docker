@@ -25,28 +25,19 @@ if (isset($_POST['csrf_token']) && isset($_SESSION['csrf_token'])) {
     }
 }
 
-// Database connection - configure these values
-$dsn = 'mysql:host=localhost;dbname=your_database;charset=utf8mb4';
-$dbUser = 'your_db_user';
-$dbPass = 'your_db_pass';
-
+// Use the project's DB config (Postgres) and the existing `admin` table
 try {
-    $pdo = new PDO($dsn, $dbUser, $dbPass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    require_once __DIR__ . '/db_config.php';
 
-    $stmt = $pdo->prepare('SELECT id, username, password_hash FROM admins WHERE username = :username LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id, username, password_hash FROM admin WHERE username = :username LIMIT 1');
     $stmt->execute([':username' => $username]);
     $admin = $stmt->fetch();
 
     if ($admin) {
-        // Expecting password_hash to be a password_hash() value. If stored plain text, adapt accordingly.
         if (password_verify($password, $admin['password_hash']) || hash_equals($password, $admin['password_hash'])) {
             session_regenerate_id(true);
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
-            // Clear CSRF token after use
             unset($_SESSION['csrf_token']);
             header('Location: admin_panel.php');
             exit;
@@ -56,9 +47,8 @@ try {
     // Invalid credentials
     header('Location: admin_login.php?error=invalid');
     exit;
-
 } catch (Exception $e) {
-    // Log error in real app
+    // In production log $e->getMessage()
     header('Location: admin_login.php?error=server');
     exit;
 }

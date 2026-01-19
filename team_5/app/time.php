@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>注文</title>
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注文</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- navbar -->
-	<nav class="navbar navbar-expand-lg">
-		<div class="container">
-			<a class="navbar-brand d-flex align-items-center" href="index.php">
-				<img src="img/nav_bar_logo.png" height="60" class="me-2" alt="Team 5 logo">
-			</a>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <img src="img/nav_bar_logo.png" height="60" class="me-2" alt="Team 5 logo">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-			<div class="collapse navbar-collapse" id="navMenu">
-				<ul class="navbar-nav ms-auto">
-					<button class="btn btn-contact rounded-pill px-4">お問い合わせ</button>
-				</ul>
-			</div>
-		</div>
-	</nav>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto">
+                    <button class="btn btn-contact rounded-pill px-4">お問い合わせ</button>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <!-- navbar -->
-    
 
 
 
-    
-	<script src="js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="js/bootstrap.bundle.min.js"></script>
 
     <!-- Site footer -->
     <footer class="site-footer mt-5">
@@ -53,6 +55,9 @@
         </div>
     </footer>
 
-    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
+
 </html>

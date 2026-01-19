@@ -10,7 +10,6 @@
 <body>
     <header>
         <h1>ピザマックへようこそ！
-            leee
         </h1>
     </header>
         <nav>

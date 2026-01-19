@@ -1,35 +1,119 @@
-body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #F5F5F5; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { background: #333; color: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        .controls { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        .chart-container { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        select, button, input { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background: #007BFF; color: white; cursor: pointer; }
-        button:hover { background: #0056B3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #F8F9FA; }
-        .tabs { display: flex; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; cursor: pointer; background: #ddd; margin-right: 5px; border-radius: 5px 5px 0 0; }
-        .tab.active { background: white; border-bottom: 2px solid #007BFF; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .capacity-summary { 
-            background: #e8f4f8; 
-            padding: 15px; 
-            border-radius: 5px; 
-            margin: 15px 0;
-            border-left: 4px solid #007BFF;
-        }
-        .shift-form { background: #f9f9f9; padding: 20px; border-radius: 5px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .shift-slots { display: flex; gap: 10px; flex-wrap: wrap; }
-        .shift-slot { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 5px; 
-            border: 1px solid #ddd;
-            flex: 1;
-            min-width: 200px;
-        }
+/* ===== Fancy Login Page ===== */
+.login-container {
+    max-width: 420px;
+    margin-top: 120px;
+    animation: fadeSlide 0.6s ease-out;
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 36px;
+    border-radius: 16px;
+    box-shadow:
+        0 25px 45px rgba(0, 0, 0, 0.18),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+.login-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #3b82f6, #9333ea);
+    z-index: -1;
+    opacity: 0.35;
+}
+
+/* Title */
+.login-card h2 {
+    margin-bottom: 6px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.login-subtitle {
+    margin-bottom: 26px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Inputs */
+.login-card input {
+    width: 100%;
+    padding: 14px 14px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.25s ease;
+}
+
+.login-card input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+}
+
+/* Button */
+.login-card button {
+    position: relative;
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    overflow: hidden;
+}
+
+.login-card button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 120%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.login-card button:hover::after {
+    left: 120%;
+}
+
+/* Error */
+.error-text {
+    margin-top: 18px;
+    color: #dc2626;
+    font-weight: 600;
+    animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}

@@ -1,0 +1,354 @@
+/* ===== Reset ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding-bottom: 120px; /* место под cart-bar для мобильных */
+    font-size: 16px; /* базовый размер для доступности */
+}
+
+@media (min-width: 768px) {
+    body {
+        padding-bottom: 100px; /* меньше отступ на десктопе */
+    }
+}
+
+/* ===== Header ===== */
+.header {
+    height: 64px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    background: #ff8c42;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+/* ===== Welcome Section ===== */
+.welcome-section {
+    text-align: center;
+    padding: 40px 16px 24px;
+}
+
+.welcome-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ff8c42; /* Слегка оранжевый цвет */
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.welcome-title .no-wrap {
+    white-space: nowrap; /* "ようこそ！" не переносится отдельно */
+}
+
+@media (min-width: 768px) {
+    .welcome-section {
+        padding: 48px 16px 32px;
+    }
+    
+    .welcome-title {
+        font-size: 48px; /* Увеличено для доступности */
+    }
+}
+
+/* ===== Menu grid ===== */
+.menu {
+    padding: 16px;
+    padding-bottom: 140px; /* Дополнительный отступ снизу для мобильных, чтобы cart-bar не перекрывал карточки */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .menu {
+        padding-bottom: 120px; /* Меньше отступ на десктопе */
+    }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    .menu {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+}
+
+/* Если карточек 3 или меньше, делаем их больше - занимают 70% экрана */
+.menu.menu--few-items {
+    max-width: 70vw !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-top: 32px !important;
+}
+
+@media (min-width: 768px) {
+    .menu.menu--few-items {
+        display: flex !important;
+        flex-direction: row;
+        justify-content: center !important;
+        align-items: flex-start;
+        gap: 24px !important;
+        padding: 40px 24px !important;
+        max-width: 1200px !important;
+        width: 100%;
+        margin: 0 auto !important;
+    }
+    
+    .menu.menu--few-items .pizza-card {
+        flex: 0 1 auto;
+        max-width: 320px;
+        min-width: 280px;
+    }
+    
+    .menu.menu--few-items .pizza-card {
+        display: flex;
+        flex-direction: column;
+        padding: 0 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+    }
+    
+    .menu.menu--few-items .pizza-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .menu.menu--few-items .pizza-card img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .menu.menu--few-items .pizza-card > *:not(img) {
+        padding: 20px;
+    }
+    
+    .menu.menu--few-items .pizza-card h3 {
+        font-size: 22px !important; /* Увеличено для доступности */
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        color: #333;
+        line-height: 1.5;
+    }
+    
+    .menu.menu--few-items .pizza-card p {
+        font-size: 17px !important; /* Увеличено для доступности */
+        color: #555; /* Более темный для лучшего контраста */
+        margin: 0 0 20px 0;
+        line-height: 1.7;
+    }
+    
+    .menu.menu--few-items .card-bottom {
+        margin-top: auto;
+        padding-top: 0;
+    }
+    
+    .menu.menu--few-items .card-bottom .price {
+        font-size: 28px !important; /* Увеличено для доступности */
+        font-weight: 700;
+        color: #27ae60;
+    }
+    
+    .menu.menu--few-items .qty {
+        gap: 12px;
+    }
+    
+    .menu.menu--few-items .qty button {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+        border-radius: 8px;
+    }
+    
+    .menu.menu--few-items .qty .count {
+        min-width: 20px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+}
+
+/* ===== Pizza card ===== */
+.pizza-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.pizza-card img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+
+.pizza-card h3 {
+    font-size: 18px; /* Увеличено для доступности */
+    margin-top: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+.pizza-card p {
+    font-size: 15px; /* Увеличено для доступности */
+    color: #555; /* Более темный для лучшего контраста */
+    margin-top: 6px;
+    line-height: 1.6; /* Улучшенная читаемость */
+}
+
+/* ===== Card bottom ===== */
+.card-bottom {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-weight: 700;
+    font-size: 20px; /* Увеличено для доступности */
+    color: #27ae60;
+}
+
+/* ===== Quantity ===== */
+.qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty button {
+    width: 36px; /* Увеличено для доступности */
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid #27ae60; /* Более заметная граница */
+    background: #27ae60;
+    color: #fff;
+    font-size: 22px; /* Увеличено для доступности */
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.qty button:hover {
+    background: #229954;
+}
+
+.qty button:active {
+    background: #1e8449;
+}
+
+.count {
+    min-width: 24px;
+    text-align: center;
+    font-size: 18px; /* Увеличено для доступности */
+    font-weight: 600;
+    color: #333;
+}
+
+/* ===== Cart bar ===== */
+.cart-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.15);
+    z-index: 100;
+    padding: 16px;
+}
+
+.cart-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.total {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.total-label {
+    font-size: 24px;
+    font-weight: 600;
+    color: #555; /* Приглушенный серый вместо оранжевого */
+}
+
+.total-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333; /* Приглушенный темный вместо яркого зеленого */
+}
+
+.go-cart {
+    background: #27ae60;
+    color: #fff;
+    text-decoration: none;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 20px;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.go-cart:hover {
+    background: #229954;
+}
+
+.go-cart:active {
+    background: #1e8449;
+}

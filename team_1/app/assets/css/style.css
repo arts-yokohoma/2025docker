@@ -352,3 +352,55 @@ body {
 .go-cart:active {
     background: #1e8449;
 }
+
+.note {
+  font-size: 13px;
+  color: #777777;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.order-finish-box {
+  background: #ffffff;
+  width: 320px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.order-finish-box h3 {
+  margin-top: 0;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.order-finish-box p {
+  margin: 10px 0;
+  font-size: 15px;
+}
+
+.order-finish-box span {
+  color: #000000;
+}
+.container {
+  margin-top: 40px;
+}
+.thanks {
+  font-size: 26px;
+  margin: 10px 0;
+}
+
+.message {
+  color: #555555;
+  margin-bottom: 80px;
+}
+.container {
+  margin-top: 40px;
+   font-family: sans-serif;
+  background-color: #fffaf6;
+  color: #333333;
+  text-align: center;
+}

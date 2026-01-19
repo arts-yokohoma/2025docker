@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <h1>ピザマックへようこそ！ lee</h1>
+        <h1>ピザマックへようこそ！ </h1>
     </header>
 
     <main style="padding: 20px;">

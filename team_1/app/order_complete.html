@@ -1,34 +1,17 @@
-<?php
-session_start();
-
-$orderId = $_SESSION['last_order_id'] ?? null;
-if (!$orderId) {
-    header('Location: index.php');
-    exit;
-}
-
-// чтобы при обновлении страницы не было “вечного” заказа
-unset($_SESSION['last_order_id']);
-?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Pizza Match | 注文完了</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./assets/css/style.css">
-    <link rel="stylesheet" href="./assets/css/components.css">
+  <meta charset="UTF-8">
+  <title>注文 - ピザマッハ</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
 </head>
 <body>
+  <header class="header">
+   
+  </header>
 
-<header class="header">
-    <div class="header-content">
-        <div class="logo">PM</div>
-        <h1 class="header-title">Pizza Match</h1>
-    </div>
-</header>
-
-<main class="container">
+  <main class="container">
     <div class="checkmark">
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +30,7 @@ unset($_SESSION['last_order_id']);
 
     <div class="order-finish-box">
       <h2>ご注文内容</h2>
-      <div class = "box"><hr>ご注文番号：<span><strong><?= htmlspecialchars((string)$orderId) ?></strong></span><br></div>
+      <div class = "box"><hr>ご注文番号：<span><strong>#123ABC</strong></span><br></div>
       <div class = "box"><hr>お届け予定時間：<span><strong>約30分後</strong></span></div>
     </div>
 
@@ -58,12 +41,8 @@ unset($_SESSION['last_order_id']);
     <button class="btn-proceed">トップページに戻る</button>
   </main>
 
-<p><a href="index.php">メニューへ戻る</a></p>
-
-<script>
-// ✅ clear cart on client
-localStorage.removeItem('cart');
-</script>
-
+  <footer class="footer">
+    
+  </footer>
 </body>
 </html>

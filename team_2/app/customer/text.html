@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Delivery Website - Concept Map (HTML/PHP)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe6e6 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header h1 { color: #dc2626; font-size: 2em; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 1.1em; }
+        
+        .guarantee { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .guarantee h2 { font-size: 1.5em; margin-bottom: 10px; }
+        .guarantee p { font-size: 1.2em; }
+        
+        .page-flow { 
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .page-flow h2 { 
+            color: #333; 
+            font-size: 1.8em; 
+            margin-bottom: 25px;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        
+        .page-card { 
+            border: 3px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .page-card.page1 { border-color: #3b82f6; }
+        .page-card.page2 { border-color: #a855f7; }
+        .page-card.page3 { border-color: #10b981; }
+        
+        .page-header { 
+            padding: 20px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .page1 .page-header { background: #3b82f6; }
+        .page2 .page-header { background: #a855f7; }
+        .page3 .page-header { background: #10b981; }
+        
+        .page-number { 
+            background: white;
+            color: inherit;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .page1 .page-number { color: #3b82f6; }
+        .page2 .page-number { color: #a855f7; }
+        .page3 .page-number { color: #10b981; }
+        
+        .page-content { padding: 25px; background: #f9fafb; }
+        
+        .file-structure {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .file-structure .filename { color: #60a5fa; }
+        .file-structure .comment { color: #9ca3af; }
+        
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        .code-block .tag { color: #60a5fa; }
+        .code-block .attr { color: #a78bfa; }
+        .code-block .string { color: #34d399; }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .feature-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+        }
+        .feature-box h3 { color: #333; margin-bottom: 10px; font-size: 1.1em; }
+        .feature-box ul { margin-left: 20px; }
+        .feature-box li { margin: 5px 0; color: #555; }
+        
+        .tech-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tech-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        
+        .db-table {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .db-table h4 { color: #4b5563; margin-bottom: 10px; }
+        .db-table table { width: 100%; border-collapse: collapse; }
+        .db-table th { 
+            background: #374151; 
+            color: white; 
+            padding: 10px; 
+            text-align: left;
+        }
+        .db-table td { 
+            padding: 8px; 
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .summary h3 { font-size: 1.5em; margin-bottom: 10px; }
+        .summary p { font-size: 1.1em; }
+        
+        .highlight { background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 15px 0; border-radius: 5px; }
+        .highlight strong { color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍕 Pizza Delivery Website - HTML/PHP</h1>
+            <p>အသက်ကြီးသူများနှင့် IT မကျွမ်းကျင်သူများအတွက် ရိုးရှင်းလွယ်ကူသော design</p>
+        </div>
+
+        <div class="guarantee">
+            <h2>🎯 အဓိက အာမခံချက်</h2>
+            <p>Order လက်ခံပြီး ၃၀ မိနစ်အတွင်း အရောက်ပို့ပေးပါမည်</p>
+        </div>
+
+        <div class="tech-section">
+            <h2>📁 File Structure (HTML/PHP)</h2>
+            <div class="file-structure">
+<span class="comment">// အဓိက ဖိုင်များ</span>
+<span class="filename">index.php</span>           <span class="comment">// စာမျက်နှာ 1: ZIP code check</span>
+<span class="filename">order.php</span>           <span class="comment">// စာမျက်နှာ 2: Pizza order form</span>
+<span class="filename">confirmation.php</span>    <span class="comment">// စာမျက်နှာ 3: Order confirmation</span>
+<span class="filename">track.php</span>           <span class="comment">// Order tracking page</span>
+<span class="filename">process_order.php</span>   <span class="comment">// Backend: Order processing</span>
+<span class="filename">config.php</span>          <span class="comment">// Database connection</span>
+<span class="filename">styles.css</span>          <span class="comment">// အသက်ကြီးသူများအတွက် ကြီးမားသော CSS</span>
+            </div>
+        </div>
+
+        <div class="page-flow">
+            <h2>📱 သုံးစာမျက်နှာ User Flow</h2>
+
+            <!-- Page 1 -->
+            <div class="page-card page1">
+                <div class="page-header">
+                    <span class="page-number">1</span>
+                    <span>index.php - ZIP Code နှင့် Delivery Area</span>
+                </div>
+                <div class="page-content">
+                    <h3 style="color: #3b82f6; margin-bottom: 15px;">🔍 အဓိက လုပ်ဆောင်ချက်များ</h3>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-box" style="border-left-color: #3b82f6;">
+                            <h3>✅ ZIP Code စစ်ဆေးခြင်း</h3>
+                            <ul>
+                                <li>Delivery လုပ်နိုင်သော area များကို database မှ စစ်ဆေးမည်</li>
+                                <li>၃၀ မိနစ် guarantee ပေးနိုင်မှသာ order လက်ခံမည်</li>
+                            </ul>
+                        </div>
+                        <div class="feature-box" style="border-left-color: #3b82f6;">
+                            <h3>🔄 Order Tracking</h3>
+                            <ul>
+                                <li>စာမျက်နှာအောက်ခြေမှာ "မှာထားပြီးသား order စစ်ရန်" link</li>
+                                <li>track.php သို့ redirect လုပ်မည်</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 20px 0 10px 0; color: #1f2937;">HTML Form Example:</h4>
+                    <div class="code-block">
+<span class="tag">&lt;form</span> <span class="attr">method=</span><span class="string">"POST"</span> <span class="attr">action=</span><span class="string">"order.php"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">style=</span><span class="string">"font-size: 24px"</span><span class="tag">&gt;</span>ZIP Code ထည့်ပါ:<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type=</span><span class="string">"text"</span> <span class="attr">name=</span><span class="string">"zipcode"</span> <span class="attr">style=</span><span class="string">"font-size: 28px; padding: 15px"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">type=</span><span class="string">"submit"</span> <span class="attr">style=</span><span class="string">"font-size: 24px; padding: 20px"</span><span class="tag">&gt;</span>ရှာပါ<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+                    </div>
+
+                    <h4 style="margin: 20px 0 10px 0; color: #1f2937;">PHP Backend Logic:</h4>
+                    <div class="code-block">
+<span class="tag">&lt;?php</span>
+<span class="attr">if</span>($_POST['zipcode']) {
+    $zipcode = $_POST['zipcode'];
+    <span class="comment">// Database မှ delivery area စစ်ဆေးခြင်း</span>
+    $query = <span class="string">"SELECT * FROM delivery_areas WHERE zipcode = ?"</span>;
+    
+    <span class="attr">if</span>($area_found) {
+        $_SESSION['zipcode'] = $zipcode;
+        header(<span class="string">"Location: order.php"</span>);
+    } <span class="attr">else</span> {
+        echo <span class="string">"Sorry, delivery မရပါ"</span>;
+    }
+}
+<span class="tag">?&gt;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 2 -->
+            <div class="page-card page2">
+                <div class="page-header">
+                    <span class="page-number">2</span>
+                    <span>order.php - Pizza Order Form</span>
+                </div>
+                <div class="page-content">
+                    <h3 style="color: #a855f7; margin-bottom: 15px;">🍕 Order Form အသေးစိတ်</h3>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-box" style="border-left-color: #a855f7;">
+                            <h3>Pizza ရွေးချယ်မှု</h3>
+                            <ul>
+                                <li><strong>Size:</strong> သေး / အလတ် / ကြီး</li>
+                                <li><strong>Quantity:</strong> number input (min=1)</li>
+                                <li>Radio buttons နဲ့ ကြီးကြီးမားမားပြသမည်</li>
+                            </ul>
+                        </div>
+                        <div class="feature-box" style="border-left-color: #a855f7;">
+                            <h3>Customer Info</h3>
+                            <ul>
+                                <li>နာမည် (text input)</li>
+                                <li>ဖုန်း (tel input)</li>
+                                <li>လိပ်စာ (textarea)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 20px 0 10px 0; color: #1f2937;">HTML Form Example:</h4>
+                    <div class="code-block">
+<span class="tag">&lt;form</span> <span class="attr">method=</span><span class="string">"POST"</span> <span class="attr">action=</span><span class="string">"process_order.php"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- Pizza Size --&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">style=</span><span class="string">"font-size: 22px"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;input</span> <span class="attr">type=</span><span class="string">"radio"</span> <span class="attr">name=</span><span class="string">"size"</span> <span class="attr">value=</span><span class="string">"small"</span> <span class="attr">style=</span><span class="string">"width: 30px; height: 30px"</span><span class="tag">&gt;</span>
+        သေးငယ်သော
+    <span class="tag">&lt;/label&gt;</span>
+    
+    <span class="comment">&lt;!-- Quantity --&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type=</span><span class="string">"number"</span> <span class="attr">name=</span><span class="string">"quantity"</span> <span class="attr">min=</span><span class="string">"1"</span> <span class="attr">style=</span><span class="string">"font-size: 24px; padding: 15px"</span><span class="tag">&gt;</span>
+    
+    <span class="comment">&lt;!-- Customer Info --&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type=</span><span class="string">"text"</span> <span class="attr">name=</span><span class="string">"name"</span> <span class="attr">placeholder=</span><span class="string">"နာမည်"</span> <span class="attr">required</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type=</span><span class="string">"tel"</span> <span class="attr">name=</span><span class="string">"phone"</span> <span class="attr">placeholder=</span><span class="string">"ဖုန်း"</span> <span class="attr">required</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;textarea</span> <span class="attr">name=</span><span class="string">"address"</span> <span class="attr">placeholder=</span><span class="string">"လိပ်စာအပြည့်အစုံ"</span> <span class="attr">required</span><span class="tag">&gt;&lt;/textarea&gt;</span>
+    
+    <span class="tag">&lt;button</span> <span class="attr">type=</span><span class="string">"submit"</span><span class="tag">&gt;</span>သေချာပါသလား?<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>⚠️ အရေးကြီးချက်:</strong> Submit မလုပ်ခင် JavaScript နဲ့ confirm dialog ပြပေးရမည် - "သေချာပါသလား? အချက်အလက်မှန်ပါသလား?"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3 -->
+            <div class="page-card page3">
+                <div class="page-header">
+                    <span class="page-number">3</span>
+                    <span>confirmation.php - Order အတည်ပြုချက်</span>
+                </div>
+                <div class="page-content">
+                    <h3 style="color: #10b981; margin-bottom: 15px;">🎉 မှာယူမှု အောင်မြင်ပါပြီ</h3>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-box" style="border-left-color: #10b981;">
+                            <h3>ပြသမည့် အချက်အလက်များ</h3>
+                            <ul>
+                                <li>Order Number (unique ID)</li>
+                                <li>မှာယူသည့်အချိန် (timestamp)</li>
+                                <li>ခန့်မှန်းရောက်ရှိမည့်အချိန် (+30 mins)</li>
+                                <li>Order summary</li>
+                            </ul>
+                        </div>
+                        <div class="feature-box" style="border-left-color: #10b981;">
+                            <h3>⏱️ Timer ပြသမှု</h3>
+                            <ul>
+                                <li>၃၀ မိနစ် countdown (JavaScript)</li>
+                                <li>Real-time update</li>
+                                <li>ကြီးကြီးမားမား ပြသမည်</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 20px 0 10px 0; color: #1f2937;">PHP Backend (process_order.php):</h4>
+                    <div class="code-block">
+<span class="tag">&lt;?php</span>
+session_start();
+<span class="comment">// Database သို့ order သိမ်းဆည်းခြင်း</span>
+$order_time = date(<span class="string">'Y-m-d H:i:s'</span>);
+$delivery_time = date(<span class="string">'Y-m-d H:i:s'</span>, strtotime(<span class="string">'+30 minutes'</span>));
+
+$sql = <span class="string">"INSERT INTO orders (customer_name, phone, address, 
+        size, quantity, order_time, delivery_time, zipcode) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"</span>;
+
+<span class="comment">// Order ID ရယူပြီး confirmation page သို့</span>
+$order_id = $conn->insert_id;
+header(<span class="string">"Location: confirmation.php?id="</span> . $order_id);
+<span class="tag">?&gt;</span>
+                    </div>
+
+                    <h4 style="margin: 20px 0 10px 0; color: #1f2937;">Confirmation Page Display:</h4>
+                    <div class="code-block">
+<span class="tag">&lt;div</span> <span class="attr">style=</span><span class="string">"text-align: center; font-size: 32px"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1</span> <span class="attr">style=</span><span class="string">"color: green"</span><span class="tag">&gt;</span>✅ မှာယူမှု အောင်မြင်ပါပြီ!<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Order #: <span class="tag">&lt;?php</span> echo $order_id; <span class="tag">?&gt;&lt;/p&gt;</span>
+    <span class="tag">&lt;p&gt;</span>အချိန်: <span class="tag">&lt;?php</span> echo $order_time; <span class="tag">?&gt;&lt;/p&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">id=</span><span class="string">"countdown"</span> <span class="attr">style=</span><span class="string">"font-size: 48px; color: red"</span><span class="tag">&gt;</span>30:00<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;p&gt;</span>💰 ငွေပေးချေမှု: Delivery လာရောက်ပြီးမှ<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-section">
+            <h2>🗄️ Database Structure (MySQL)</h2>
+            
+            <div class="db-table">
+                <h4>📋 Table: delivery_areas</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>INT PRIMARY KEY</td>
+                            <td>Auto increment</td>
+                        </tr>
+                        <tr>
+                            <td>zipcode</td>
+                            <td>VARCHAR(10)</td>
+                            <td>ZIP code</td>
+                        </tr>
+                        <tr>
+                            <td>area_name</td>
+                            <td>VARCHAR(100)</td>
+                            <td>ဒေသအမည်</td>
+                        </tr>
+                        <tr>
+                            <td>active</td>
+                            <td>BOOLEAN</td>
+                            <td>Delivery ရနိုင်/မရနိုင်</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="db-table">
+                <h4>🍕 Table: orders</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>INT PRIMARY KEY</td>
+                            <td>Order ID</td>
+                        </tr>
+                        <tr>
+                            <td>customer_name</td>
+                            <td>VARCHAR(100)</td>
+                            <td>ဝယ်သူအမည်</td>
+                        </tr>
+                        <tr>
+                            <td>phone</td>
+                            <td>VARCHAR(20)</td>
+                            <td>ဖုန်းနံပါတ်</td>
+                        </tr>
+                        <tr>
+                            <td>address</td>
+                            <td>TEXT</td>
+                            <td>လိပ်စာ</td>
+                        </tr>
+                        <tr>
+                            <td>zipcode</td>
+                            <td>VARCHAR(10)</td>
+                            <td>ZIP Code</td>
+                        </tr>
+                        <tr>
+                            <td>size</td>
+                            <td>VARCHAR(20)</td>
+                            <td>small/medium/large</td>
+                        </tr>
+                        <tr>
+                            <td>quantity</td>
+                            <td>INT</td>
+                            <td>အရေအတွက်</td>
+                        </tr>
+                        <tr>
+                            <td>order_time</td>
+                            <td>DATETIME</td>
+                            <td>မှာယူသည့်အချိန်</td>
+                        </tr>
+                        <tr>
+                            <td>delivery_time</td>
+                            <td>DATETIME</td>
+                            <td>ရောက်ရှိမည့်အချိန်</td>
+                        </tr>
+                        <tr>
+                            <td>status</td>
+                            <td>VARCHAR(20)</td>
+                            <td>pending/delivered/cancelled</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tech-section">
+            <h2>🎨 CSS Design အရေးကြီးချက်များ (အသက်ကြီးသူများအတွက်)</h2>
+            <div class="code-block">
+<span class="comment">/* ကြီးမားသော စာလုံးများ */</span>
+body { <span class="attr">font-size:</span> <span class="string">20px</span>; }
+h1 { <span class="attr">font-size:</span> <span class="string">36px</span>; }
+button { <span class="attr">font-size:</span> <span class="string">24px</span>; <span class="attr">padding:</span> <span class="string">20px 40px</span>; }
+input, textarea { <span class="attr">font-size:</span> <span class="string">22px</span>; <span class="attr">padding:</span> <span class="string">15px</span>; }
+
+<span class="comment">/* ကြီးမားသော radio buttons နှင့် checkboxes */</span>
+input[type=<span class="string">"radio"</span>] { <span class="attr">width:</span> <span class="string">30px</span>; <span class="attr">height:</span> <span class="string">30px</span>; }
+
+<span class="comment">/* အရောင်ခြားနားမှုကောင်းခြင်း */</span>
+button { <span class="attr">background:</span> <span class="string">#dc2626</span>; <span class="attr">color:</span> <span class="string">white</span>; }
+button:hover { <span class="attr">background:</span> <span class="string">#b91c1c</span>; }
+
+<span class="comment">/* နေရာလွတ်များများ */</span>
+.form-group { <span class="attr">margin-bottom:</span> <span class="string">30px</span>; }
+            </div>
+        </div>
+
+        <div class="summary">
+            <h3>📌 အတိုချုပ်</h3>
+            <p><strong>HTML/PHP Stack:</strong> ရိုးရှင်းပြီး လုံခြုံသော ၃ စာမျက်နှာ pizza delivery system၊ MySQL database နဲ့၊ အသက်ကြီးသူတွေအတွက် အထူးပြုလုပ်ထားသော UI/UX ဖြင့်၊ ၃၀ မိနစ် delivery guarantee အတွက် ZIP code validation ပါဝင်သည်။</p>
+        </div>
+    </div>
+</body>
+</html>

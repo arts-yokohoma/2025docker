@@ -3,11 +3,17 @@
  * Database schema installation script
  * 
  * Creates all required tables for the pizza delivery application:
- * - customer: Customer information
+ * - customer: Customer information with privacy consent tracking
  * - menu: Menu items with S/M/L pricing
- * - orders: Order records with delivery info
+ * - orders: Order records with delivery info (DATETIME format)
  * - order_items: Individual items in each order
  * - store_hours: Store operating hours and shift configuration
+ * 
+ * Version: 2.0
+ * Changes:
+ * - Added privacy_consent and consent_time to customer table
+ * - Changed delivery_time from VARCHAR to DATETIME in orders table
+ * - Added index on delivery_time for faster queries
  * 
  * Note: DDL statements auto-commit in MySQL, but we stop on first error
  */
@@ -20,6 +26,7 @@ $queries = [];
 
 /* =========================
    1) customer table
+   Stores customer information with privacy consent tracking
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS customer (
@@ -28,6 +35,8 @@ CREATE TABLE IF NOT EXISTS customer (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(50) NOT NULL,
   address TEXT NOT NULL,
+  consent TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Privacy policy consent flag',
+  consent_time DATETIME NULL COMMENT 'Time when user gave consent',
   active TINYINT(1) NOT NULL DEFAULT 1,
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -63,6 +72,7 @@ CREATE TABLE IF NOT EXISTS menu (
    3) orders table
    Stores order information with delivery details
    delivery_comment stored separately from delivery_address
+   delivery_time is DATETIME for proper date/time handling
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS orders (
@@ -70,13 +80,14 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_id INT NOT NULL,
   delivery_address TEXT NOT NULL,
   delivery_comment TEXT NULL,
-  delivery_time VARCHAR(50) NULL,
+  delivery_time DATETIME NULL COMMENT 'Scheduled delivery date and time',
   total_price INT NOT NULL,
   status VARCHAR(30) NOT NULL DEFAULT 'NEW',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_orders_customer (customer_id),
   INDEX idx_orders_status (status),
+  INDEX idx_orders_delivery_time (delivery_time),
   CONSTRAINT fk_orders_customer
     FOREIGN KEY (customer_id) REFERENCES customer(id)
     ON DELETE RESTRICT ON UPDATE CASCADE
@@ -161,4 +172,9 @@ foreach ($queries as $i => $sql) {
 }
 
 echo "\n🎉 Schema ready: customer, menu, orders, order_items, store_hours\n";
+echo "\nSchema version: 2.0\n";
+echo "Features:\n";
+echo "  ✅ Privacy consent tracking (consent, consent_time)\n";
+echo "  ✅ DATETIME format for delivery_time\n";
+echo "  ✅ Indexed delivery_time for efficient queries\n";
 echo "</pre>";

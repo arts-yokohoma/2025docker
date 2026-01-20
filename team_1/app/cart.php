@@ -42,12 +42,23 @@ $closeMinutes = (int)$closeH * 60 + (int)$closeM;
 // Check if store is currently open
 $isStoreOpen = ($currentMinutes >= $openMinutes && $currentMinutes < $closeMinutes);
 
+// Calculate last order time for today
+$todayClose = clone $now;
+$todayClose->setTime((int)$closeH, (int)$closeM, 0);
+$lastOrderTime = clone $todayClose;
+$lastOrderTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
+
+// Check if we can still accept orders for today
+// Orders can be accepted only BEFORE last_order_time
+$canOrderToday = ($now < $lastOrderTime);
+
 // Calculate minimum delivery time (current time + 30 min preparation)
 $minDeliveryTime = clone $now;
 $minDeliveryTime->modify('+30 minutes');
 
-// If store is closed, set minimum time to next opening + 30 minutes
-if (!$isStoreOpen) {
+// If we cannot order for today (after last_order_time OR store closed), 
+// set minimum time to next opening + 30 minutes
+if (!$canOrderToday || !$isStoreOpen) {
     $todayOpen = clone $now;
     $todayOpen->setTime((int)$openH, (int)$openM, 0);
     if ($todayOpen < $now) {
@@ -56,12 +67,6 @@ if (!$isStoreOpen) {
     $minDeliveryTime = clone $todayOpen;
     $minDeliveryTime->modify('+30 minutes');
 }
-
-// Calculate last order time for today
-$todayClose = clone $now;
-$todayClose->setTime((int)$closeH, (int)$closeM, 0);
-$lastOrderTime = clone $todayClose;
-$lastOrderTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
 
 // Generate available time slots for today, tomorrow, and day after tomorrow
 $availableTimesByDate = [];
@@ -198,16 +203,59 @@ if ($menuRes) {
         <div class="cart-sidebar">
             <div class="sidebar-card">
                 <h2>お届け希望時間</h2>
-                <div class="delivery-option selected" id="option-asap">
-                    <input type="radio" name="delivery_time" id="delivery_asap" value="ASAP" checked>
+                <?php
+                // Show ASAP option ONLY if:
+                // 1. Store is currently open
+                // 2. Current time is before last_order_time
+                // 3. There are available slots for today
+                $showAsap = $isStoreOpen && $canOrderToday && isset($availableTimesByDate['today']) && !empty($availableTimesByDate['today']);
+                $asapSelected = $showAsap ? 'checked' : '';
+                $scheduledSelected = !$showAsap ? 'checked' : '';
+                $asapClass = $showAsap ? 'selected' : '';
+                $scheduledClass = !$showAsap ? 'selected' : '';
+                $scheduledDisplay = !$showAsap ? 'block' : 'none';
+                ?>
+                
+                <?php if (!$showAsap): ?>
+                <div style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 12px; border: 2px solid #ff9800; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="flex-shrink: 0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#ff6f00">
+                                <path d="M638-448h-23.33l-66.34-66.67H628l120.67-218.66H328.33L261.67-800h527.66q25 0 37.17 20.83 12.17 20.84-1.17 45.17L684-478q-7.58 14.29-19.29 22.14Q653-448 638-448ZM284.53-80.67q-30.86 0-52.7-21.97Q210-124.62 210-155.47q0-30.86 21.98-52.7Q253.95-230 284.81-230t52.69 21.98q21.83 21.97 21.83 52.83t-21.97 52.69q-21.98 21.83-52.83 21.83Zm556.14 48L585.33-286H286q-40 0-59.67-30.83-19.66-30.84-.33-65.84l60.67-106.66L205.33-668 40-833.33l47.33-47.34L888-80l-47.33 47.33Zm-322-320-94-96h-84l-55.34 96h233.34Zm109.33-162h-79.67H628Zm57.33 434q-30.33 0-52.5-21.97-22.16-21.98-22.16-52.83 0-30.86 22.16-52.7Q655-230 685.33-230q30.34 0 52.5 21.98Q760-186.05 760-155.19t-22.17 52.69q-22.16 21.83-52.5 21.83Z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: bold; color: #e65100; margin-bottom: 8px;">
+                                <?php if (!$isStoreOpen): ?>
+                                    現在営業時間外です
+                                <?php elseif (!$canOrderToday): ?>
+                                    本日のラストオーダー時間を過ぎています
+                                <?php endif; ?>
+                            </div>
+                            <div style="font-size: 15px; font-weight: 600; color: #d84315; line-height: 1.5;">
+                                <?php if (!$isStoreOpen): ?>
+                                    下記より配達時間をご指定ください
+                                <?php elseif (!$canOrderToday): ?>
+                                    明日以降の配達時間をご指定ください
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($showAsap): ?>
+                <div class="delivery-option <?= $asapClass ?>" id="option-asap">
+                    <input type="radio" name="delivery_time" id="delivery_asap" value="ASAP" <?= $asapSelected ?>>
                     <label for="delivery_asap">最短でお届け</label>
                     <div class="delivery-time-estimate">約30分～45分</div>
                 </div>
+                <?php endif; ?>
                 
-                <div class="delivery-option" id="option-scheduled">
-                    <input type="radio" name="delivery_time" id="delivery_scheduled" value="SCHEDULED">
+                <div class="delivery-option <?= $scheduledClass ?>" id="option-scheduled">
+                    <input type="radio" name="delivery_time" id="delivery_scheduled" value="SCHEDULED" <?= $scheduledSelected ?>>
                     <label for="delivery_scheduled">配達時間を指定する</label>
-                    <div class="time-select-wrapper" id="scheduled-time-wrapper" style="display: none;">
+                    <div class="time-select-wrapper" id="scheduled-time-wrapper" style="display: <?= $scheduledDisplay ?>;">
                         <select id="delivery-date" style="margin-bottom: 12px;">
                             <?php
                             $dateLabels = [
@@ -420,12 +468,27 @@ document.getElementById('delivery-date').addEventListener('change', function() {
 
 // Сохранение времени доставки (с датой, если выбрана)
 document.getElementById('go-to-order').addEventListener('click', function(e) {
-    const selectedTime = document.querySelector('input[name="delivery_time"]:checked').value;
+    const selectedRadio = document.querySelector('input[name="delivery_time"]:checked');
+    
+    if (!selectedRadio) {
+        e.preventDefault();
+        alert('配達時間を選択してください。');
+        return;
+    }
+    
+    const selectedTime = selectedRadio.value;
     let deliveryTime = 'ASAP';
     
     if (selectedTime === 'SCHEDULED') {
         const selectedDate = document.getElementById('delivery-date').value;
         const selectedTimeSlot = document.getElementById('scheduled-time').value;
+        
+        if (!selectedDate || !selectedTimeSlot) {
+            e.preventDefault();
+            alert('配達時間を選択してください。');
+            return;
+        }
+        
         // Формат: "tomorrow_14:30" или "today_18:00"
         deliveryTime = selectedDate + '_' + selectedTimeSlot;
     }
@@ -437,7 +500,18 @@ document.getElementById('go-to-order').addEventListener('click', function(e) {
 });
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', renderCart);
+document.addEventListener('DOMContentLoaded', function() {
+    renderCart();
+    
+    // Если SCHEDULED выбран по умолчанию (ASAP недоступен), загрузить слоты
+    const scheduledRadio = document.getElementById('delivery_scheduled');
+    if (scheduledRadio && scheduledRadio.checked) {
+        const selectedDate = document.getElementById('delivery-date').value;
+        if (selectedDate) {
+            updateTimeSlots(selectedDate);
+        }
+    }
+});
 </script>
 
 </body>

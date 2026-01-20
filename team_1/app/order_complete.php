@@ -1,5 +1,6 @@
 <?php
 session_start();
+require __DIR__ . '/../config/db.php';
 
 $orderId = $_SESSION['last_order_id'] ?? null;
 if (!$orderId) {
@@ -7,8 +8,46 @@ if (!$orderId) {
     exit;
 }
 
-// чтобы при обновлении страницы не было “вечного” заказа
+// Get delivery time from the order
+$deliveryTimeDisplay = 'お届け予定時間：約30分後';
+$res = $mysqli->query("SELECT delivery_time FROM orders WHERE id=" . (int)$orderId . " LIMIT 1");
+if ($res && $row = $res->fetch_assoc()) {
+    $deliveryTime = $row['delivery_time'];
+    if ($deliveryTime) {
+        try {
+            date_default_timezone_set('Asia/Tokyo');
+            $dt = new DateTime($deliveryTime, new DateTimeZone('Asia/Tokyo'));
+            $now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
+            
+            // Check if delivery is today, tomorrow, or day after
+            $deliveryDate = $dt->format('Y-m-d');
+            $todayDate = $now->format('Y-m-d');
+            $tomorrowDate = (clone $now)->modify('+1 day')->format('Y-m-d');
+            $dayAfterDate = (clone $now)->modify('+2 days')->format('Y-m-d');
+            
+            $dateLabel = '';
+            if ($deliveryDate === $todayDate) {
+                $dateLabel = '本日';
+            } elseif ($deliveryDate === $tomorrowDate) {
+                $dateLabel = '明日';
+            } elseif ($deliveryDate === $dayAfterDate) {
+                $dateLabel = '明後日';
+            } else {
+                $dateLabel = $dt->format('m月d日');
+            }
+            
+            $timeLabel = $dt->format('H:i');
+            $deliveryTimeDisplay = "お届け予定時間：{$dateLabel} {$timeLabel}";
+        } catch (Exception $e) {
+            // Keep default message if parsing fails
+        }
+    }
+    $res->free();
+}
+
+// чтобы при обновлении страницы не было "вечного" заказа
 unset($_SESSION['last_order_id']);
+unset($_SESSION['delivery_time']);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -21,6 +60,7 @@ unset($_SESSION['last_order_id']);
 </head>
 <body>
 
+<!-- Header -->
 <header class="header">
     <div class="header-content">
         <div class="logo">PM</div>
@@ -28,41 +68,40 @@ unset($_SESSION['last_order_id']);
     </div>
 </header>
 
-<main class="container">
-    <div class="checkmark">
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 -960 960 960"
-    width="40"
-    height="40"
-    fill="#09be0c"
-    aria-hidden="true"
-  >
-    <path d="M422-297.33 704.67-580l-49.34-48.67L422-395.33l-118-118-48.67 48.66L422-297.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Z"/>
-  </svg>
-</div>
-
-      <h1 class="thanks">ご注文ありがとうございます！</h1>
-    <p class="message">ご注文を受け付けました。ただいま調理中です。</p>
-
-    <div class="order-finish-box">
-      <h2>ご注文内容</h2>
-      <div class = "box"><hr>ご注文番号：<span><strong><?= htmlspecialchars((string)$orderId) ?></strong></span><br></div>
-      <div class = "box"><hr>お届け予定時間：<span><strong>約30分後</strong></span></div>
+<!-- Main Content -->
+<div class="order-complete-container">
+    <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="80" height="80" fill="#27ae60">
+            <path d="M422-297.33 704.67-580l-49.34-48.67L422-395.33l-118-118-48.67 48.66L422-297.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Z"/>
+        </svg>
     </div>
 
-    <p class="note">
-      お問い合わせの際は、上記の注文番号をお伝えください。
+    <h1 class="success-title">ご注文ありがとうございます！</h1>
+    <p class="success-message">ご注文を受け付けました。ただいま調理中です。</p>
+
+    <div class="order-info-card">
+        <h2>ご注文内容</h2>
+        <div class="info-row">
+            <span class="info-label">ご注文番号</span>
+            <span class="info-value"><?= htmlspecialchars((string)$orderId) ?></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><?= htmlspecialchars(explode('：', $deliveryTimeDisplay)[0]) ?></span>
+            <span class="info-value"><?= htmlspecialchars(explode('：', $deliveryTimeDisplay)[1]) ?></span>
+        </div>
+    </div>
+
+    <p class="note-text">
+        お問い合わせの際は、上記の注文番号をお伝えください。
     </p>
 
-    <button class="btn-proceed">トップページに戻る</button>
-  </main>
-
-<p><a href="index.php">メニューへ戻る</a></p>
+    <a href="index.php" class="btn-proceed" style="display: inline-block;">トップページに戻る</a>
+</div>
 
 <script>
-// ✅ clear cart on client
+// Clear cart from localStorage
 localStorage.removeItem('cart');
+localStorage.removeItem('delivery_time');
 </script>
 
 </body>

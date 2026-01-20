@@ -135,6 +135,25 @@ if ($deliveryTimeRaw === 'ASAP') {
 $status = 'NEW';
 
 /**
+ * Validate data before transaction
+ */
+// Check if consent fields exist in customer table
+$checkConsent = $mysqli->query("SHOW COLUMNS FROM customer LIKE 'consent'");
+$hasConsentFields = $checkConsent && $checkConsent->num_rows > 0;
+if ($checkConsent) $checkConsent->free();
+
+// DEBUG: Uncomment to check consent data (remove after testing)
+// echo "DEBUG consent data:<br>";
+// echo "consent: " . ($user['privacy_consent'] ?? 'NOT SET') . "<br>";
+// echo "consent_time: " . ($user['consent_time'] ?? 'NOT SET') . "<br>";
+// exit;
+
+// Validate delivery_time format for DATETIME
+if ($deliveryTime && !preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $deliveryTime)) {
+    exit('配達時間の形式が正しくありません: ' . htmlspecialchars($deliveryTime) . '<br><a href="cart.php">← カートに戻る</a>');
+}
+
+/**
  * Database transaction: create customer, order, and order items
  * All operations must succeed or entire transaction is rolled back
  */
@@ -142,18 +161,36 @@ $mysqli->begin_transaction();
 
 try {
     // 1) Create customer record
-    $stmt = $mysqli->prepare("
-        INSERT INTO customer (name, email, phone, address, active)
-        VALUES (?, ?, ?, ?, 1)
-    ");
-    if (!$stmt) throw new Exception($mysqli->error);
-
     $name  = (string)($user['name'] ?? '');
     $email = (string)($user['email'] ?? '');
     $phone = (string)($user['phone'] ?? '');
-
-    $stmt->bind_param("ssss", $name, $email, $phone, $deliveryAddress);
-    $stmt->execute();
+    
+    if ($hasConsentFields) {
+        // Customer table has consent fields
+        $stmt = $mysqli->prepare("
+            INSERT INTO customer (name, email, phone, address, consent, consent_time, active)
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+        ");
+        if (!$stmt) throw new Exception("Customer prepare failed: " . $mysqli->error);
+        
+        $consent = (int)($user['privacy_consent'] ?? 0);
+        $consentTime = $user['consent_time'] ?? null;
+        
+        $stmt->bind_param("ssssis", $name, $email, $phone, $deliveryAddress, $consent, $consentTime);
+    } else {
+        // Old schema without consent fields
+        $stmt = $mysqli->prepare("
+            INSERT INTO customer (name, email, phone, address, active)
+            VALUES (?, ?, ?, ?, 1)
+        ");
+        if (!$stmt) throw new Exception("Customer prepare failed: " . $mysqli->error);
+        
+        $stmt->bind_param("ssss", $name, $email, $phone, $deliveryAddress);
+    }
+    
+    if (!$stmt->execute()) {
+        throw new Exception("Customer insert failed: " . $stmt->error);
+    }
     $customerId = $stmt->insert_id;
     $stmt->close();
 
@@ -162,10 +199,13 @@ try {
         INSERT INTO orders (customer_id, delivery_address, delivery_comment, delivery_time, total_price, status)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
-    if (!$stmt) throw new Exception($mysqli->error);
+    if (!$stmt) throw new Exception("Order prepare failed: " . $mysqli->error);
 
     $stmt->bind_param("isssis", $customerId, $deliveryAddress, $deliveryComment, $deliveryTime, $totalPrice, $status);
-    $stmt->execute();
+    
+    if (!$stmt->execute()) {
+        throw new Exception("Order insert failed: " . $stmt->error . " | delivery_time: " . $deliveryTime);
+    }
     $orderId = $stmt->insert_id;
     $stmt->close();
 
@@ -174,7 +214,7 @@ try {
         INSERT INTO order_items (order_id, menu_id, size, quantity, price)
         VALUES (?, ?, ?, ?, ?)
     ");
-    if (!$itemStmt) throw new Exception($mysqli->error);
+    if (!$itemStmt) throw new Exception("Order items prepare failed: " . $mysqli->error);
 
     foreach ($cart as $key => $item) {
         // Extract menu_id from composite ID (format: "123_S" -> 123)
@@ -189,11 +229,14 @@ try {
         $price  = (int)($item['price'] ?? 0);
 
         if ($menuId <= 0 || $qty <= 0 || $price <= 0) {
-            throw new Exception('Invalid cart item');
+            throw new Exception("Invalid cart item: menuId=$menuId, qty=$qty, price=$price, key=$key");
         }
 
         $itemStmt->bind_param("issii", $orderId, $menuId, $size, $qty, $price);
-        $itemStmt->execute();
+        
+        if (!$itemStmt->execute()) {
+            throw new Exception("Order item insert failed: " . $itemStmt->error . " | item: $key");
+        }
     }
 
     $itemStmt->close();
@@ -201,7 +244,13 @@ try {
 
 } catch (Throwable $e) {
     $mysqli->rollback();
-    exit('注文処理に失敗しました');
+    
+    // Log error for debugging
+    error_log('Order creation failed: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    // Show detailed error in development (remove in production)
+    exit('注文処理に失敗しました<br><br>エラー詳細:<br>' . htmlspecialchars($e->getMessage()) . '<br><br><a href="cart.php">← カートに戻る</a>');
 }
 
 /**

@@ -7,7 +7,7 @@
     
 </head>
 <body>
-    <h1>You can view avaliable area</h1>
+    <h1>You can view avaliable test</h1>
 </body>
 </html><?php
 include '../database/db_conn.php';

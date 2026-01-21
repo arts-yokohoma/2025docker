@@ -1,5 +1,6 @@
 <?php
 // ၁။ Docker အတွက် အချက်အလက်များ
+date_default_timezone_set('Asia/Tokyo');
 $docker_server = "team_2_mysql";
 $docker_user = "team_2";
 $docker_pass = "team2pass";
@@ -17,7 +18,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 try {
     // ၃။ Docker Server ကို အရင်ကြိုးစားပြီး ချိတ်ပါမယ်
     $conn = @new mysqli($docker_server, $docker_user, $docker_pass, $docker_db);
-    echo "docker db connected :";
+    //echo "docker db connected :";
     
 } catch (mysqli_sql_exception $e) {
     // ၄။ Docker ချိတ်မရလို့ Error တက်သွားရင် ဒီနေရာကို ရောက်လာပါမယ်

@@ -13,6 +13,17 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 //create table zipcodes
+$sql = "CREATE TABLE IF NOT EXISTS locations(
+id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+zip_code VARCHAR(10) NOT NULL,
+city text,
+state text)";
+if ($conn->query($sql) === TRUE) {
+    echo "Table locations created successfully";
+} else {
+    echo "Error creating table: " . $conn->error;
+}
+
 $sql1 = "CREATE TABLE IF NOT EXISTS zipcodes (
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 postal_code VARCHAR(10) NOT NULL,

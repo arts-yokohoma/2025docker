@@ -9,6 +9,7 @@ if ($mysqli->connect_error) {
     echo "<p>MySQL Connection failed: " . $mysqli->connect_error . "</p>";
 } else {
     echo "<p>MySQL Connection successful!</p>";
+    echo "<p>wellcome form team1";
     echo "<p>Server time: " . date('Y-m-d H:i:s') . "</p>";
 }
 ?>

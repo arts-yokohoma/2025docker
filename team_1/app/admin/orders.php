@@ -1,4 +1,4 @@
-<?php include "mock_orders.php"; 
+<?php include "/./mock_orders.php"; 
 
 // Count orders by status
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];

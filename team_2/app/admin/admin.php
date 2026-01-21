@@ -43,9 +43,20 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     if ($sql != "") {
         mysqli_query($conn, $sql);
     }
-    // Refresh page to clean URL
+    // admin.php ထဲက Status ပြောင်းတဲ့နေရာ (ဥပမာ action=cook ဖြစ်တဲ့နေရာ)
+if (isset($_GET['action']) && $_GET['action'] == 'cook') {
+    $id = $_GET['id'];
+    $current_time = date('Y-m-d H:i:s'); // လက်ရှိအချိန်ကို ယူမယ်
+    
+    // Status ပြောင်းရုံတင်မကဘဲ start_time ကိုပါ ထည့်ပေးလိုက်မယ်
+    $sql = "UPDATE orders SET status = 'Cooking', start_time = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $current_time, $id);
+    $stmt->execute();
+    
     header("Location: admin.php");
     exit();
+}
 }
 
 // --- ၃။ Order စာရင်းများကို ဆွဲထုတ်ခြင်း ---

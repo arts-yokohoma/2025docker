@@ -1,39 +1,41 @@
-        <?php
-            include '../database/db_conn.php';
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $postal_code = $_POST['postal_code'];
-            $stmt = $conn->prepare("SELECT * FROM locations WHERE zip_code = ?");
-            $stmt->bind_param("s", $postal_code);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows > 0){
-                $found_data = $result->fetch_assoc();
-                echo "<h2>Address Found:</h2>";
-                header("location: order_form.php?address=" . urlencode($found_data['city']) . "&postal_code=" . urlencode($found_data['zip_code']));
-                exit();
-                //include 'order_form.php';
-                //echo "<a href='order_form.php'>Go to Order Form</a>";
-            }else {
-                echo "<h2>No address found for postal code: " . htmlspecialchars($postal_code) . "</h2>";
-            }
+<?php
+include '../database/db_conn.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // ၁။ Postal Code Search အတွက် စစ်ဆေးခြင်း
+    if (isset($_POST['postal_code'])) {
+        $postal_code = $_POST['postal_code'];
+        $stmt = $conn->prepare("SELECT * FROM locations WHERE zip_code = ?");
+        $stmt->bind_param("s", $postal_code);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0){
+            $found_data = $result->fetch_assoc();
+            include 'order_form.php';
+        } else {
+            echo "<h2>No address found for postal code: " . htmlspecialchars($postal_code) . "</h2>";
         }
-        if ($_SERVER["REQUEST_METHOD"]=="POST"){
-            $chkod=$_POST['checkphonenumber'];
-            $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ?");
-            $stmt->bind_param("s", $chkod);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows > 0) {
-                $order_data = $result->fetch_assoc();
-                echo "<h2>Order Found:</h2>";
-                echo "Order ID: " . htmlspecialchars($order_data['id']) . "<br>";
-                echo "Status: " . htmlspecialchars($order_data['status']) . "<br>";
-                
-            } else {
-                echo "<h2>No order found for phone number: " . htmlspecialchars($chkod) . "</h2>";
-            }
+    }
+
+    // ၂။ Phone Number Check အတွက် စစ်ဆေးခြင်း (isset နဲ့ အရင်စစ်ရပါမယ်)
+    if (isset($_POST['checkphonenumber'])) {
+        $chkod = $_POST['checkphonenumber'];
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ?");
+        $stmt->bind_param("s", $chkod);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $order_data = $result->fetch_assoc();
+            echo "<h2>Order Found:</h2>";
+            echo "Order ID: " . htmlspecialchars($order_data['id']) . "<br>";
+            echo "Status: " . htmlspecialchars($order_data['status']) . "<br>";
+        } else {
+            echo "<h2>No order found for phone number: " . htmlspecialchars($chkod) . "</h2>";
         }
-        ?>
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/../config/db.php';
+require __DIR__ . '/./config/db.php';
 
 $orderId = $_SESSION['last_order_id'] ?? null;
 if (!$orderId) {

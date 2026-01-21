@@ -1,6 +1,5 @@
 name: Team 2 Auto Deploy
 
-# ဒီအပိုင်းက Trigger ပါ (Push တင်တိုင်း အလုပ်လုပ်ခိုင်းတာ)
 on:
   push:
     branches: [ "main" ]
@@ -9,15 +8,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # GitHub Server ကို မသုံးဘဲ အစ်ကိုခုနက သွင်းလိုက်တဲ့ Runner ကို သုံးဖို့ ပြောတာပါ
+    runs-on: self-hosted 
+
     steps:
-      - name: Deploying via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: adminarts
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ~/forschool
-            git pull origin main
-            docker-compose up -d --build team_2_apache team_2_mysql
+      - name: Update Code and Build Docker
+        run: |
+          cd ~/forschool
+          git pull origin main
+          docker-compose up -d --build team_2_apache team_2_mysql

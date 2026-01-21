@@ -38,6 +38,24 @@
   font-weight: bold;
   border-radius: 50px;
 }
+/* Increment / decrement buttons (plus/minus) */
+.btn-incr,
+.btn-decr {
+  background-color: var(--dark-red);
+  color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: 44px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.btn-incr:hover,
+.btn-decr:hover {
+  background-color: #7c1811; /* slightly darker on hover */
+  color: #fff;
+}
 .hero-section {
   min-height: 50vh;
   overflow: hidden;
@@ -187,4 +205,9 @@
 }
 .site-footer small {
   color: #555;
+}
+
+/* S-size specific image width (larger than default but smaller than M) */
+.img-s {
+  width: 60% !important;
 }

@@ -18,7 +18,16 @@ $options = [
 try {
     $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
 } catch (PDOException $e) {
+    // Log full error for server logs
+    error_log('DB connection error: ' . $e->getMessage());
+
+    // When debugging is enabled (set SHOW_DB_ERROR=true or DEBUG=true), show the PDO error message
+    $showDebug = filter_var(getenv('SHOW_DB_ERROR') ?: getenv('DEBUG'), FILTER_VALIDATE_BOOLEAN);
     http_response_code(500);
-    echo 'Database connection failed.';
+    if ($showDebug) {
+        echo 'Database connection failed: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    } else {
+        echo 'Database connection failed.';
+    }
     exit;
 }

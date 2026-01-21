@@ -1,7 +1,17 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viwe AREA</title>
+</head>
+<body>
+    <h1>You can view avaliable area</h1>
+</body>
+</html><?php
 include '../database/db_conn.php';
 echo "Database connection successful from addzip.php";
-$sql = "SELECT * FROM zipcodes";
+$sql = "SELECT * FROM locations";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     echo "<h1>Zipcode List</h1>";
@@ -14,8 +24,8 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         echo "<tr>
                 <td>" . $row["id"] . "</td>
-                <td>" . $row["postal_code"] . "</td>
-                <td>" . $row["address"] . "</td>
+                <td>" . $row["zip_code"] . "</td>
+                <td>" . $row["city"] . "</td>
               </tr>";
     }
     echo "</table>";

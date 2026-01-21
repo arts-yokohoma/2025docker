@@ -15,10 +15,17 @@ if (isset($_GET['delivery_time'])) {
 
 // Handle form submission: save user data to session and redirect
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if privacy consent checkbox is checked
+    // Checkbox sends value only when checked, so we check isset() and value
+    $privacyConsent = (isset($_POST['privacy_agree']) && $_POST['privacy_agree'] == '1') ? 1 : 0;
+    $consentTime = $privacyConsent ? date('Y-m-d H:i:s') : null;
+    
     $_SESSION['order']['user'] = [
         'name'  => $_POST['name'] ?? '',
         'email' => $_POST['email'] ?? '',
-        'phone' => $_POST['phone'] ?? ''
+        'phone' => $_POST['phone'] ?? '',
+        'privacy_consent' => $privacyConsent,
+        'consent_time' => $consentTime
     ];
 
     header('Location: address.php');
@@ -95,7 +102,7 @@ $user = $_SESSION['order']['user'] ?? [
         
         <div class="privacy-section">
             <div class="privacy-checkbox">
-                <input type="checkbox" id="privacy-agree" name="privacy_agree" required checked>
+                <input type="checkbox" id="privacy-agree" name="privacy_agree" value="1" required checked>
                 <label for="privacy-agree">
                     個人情報の取り扱いについて同意します (注文処理の目的でのみ利用します)
                 </label>

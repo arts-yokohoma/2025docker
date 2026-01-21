@@ -1,3 +1,26 @@
+<?php
+include_once '../database/db_conn.php';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $zipcode = $_POST['zipcode'];
+    $city = $_POST['city'];
+    $state = $_POST['state'];
+    
+    $stmt = $conn->prepare("INSERT INTO locations (zip_code, city, state) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $zipcode, $city, $state);
+    
+    if ($stmt->execute()) {
+        echo "<h2>Zipcode added successfully!</h2>";
+        header("location: viewzip.php");
+        exit();
+        } else {
+            echo "<h2>Error adding zipcode: " . htmlspecialchars($stmt->error) . "</h2>";
+            }
+            
+            $stmt->close();
+            $conn->close();
+            }
+            ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,31 +34,13 @@
         <label for="zipcode">Zipcode:</label>
         <input type="text" id="zipcode" name="zipcode" required>
         <br><br>
-        <label for="area">Area:</label>
-        <input type="text" id="area" name="area" required>
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+        <br><br>
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state" required>
         <br><br>
         <input type="submit" value="Add Zipcode">
     </form>
 </body>
 </html>
-<?php
-include '../database/db_conn.php';
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $zipcode = $_POST['zipcode'];
-    $area = $_POST['area'];
-
-    $stmt = $conn->prepare("INSERT INTO zipcodes (zipcode, area) VALUES (?, ?)");
-    $stmt->bind_param("ss", $zipcode, $area);
-
-    if ($stmt->execute()) {
-        echo "New zipcode added successfully";
-        echo "<br><a href='addzip.php'>Add another zipcode</a>";
-        echo "<br><a href='viewzip.php'>View all zipcodes</a>";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
-}
-?>

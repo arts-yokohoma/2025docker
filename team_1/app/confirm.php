@@ -66,6 +66,19 @@ if (!$user || !$address) {
     $deliveryTime = $_SESSION['delivery_time'] ?? 'ASAP';
     if ($deliveryTime === 'ASAP') {
         echo 'できるだけ早く（最短30分後）';
+    } else if (preg_match('/^(today|tomorrow|day_after)_(\d{2}):(\d{2})$/', $deliveryTime, $matches)) {
+        // Parse scheduled delivery time: "today_14:30", "tomorrow_18:00", etc.
+        $dateKey = $matches[1];
+        $timeStr = $matches[2] . ':' . $matches[3];
+        
+        $dateLabels = [
+            'today' => '今日',
+            'tomorrow' => '明日',
+            'day_after' => '明後日'
+        ];
+        
+        $dateLabel = $dateLabels[$dateKey] ?? '';
+        echo '指定時間: ' . htmlspecialchars($dateLabel . ' ' . $timeStr);
     } else {
         echo '指定時間: ' . htmlspecialchars($deliveryTime);
     }

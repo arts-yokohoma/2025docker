@@ -34,6 +34,11 @@
     <!-- navbar -->
     <!-- body -->
     <form action="menu_process.php" method="post">
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success text-center" role="alert">価格を更新しました。</div>
+        <?php elseif (isset($_GET['error'])): ?>
+            <div class="alert alert-danger text-center" role="alert">価格更新中にエラーが発生しました。</div>
+        <?php endif; ?>
         <div class="container_def mx-auto w-50 p-4 m-5">
 
             <h3 class="text-center mb-4 fs-1 fw-bold">価格管理</h3>

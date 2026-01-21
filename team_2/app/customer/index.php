@@ -1,3 +1,40 @@
+        <?php
+            include '../database/db_conn.php';
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $postal_code = $_POST['postal_code'];
+            $stmt = $conn->prepare("SELECT * FROM locations WHERE zip_code = ?");
+            $stmt->bind_param("s", $postal_code);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0){
+                $found_data = $result->fetch_assoc();
+                echo "<h2>Address Found:</h2>";
+                header("location: order_form.php?address=" . urlencode($found_data['city']) . "&postal_code=" . urlencode($found_data['zip_code']));
+                exit();
+                //include 'order_form.php';
+                //echo "<a href='order_form.php'>Go to Order Form</a>";
+            }else {
+                echo "<h2>No address found for postal code: " . htmlspecialchars($postal_code) . "</h2>";
+            }
+        }
+        if ($_SERVER["REQUEST_METHOD"]=="POST"){
+            $chkod=$_POST['checkphonenumber'];
+            $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ?");
+            $stmt->bind_param("s", $chkod);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $order_data = $result->fetch_assoc();
+                echo "<h2>Order Found:</h2>";
+                echo "Order ID: " . htmlspecialchars($order_data['id']) . "<br>";
+                echo "Status: " . htmlspecialchars($order_data['status']) . "<br>";
+                
+            } else {
+                echo "<h2>No order found for phone number: " . htmlspecialchars($chkod) . "</h2>";
+            }
+        }
+        ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,21 +50,86 @@
         </h1>
     </header>
         <nav>
-            <form action="" method="post" name="postalForm">
+            <form action="" method="post" name="postalForm" id="zipform">
                 <label>Search for a postal code:</label>
                 <input type="text" name="postal_code" placeholder="e.g., 1234567" required>
                 <input type="submit" value="Search">
             </form>
         </nav>
-        <button onclick="toggleOrderSearch()">Search Order</button>
-        <nav id="order-search" style="display: none;">
-            <form action="" method="post" name="orderForm">
-                <label>Search for order:</label>
-                <input type="text" name="phonenumber" placeholder="e.g., 09012345678" required>
-                <input type="submit" value="Search">
-            </form>
-        </nav>
-    <script src="./script.js"></script>
+        <button onclick="showform()" id="chkbtn" type="submit" name=checkod>check order</button>
+        <form id="chkform" action="check_order.php" method="post" hidden>
+            <label for="phone">phone</label>
+            <input type="text" name="checkphonenumber" required>
+            <input type="submit" value="check">
+        </form>
+        
+    <main>
+        <script>
+        
+        // စာမျက်နှာပွင့်တာနဲ့ အလုပ်လုပ်မယ်
+        window.onload = function() {
+            getLocation();
+        };
+
+        function getLocation() {
+            // Browser က Geolocation ထောက်ပံ့လား စစ်တာ
+            if (navigator.geolocation) {
+                // Permission တောင်းမယ်
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else { 
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Permission ပေးလိုက်ရင် ဒီ function အလုပ်လုပ်မယ်
+        function showPosition(position) {
+            let lat = position.coords.latitude;
+            let long = position.coords.longitude;
+            
+            // လက်ရှိ Latitude နဲ့ Longitude ကို ရပြီ
+            document.getElementById("status-msg").innerHTML = 
+                "✅ Location ရရှိပါသည်: " + lat + ", " + long;
+
+            // ဒီအဆင့်မှာ Lat/Long ကိုသုံးပြီး မြေပုံပြတာ (သို့) Address ရှာတာ ဆက်လုပ်လို့ရပြီ
+            console.log("Lat: " + lat + ", Long: " + long);
+        }
+
+        // Permission မပေးဘဲ Block လိုက်ရင် (သို့) Error တက်ရင်
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("status-msg").innerHTML = "❌ User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("status-msg").innerHTML = "❌ Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("status-msg").innerHTML = "❌ The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("status-msg").innerHTML = "❌ An unknown error occurred.";
+                    break;
+            }
+        }
+    
+
+            let zip = document.getElementById("zipform");
+            let fo = document.getElementById("chkbtn");
+            let chkform = document.getElementById("chkform");
+            fo.addEventListener("click", function() {
+                if (chkform.hidden) {
+                    chkform.hidden = false;
+                    fo.innerHTML = 'Back'; // Fixed typo from 'changetext.innterHTML' to 'innerHTML'
+                    zip.hidden = true;
+                } else {
+                    zip.hidden = false;
+                    chkform.hidden = true;
+                }
+            });
+        </script>
 </body>
 </html>
-
+<?php
+//echo "<h2>Database Locations Table</h2>";
+//include '../database/show_tb.php';
+?>

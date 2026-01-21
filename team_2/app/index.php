@@ -10,6 +10,7 @@
 <body>
     <header>
         <h1>ピザマックへようこそ！ </h1>
+        <h1>lwww</h1>
     </header>
 
     <main style="padding: 20px;">
@@ -40,6 +41,8 @@
             // စာသားတွေ မှန်အောင် UTF-8 သတ်မှတ်ခြင်း
             $conn->set_charset("utf8mb4");
             ?>
+            <a href="../customer/index.php">order</a>
     </main>
+    
 </body>
 </html>

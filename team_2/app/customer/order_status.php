@@ -167,7 +167,7 @@ if ($remaining_seconds < 0) $remaining_seconds = 0;
             timerElement.innerHTML = mStr + ":" + sStr;
             timeLeft--;
         }
-        setInterval(updateTimer, 1000);
+        setInterval(updateTimer, 10000);
         updateTimer();
     </script>
     <?php endif; ?>

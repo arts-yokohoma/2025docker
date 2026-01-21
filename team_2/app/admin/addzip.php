@@ -5,12 +5,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $city = $_POST['city'];
     $state = $_POST['state'];
     
-    $stmt = $conn->prepare("INSERT INTO locations (zip_code, city, address) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO locations (zip_code, city, state) VALUES (?, ?, ?)");
     $stmt->bind_param("sss", $zipcode, $city, $state);
     
     if ($stmt->execute()) {
-        header("location: viewzip.php");
         echo "<h2>Zipcode added successfully!</h2>";
+         echo "<br><a href='viewzo@.php'>View Zipcode</a>";
+        //header("location: viewzip.php");
         exit();
         } else {
             echo "<h2>Error adding zipcode: " . htmlspecialchars($stmt->error) . "</h2>";

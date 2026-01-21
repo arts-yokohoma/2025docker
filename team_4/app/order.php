@@ -26,7 +26,7 @@
     </div>
 
     <div class="pizza-item">
-      <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65" alt="Pepperoni Pizza">
+      <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65" alt="Pepperoni Pizza" width=500 height="200">
       <div class="qty">
         <button type="button" onclick="changeQty('medium',-1)">−</button>
         <span id="mediumQty">2</span>

@@ -1,3 +1,17 @@
+<?php
+// load DB prices for menu (falls back to defaults on error)
+require_once __DIR__ . '/db_config.php';
+
+$price_s = 800;
+$price_m = 1200;
+$price_l = 1500;
+try {
+    $stmt = $pdo->prepare('SELECT size_s, size_m, size_l FROM menu_prices WHERE id = 1');
+    $stmt->execute();
+    $row = $stmt->fetch();
+    if ($row) {
+        // convert to integer yen for display
+        $price_s = (int)round($row['size_s']);
         $price_m = (int)round($row['size_m']);
         $price_l = (int)round($row['size_l']);
     }

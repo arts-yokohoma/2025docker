@@ -132,7 +132,7 @@ if ($deliveryTimeRaw === 'ASAP') {
     $deliveryTime = $deliveryTimeRaw;
 }
 
-$status = 'NEW';
+$status = 'New';
 
 /**
  * Validate data before transaction

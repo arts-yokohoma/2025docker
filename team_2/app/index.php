@@ -10,7 +10,7 @@
 <body>
     <header>
         <h1>ピザマックへようこそ！ </h1>
-        <h1>lwww</h1>
+        <h1>lwww hann</h1>    
     </header>
 
     <main style="padding: 20px;">

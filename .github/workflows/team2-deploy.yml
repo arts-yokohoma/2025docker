@@ -1,0 +1,19 @@
+name: Team 2 Auto Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'forschool/team_2/**'
+
+jobs:
+  deploy:
+    # GitHub Server ကို မသုံးဘဲ အစ်ကိုခုနက သွင်းလိုက်တဲ့ Runner ကို သုံးဖို့ ပြောတာပါ
+    runs-on: self-hosted 
+
+    steps:
+      - name: Update Code and Build Docker
+        run: |
+          cd ~/forschool
+          git pull origin main
+          docker-compose up -d --build team_2_apache team_2_mysql

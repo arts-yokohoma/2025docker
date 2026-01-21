@@ -10,7 +10,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($stmt->execute()) {
         echo "<h2>Zipcode added successfully!</h2>";
-        header("location: viewzip.php");
+         echo "<br><a href='viewzo@.php'>View Zipcode</a>";
+        //header("location: viewzip.php");
         exit();
         } else {
             echo "<h2>Error adding zipcode: " . htmlspecialchars($stmt->error) . "</h2>";

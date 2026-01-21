@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pizza Mach — Authentic Italian Pizza Experience</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/app/sama/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.jpg" alt="Pizza Mach">
+        </div>
+        <span class="logo-text">Pizza Mach</span>
+      </div>
+      
+      <nav class="nav" id="nav">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#menu" class="nav-link">Menu</a></li>
+          <li><a href="#services" class="nav-link">Services</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      
+      <button class="mobile-toggle" id="mobileToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO SLIDER -->
+<section class="hero" id="home">
+  <div class="hero-slider">
+    <!-- Slide 1 -->
+    <div class="hero-slide active">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container">
+        <div class="hero-content centered">
+          <span class="hero-subtitle" data-aos="fade-up">Welcome to Excellence</span>
+          <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+            We Cook Your<br><span class="accent-text">Desired Pizza</span>
+          </h1>
+          <p class="hero-description" data-aos="fade-up" data-aos-delay="200">
+            Experience authentic Italian flavors crafted with passion and tradition
+          </p>
+          <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+            <a href="#menu" class="btn btn-primary">Order Now</a>
+            <a href="#menu" class="btn btn-outline">View Menu</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 2 -->
+    <div class="hero-slide">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container">
+        <div class="hero-content split">
+          <div class="hero-image-wrap">
+            <img src="1.png" alt="Italian Pizza" class="hero-pizza">
+          </div>
+          <div class="hero-text">
+            <span class="hero-subtitle">Crunchy & Fresh</span>
+            <h1 class="hero-title">
+              Italian<br><span class="accent-text">Pizza</span>
+            </h1>
+            <p class="hero-description">
+              Handcrafted with the finest ingredients from Italy
+            </p>
+            <div class="hero-actions">
+              <a href="#menu" class="btn btn-primary">Order Now</a>
+              <a href="#menu" class="btn btn-outline">View Menu</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 3 -->
+    <div class="hero-slide">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container">
+        <div class="hero-content split reverse">
+          <div class="hero-image-wrap">
+            <img src="2.png" alt="Italian Cuisine" class="hero-pizza">
+          </div>
+          <div class="hero-text">
+            <span class="hero-subtitle">Delicious Tradition</span>
+            <h1 class="hero-title">
+              Italian<br><span class="accent-text">Cuisine</span>
+            </h1>
+            <p class="hero-description">
+              Where every bite tells a story of Italian heritage
+            </p>
+            <div class="hero-actions">
+              <a href="#menu" class="btn btn-primary">Order Now</a>
+              <a href="#menu" class="btn btn-outline">View Menu</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Slider Controls -->
+  <div class="slider-controls">
+    <button class="slider-arrow prev" id="prevSlide">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="slider-dots">
+      <span class="dot active" data-slide="0"></span>
+      <span class="dot" data-slide="1"></span>
+      <span class="dot" data-slide="2"></span>
+    </div>
+    <button class="slider-arrow next" id="nextSlide">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="about-image">
+      <img src="about.jpg" alt="Pizza Mach Restaurant">
+      <div class="about-badge">
+        <i class="fas fa-award"></i>
+        <span>Since 1990</span>
+      </div>
+    </div>
+    <div class="about-content">
+      <span class="section-label">Our Story</span>
+      <h2 class="section-title">Welcome to <span class="accent-text">Pizza Mach</span></h2>
+      <p class="about-text">
+        For over three decades, we've been serving the finest authentic Italian pizzas to our beloved community. Our journey began with a simple mission: to bring the true taste of Italy to every table.
+      </p>
+      <p class="about-text">
+        Every pizza is crafted with premium ingredients, traditional techniques, and a passion for perfection. From our wood-fired ovens to your plate, we ensure an unforgettable dining experience.
+      </p>
+      <div class="about-features">
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>100% Fresh Ingredients</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>Traditional Italian Recipes</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>Expert Chefs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">What We Offer</span>
+      <h2 class="section-title">Our <span class="accent-text">Services</span></h2>
+      <p class="section-description">
+        We're committed to providing exceptional service and quality in everything we do
+      </p>
+    </div>
+    
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-leaf"></i>
+        </div>
+        <h3 class="service-title">Healthy Foods</h3>
+        <p class="service-description">
+          Fresh, organic ingredients carefully selected to ensure nutritional value and exceptional taste in every bite.
+        </p>
+      </div>
+      
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-truck-fast"></i>
+        </div>
+        <h3 class="service-title">Fast Delivery</h3>
+        <p class="service-description">
+          Hot, delicious pizza delivered to your door within 30 minutes. Track your order in real-time.
+        </p>
+      </div>
+      
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-pizza-slice"></i>
+        </div>
+        <h3 class="service-title">Original Recipes</h3>
+        <p class="service-description">
+          Authentic Italian recipes passed down through generations, prepared with love and expertise.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu" id="menu">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Our Menu</span>
+      <h2 class="section-title">Discover Our <span class="accent-text">Specialties</span></h2>
+      <p class="section-description">
+        Handcrafted pizzas made with premium ingredients and authentic Italian techniques
+      </p>
+      <div class="delivery-badge">
+        <i class="fas fa-clock"></i> 30 Minutes Delivery Guarantee
+      </div>
+    </div>
+    
+    <div class="menu-grid">
+      <div class="menu-card">
+        <div class="menu-image-small">
+          <img src="/menu.jpg" alt="Italian Pizza - Small">
+          <div class="menu-badge">Popular</div>
+        </div>
+        <div class="menu-info">
+          <h3 class="menu-title">Small (S)</h3>
+          <p class="menu-description">
+            Perfect for one person. Fresh ingredients on crispy crust.
+          </p>
+          <div class="menu-footer">
+            <span class="menu-price">¥1,000</span>
+            <button class="btn-cart" onclick="openOrderModal('S', '¥1,000')">
+              <i class="fas fa-shopping-cart"></i>
+              Order
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-card">
+        <div class="menu-image-small">
+          <img src="menu.jpg" alt="Italian Pizza - Medium">
+          <div class="menu-badge hot">Best Value</div>
+        </div>
+        <div class="menu-info">
+          <h3 class="menu-title">Medium (M)</h3>
+          <p class="menu-description">
+            Great for sharing. Rich cheese and fresh toppings.
+          </p>
+          <div class="menu-footer">
+            <span class="menu-price">¥2,000</span>
+            <button class="btn-cart" onclick="openOrderModal('M', '¥2,000')">
+              <i class="fas fa-shopping-cart"></i>
+              Order
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-card">
+        <div class="menu-image-small">
+          <img src="menu.jpg" alt="Italian Pizza - Large">
+        </div>
+        <div class="menu-info">
+          <h3 class="menu-title">Large (L)</h3>
+          <p class="menu-description">
+            Family size. Perfect for parties and gatherings.
+          </p>
+          <div class="menu-footer">
+            <span class="menu-price">¥3,000</span>
+            <button class="btn-cart" onclick="openOrderModal('L', '¥3,000')">
+              <i class="fas fa-shopping-cart"></i>
+              Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contact Form Section -->
+    <div class="contact-form-section">
+      <div class="contact-form-header">
+        <span class="section-label">Get In Touch</span>
+        <h2 class="section-title">Contact <span class="accent-text">Us</span></h2>
+        <p class="section-description">
+          Have questions or special requests? Leave your information and we'll get back to you soon!
+        </p>
+      </div>
+      
+      <form class="contact-form" id="contactForm">
+        <div class="form-group">
+          <label for="contact_name">
+            <i class="fas fa-user"></i> Full Name *
+          </label>
+          <input type="text" id="contact_name" placeholder="Enter your full name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="contact_phone">
+            <i class="fas fa-phone"></i> Phone Number *
+          </label>
+          <input type="tel" id="contact_phone" placeholder="Enter your phone number" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="contact_address">
+            <i class="fas fa-map-marker-alt"></i> Address *
+          </label>
+          <textarea id="contact_address" rows="3" placeholder="Enter your address" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="contact_message">
+            <i class="fas fa-comment"></i> Message (Optional)
+          </label>
+          <textarea id="contact_message" rows="4" placeholder="Any special requests or questions?"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary full-width">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+      
+      <div class="form-success-message hidden" id="contactSuccess">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Thank You!</h3>
+        <p>We've received your message and will contact you shortly.</p>
+      </div>
+    </div>
+
+    <!-- Customer Information Section -->
+    <div class="customer-info-section">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h4>Delivery Time</h4>
+          <p>Within 30 minutes to your door</p>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h4>Quality Guarantee</h4>
+          <p>Fresh ingredients, hot delivery</p>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-icon">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <h4>Payment Options</h4>
+          <p>Cash or card on delivery</p>
+        </div>
+      </div>
+      
+      <div class="important-notes">
+        <h4><i class="fas fa-info-circle"></i> Important Information</h4>
+        <ul>
+          <li><i class="fas fa-check"></i> Delivery available within service area only</li>
+          <li><i class="fas fa-check"></i> Minimum order: ¥1,000</li>
+          <li><i class="fas fa-check"></i> Please have exact change ready if paying cash</li>
+          <li><i class="fas fa-check"></i> Contact us for special dietary requirements</li>
+        </ul>
+      </div>
+      
+      <div class="contact-info-box">
+        <h4>Need Help? Contact Us</h4>
+        <div class="contact-details">
+          <p><i class="fas fa-phone"></i> Phone: <strong>+1 234 567 8900</strong></p>
+          <p><i class="fas fa-envelope"></i> Email: <strong>info@pizzamach.com</strong></p>
+          <p><i class="fas fa-clock"></i> Hours: <strong>11:00 AM - 11:00 PM Daily</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER MODAL -->
+<div class="order-modal" id="orderModal">
+  <div class="order-modal-content">
+    <button class="close-modal" onclick="closeOrderModal()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <!-- Order Form -->
+    <div class="order-step" id="orderForm">
+      <div class="step-header">
+        <i class="fas fa-pizza-slice"></i>
+        <h3>Place Your Order</h3>
+      </div>
+      
+      <div class="order-summary">
+        <p><strong>Pizza Size:</strong> <span id="display-size"></span></p>
+        <p><strong>Price:</strong> <span id="display-price"></span></p>
+      </div>
+      
+      <input type="text" id="cust_name" placeholder="Full Name *" required>
+      <input type="text" id="cust_address" placeholder="Delivery Address *" required>
+      <input type="tel" id="cust_phone" placeholder="Phone Number *" required>
+      
+      <button class="btn btn-primary full-width" onclick="submitOrder()">
+        <i class="fas fa-check"></i> Confirm Order
+      </button>
+    </div>
+    
+    <!-- Success Step -->
+    <div class="order-step hidden" id="successStep">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 class="success-title">Order Confirmed!</h2>
+      <p class="success-message">Thank you for your order. Your pizza is being prepared.</p>
+      
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="detail-label">Estimated Delivery:</span>
+          <span class="detail-value" id="arrival-time"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value status-preparing">
+            <i class="fas fa-fire"></i> Preparing...
+          </span>
+        </div>
+      </div>
+      
+      <p class="screenshot-note">
+        <i class="fas fa-info-circle"></i> Please screenshot this page for your reference
+      </p>
+      
+      <button class="btn btn-primary full-width" onclick="closeAndReset()">
+        <i class="fas fa-home"></i> Back to Home
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon">
+            <img src="logo.jpg" alt="Pizza Mach">
+          </div>
+          <span class="logo-text">Pizza Mach</span>
+        </div>
+        <p class="footer-text">
+          Serving authentic Italian pizza with passion and tradition since 1990.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact Us</h4>
+        <p><i class="fas fa-phone"></i> +1 234 567 8900</p>
+        <p><i class="fas fa-envelope"></i> info@pizzamach.com</p>
+        <p><i class="fas fa-map-marker-alt"></i> 123 Pizza Street, Italy</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Pizza Mach. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/app/sama/script.js"></script>
+</body>
+</html>

@@ -77,11 +77,7 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
 
     <!-- Medium Pizza -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Medium Pizza">
-      <div class="pizza-info">
-        <h3>Medium Pizza (30cm)</h3>
-        <p>¥<?php echo number_format($pizza['medium_price']); ?></p>
-      </div>
+      <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65" alt="Pepperoni Pizza">
       <div class="qty">
         <button type="button" onclick="changeQty('medium', -1)">−</button>
         <span id="mediumQty">2</span>

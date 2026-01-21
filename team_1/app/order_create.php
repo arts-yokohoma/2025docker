@@ -1,6 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/../config/db.php';
+require __DIR__ . '/./config/db.php';
 
 /**
  * Order creation endpoint
@@ -132,7 +132,7 @@ if ($deliveryTimeRaw === 'ASAP') {
     $deliveryTime = $deliveryTimeRaw;
 }
 
-$status = 'NEW';
+$status = 'New';
 
 /**
  * Validate data before transaction

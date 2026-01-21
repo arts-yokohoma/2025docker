@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../config/db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Fetch orders from database with order items and customer details
 $query = "

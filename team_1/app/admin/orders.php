@@ -1,4 +1,4 @@
-<?php include "/./mock_orders.php"; 
+<?php include "mock_orders.php"; 
 
 // Count orders by status
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];
@@ -15,61 +15,7 @@ foreach ($orders as $order) {
   <meta charset="UTF-8">
   <title>注文ページ</title>
   <link rel="stylesheet" href="css/orders.css">
-  <style>
-    .filter-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #ddd;
-    }
-    .filter-tab {
-      padding: 10px 15px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-size: 14px;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .filter-tab.active {
-      border-bottom-color: #2196F3;
-      color: #2196F3;
-      font-weight: bold;
-    }
-    .filter-tab:hover {
-      background-color: #f5f5f5;
-    }
-    .filter-badge {
-      background-color: #2196F3;
-      color: white;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .filter-tab.active .filter-badge {
-      background-color: #2196F3;
-    }
-    .orders tbody tr {
-      display: none;
-    }
-    .orders tbody tr.visible {
-      display: table-row;
-    }
-    .status.completed {
-      background-color: #4CAF50;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
-    }
-  </style>
+ 
 </head>
 <body>
 

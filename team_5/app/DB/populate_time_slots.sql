@@ -5,13 +5,15 @@ SELECT s.shift_date,
        (gs)::time AS slot_start,
        (gs + interval '30 minutes')::time AS slot_end,
        (CASE WHEN (gs::time) < time '16:00'
-             THEN COALESCE(s.morning_kitchen,0) + COALESCE(s.morning_driver,0)
-             ELSE COALESCE(s.evening_kitchen,0) + COALESCE(s.evening_driver,0)
+       THEN COALESCE(s.morning_driver,0)
+       ELSE COALESCE(s.evening_driver,0)
         END) AS capacity,
-       (CASE WHEN (CASE WHEN (gs::time) < time '16:00'
-                        THEN COALESCE(s.morning_kitchen,0) + COALESCE(s.morning_driver,0)
-                        ELSE COALESCE(s.evening_kitchen,0) + COALESCE(s.evening_driver,0)
-                   END) > 0 THEN TRUE ELSE FALSE END) AS available
+    (CASE
+      WHEN (CASE WHEN (gs::time) < time '16:00'
+           THEN COALESCE(s.morning_driver,0)
+           ELSE COALESCE(s.evening_driver,0)
+         END) > 0 THEN TRUE ELSE FALSE
+     END) AS available
 FROM shifts s
 CROSS JOIN LATERAL generate_series(
   (s.shift_date + time '10:00'),

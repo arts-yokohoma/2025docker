@@ -1,8 +1,7 @@
--- PostgreSQL table for pizza orders (Team 5)
--- NOTE: The `customer` table is used for お問い合わせ, so orders are stored separately here.
+-- PostgreSQL table for pizza orders
 
 CREATE TABLE IF NOT EXISTS orders (
-  id BIGSERIAL PRIMARY KEY,
+  order_number VARCHAR(6) PRIMARY KEY,
 
   -- Reservation / time slot selected in time.php
   time_slot VARCHAR(50),
@@ -26,6 +25,13 @@ CREATE TABLE IF NOT EXISTS orders (
   status VARCHAR(30) NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE orders
+  DROP CONSTRAINT IF EXISTS chk_orders_order_number_format;
+
+ALTER TABLE orders
+  ADD CONSTRAINT chk_orders_order_number_format
+  CHECK (order_number ~ '^[A-Z]{3}[0-9]{3}$') NOT VALID;
 
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_phone ON orders(customer_phone);

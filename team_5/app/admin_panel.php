@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+if (empty($_SESSION['admin_id'])) {
+    header('Location: admin_login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -21,6 +29,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item d-flex align-items-center me-2">
+                        <span class="nav-link fw-bold">ログイン中の管理者：
+                            <?php echo htmlspecialchars((string)($_SESSION['admin_username'] ?? '')); ?>
+                        </span>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="customer_data.php">お問い合わせ</a>
                     </li>
@@ -35,6 +48,12 @@
 
     <!-- body -->
     <div class="container text-center mt-5">
+        <?php if (!empty($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success fs-4 fw-bold" role="alert">
+                <?php echo htmlspecialchars((string)$_SESSION['flash_success']); ?>
+            </div>
+            <?php unset($_SESSION['flash_success']); ?>
+        <?php endif; ?>
         <div class="row">
             <div class="col container_def_button m-4 fs-1">
                 <a href="shift.php" class="text-decoration-none text-dark d-block">シフト<br>管理</a>
@@ -45,6 +64,9 @@
             <div class="col container_def_button m-4 fs-1">
                 <a href="menu.php" class="text-decoration-none text-dark d-block">メニュー<br>管理</a>
             </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="admin_create_user.php" class="btn btn-filled-custom btn-lg rounded-2 fw-bold">管理者ユーザー作成</a>
         </div>
     </div>
 

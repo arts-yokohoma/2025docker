@@ -135,7 +135,8 @@ $customer = $_SESSION['customer'] ?? [];
         </div>
 
         <!-- Submit (outside the container box) -->
-        <div class="text-center mt-3">
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <a class="btn btn-outline-secondary px-5 py-2 fs-3 fw-bold" href="order_select.php">戻る</a>
             <button type="submit" class="btn btn-success px-5 py-2 fs-3 fw-bold">
                 予約 →
             </button>

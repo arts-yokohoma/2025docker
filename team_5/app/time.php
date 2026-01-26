@@ -29,10 +29,102 @@
     <!-- navbar -->
 
 
+    <form id="timeSlotForm" action="order_select.php" method="get">
+        <input type="hidden" name="time_slot" id="selectedTimeSlot" value="">
+
+        <div class="container mt-3">
+            <div id="time-slots" class="row g-4 text-center"></div>
+        </div>
+
+        <div class="d-flex justify-content-center my-5">
+            <button id="submitBtn" type="submit" class="btn btn-success fs-3 px-5" disabled>
+                メニューへ進む
+            </button>
+        </div>
+    </form>
 
 
 
     <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const startTime = "10:00";
+        const endTime = "22:00";
+        const intervalMinutes = 30;
+
+        // Full (満席) slots
+        const fullSlots = [
+            "12:30-13:00",
+            "17:30-18:00"
+        ];
+
+        const container = document.getElementById("time-slots");
+        const selectedTimeSlot = document.getElementById("selectedTimeSlot");
+        const submitBtn = document.getElementById("submitBtn");
+        const form = document.getElementById("timeSlotForm");
+
+        function timeToMinutes(time) {
+            const [h, m] = time.split(":").map(Number);
+            return h * 60 + m;
+        }
+
+        function minutesToTime(minutes) {
+            const h = String(Math.floor(minutes / 60)).padStart(2, "0");
+            const m = String(minutes % 60).padStart(2, "0");
+            return `${h}:${m}`;
+        }
+
+        let current = timeToMinutes(startTime);
+        const end = timeToMinutes(endTime);
+
+        while (current < end) {
+            const next = current + intervalMinutes;
+
+            const label = `${minutesToTime(current)}-${minutesToTime(next)}`;
+            const isFull = fullSlots.includes(label);
+
+            const col = document.createElement("div");
+            col.className = "col-6 col-md-3";
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "btn w-100 py-4 time-slot-btn";
+            btn.disabled = isFull;
+            btn.dataset.slot = label;
+            btn.innerHTML = isFull ?
+                `${label}<br><span class="text-danger">満席</span>` :
+                label;
+
+            if (!isFull) {
+                btn.addEventListener('click', function() {
+                    // only one selected at a time
+                    container.querySelectorAll('.time-slot-btn.is-selected').forEach(b => {
+                        b.classList.remove('is-selected');
+                        b.setAttribute('aria-pressed', 'false');
+                    });
+
+                    btn.classList.add('is-selected');
+                    btn.setAttribute('aria-pressed', 'true');
+                    selectedTimeSlot.value = btn.dataset.slot;
+                    submitBtn.disabled = false;
+                });
+                btn.setAttribute('aria-pressed', 'false');
+            }
+
+            col.appendChild(btn);
+            container.appendChild(col);
+
+            current = next;
+        }
+
+        form.addEventListener('submit', function(e) {
+            if (!selectedTimeSlot.value) {
+                e.preventDefault();
+                alert('時間を1つ選択してください。');
+            }
+        });
+    </script>
+
 
     <!-- Site footer -->
     <footer class="site-footer mt-5">

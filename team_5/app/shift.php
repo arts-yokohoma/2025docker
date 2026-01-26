@@ -51,7 +51,7 @@
                 <div class="row text-center mb-4 mx-auto justify-content-center">
                     <div class="col-12 mb-3">
                         <label class="form-label fs-4 fw-bold d-block">勤務区分</label>
-                        <div class="btn-group" role="group" aria-label="shift period">
+                        <div class="btn-group shift-period" role="group" aria-label="shift period">
                             <input type="radio" class="btn-check" name="shift_period" id="period_morning" value="morning" autocomplete="off" checked>
                             <label class="btn btn-outline-primary" for="period_morning">日勤（10:00〜16:00）</label>
 

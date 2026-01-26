@@ -131,7 +131,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </script>
 </body>
 </html>
-<?php
-//echo "<h2>Database Locations Table</h2>";
-//include '../database/show_tb.php';
-?>

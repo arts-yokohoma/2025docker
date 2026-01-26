@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Order Pizza</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 
 
@@ -17,7 +17,7 @@
   <!-- LEFT : PIZZA LIST -->
   <div class="pizza-list">
     <div class="pizza-item">
-      <img src="https://images.unsplash.com/photo-1601924638867-3ec62c7e5c79" alt="Margherita Pizza">
+      <img src="image/p1.jpg" style="width:120px">
       <div class="qty">
         <button type="button" onclick="changeQty('small',-1)">−</button>
         <span id="smallQty">1</span>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="pizza-item">
-      <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65" alt="Pepperoni Pizza">
+      <img src="image/p2.jpg" style="width:200px">
       <div class="qty">
         <button type="button" onclick="changeQty('medium',-1)">−</button>
         <span id="mediumQty">2</span>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="pizza-item">
-      <img src="https://images.unsplash.com/photo-1548365328-9f547fb095d8" alt="Vegetarian Pizza">
+      <img src="image/p3.jpg" style="width:300px">
       <div class="qty">
         <button type="button" onclick="changeQty('large',-1)">−</button>
         <span id="largeQty">1</span>

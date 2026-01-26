@@ -1,5 +1,4 @@
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Poppins', sans-serif;
       background: #fdf8f3;
@@ -30,8 +29,9 @@
     .hero {
       display: flex;
       align-items: center;
+      height: 100px;
       justify-content: center;
-      padding: 80px 60px;
+      padding: 120px 60px; /* Increase padding to make the section larger */
       position: relative;
     }
     .vertical-text {
@@ -56,12 +56,12 @@
     .hero-card {
       background: #fff;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 80px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       position: relative;
     }
     .hero-card img {
-      width: 280px;
+      width: 320px; /* Increase the image size */
       border-radius: 10px;
     }
     .badge {
@@ -71,7 +71,7 @@
       transform: translateX(-50%);
       background: linear-gradient(135deg,#f6a03d,#e07b18);
       width: 200px;
-      height: 40px;
+      height: 2000px;
     }
     .menu {
       display: flex;
@@ -93,6 +93,11 @@
     .menu-card p {
       font-size: 14px;
     }
+    .menu-card:hover {
+      transform: scale(1.05); /* Slightly enlarge the card */
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    }
     .order-btn {
       display: flex;
       justify-content: center;
@@ -107,6 +112,12 @@
       border-radius: 25px;
       cursor: pointer;
       box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .order-btn button:hover {
+      background-color: #ff6347; /* Change to a tomato color */
+      color: white; /* Change text color to white */
+      cursor: pointer; /* Change cursor to pointer */
+      transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
     }
     .about {
       padding: 60px;
@@ -164,8 +175,8 @@
 
 .qty button {
   border: none;
-  background: #b1352f;
-  color: white;
+  background: hwb(0 98% 2%);
+  color: rgb(12, 12, 12);
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -180,11 +191,11 @@
 }
 
 .order-summary {
-  width: 35%;
+  width: 90%;
   background: #f6b47c;
-  border: 6px solid #b1352f;
+  border: 6px solid #a83434;
   border-radius: 20px;
-  padding: 40px;
+  padding: 0 auto;
   text-align: center;
   position: sticky;
   top: 40px;
@@ -489,4 +500,3 @@
     flex-direction: column;
   }
 }
-    

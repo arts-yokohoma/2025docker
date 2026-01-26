@@ -1,88 +1,81 @@
 <?php
-// ၁။ အချိန်ဇုန် ညှိခြင်း (Timer မှန်ဖို့ အရေးကြီးဆုံး)
 date_default_timezone_set('Asia/Tokyo');
-
 include '../database/db_conn.php';
 
 $order = null;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['checkphonenumber'])) {
+// ၁။ ဖုန်းနံပါတ်ဖြင့် ရှာခြင်း (သို့) ID ဖြင့် ရှာခြင်း
+if (isset($_POST['checkphonenumber'])) {
     $chkorder = mysqli_real_escape_string($conn, $_POST['checkphonenumber']);
-    
-    // နောက်ဆုံး မှာထားတဲ့ Order ကို ယူမယ်
     $query = "SELECT * FROM orders WHERE phonenumber = '$chkorder' ORDER BY id DESC LIMIT 1";
     $result = $conn->query($query);
     $order = $result->fetch_assoc();
-    
-    if (!$order) {
-        echo "<h2 style='text-align:center; color:red;'>Order not found! (အော်ဒါမရှိပါ)</h2>";
-        echo "<center><a href='../customer/index.php'>Back</a></center>";
-        exit();
-    }
 } elseif (isset($_GET['id'])) {
-    // URL ကနေ ID နဲ့ လာရင်လည်း လက်ခံနိုင်အောင် (Refresh အတွက်)
     $id = mysqli_real_escape_string($conn, $_GET['id']);
     $query = "SELECT * FROM orders WHERE id = '$id'";
     $result = $conn->query($query);
     $order = $result->fetch_assoc();
-} else {
-    header("Location: ../customer/index.php");
+}
+
+// Order မရှိလျှင်
+if (!$order) {
+    echo "<script>alert('Order not found!'); window.location='../customer/index.php';</script>";
     exit();
 }
 
-// ၂။ Customer က "လက်ခံရရှိပါပြီ" ဟု နှိပ်လိုက်လျှင်
+// ၂။ Customer Confirm Logic (လက်ခံရရှိပါပြီ)
 if (isset($_POST['confirm_receive'])) {
     $order_id = $_POST['order_id'];
-    $conn->query("UPDATE orders SET status = 'Completed' WHERE id = $order_id");
+    // Status Completed ပြောင်းမယ်၊ Received Time မှတ်မယ်
+    $conn->query("UPDATE orders SET status = 'Completed', received_time = NOW() WHERE id = $order_id");
     header("Location: check_order.php?id=" . $order_id); 
     exit();
 }
 
-// ၃။ ဈေးနှုန်း တွက်ချက်ခြင်း
-$unit_price = 0;
-if ($order['pizza_type'] == 'S') $unit_price = 1000;
-elseif ($order['pizza_type'] == 'M') $unit_price = 2000;
-elseif ($order['pizza_type'] == 'L') $unit_price = 3000;
-
-$total_price = $unit_price * $order['quantity'];
-
-// ၄။ Status Logic
+// ၃။ Status & Timer Logic
 $status_text = "";
 $status_color = "";
-$show_timer = true; 
-
-switch ($order['status']) {
-    case 'Pending':
-        $status_text = "အော်ဒါ လက်ခံရရှိထားပါသည် (Waiting)";
-        $status_color = "#f39c12";
-        break;
-    case 'Cooking':
-        $status_text = "👨‍🍳 စားဖိုမှူး ချက်ပြုတ်နေပါသည် (Cooking)";
-        $status_color = "#d35400";
-        break;
-    case 'Delivering':
-        $status_text = "🛵 လူကြီးမင်းထံ လာပို့နေပါပြီ (On the way)";
-        $status_color = "#2980b9";
-        break;
-    case 'Completed':
-        $status_text = "✅ ပို့ဆောင်မှု ပြီးစီးပါပြီ (Completed)";
-        $status_color = "#27ae60";
-        $show_timer = false; 
-        break;
-    default:
-        $status_text = "Processing...";
-        $status_color = "grey";
-}
-
-// ၅။ အချိန်တွက်ချက်ခြင်း (Admin လက်ခံတဲ့ start_time ကနေပဲ တွက်မယ်)
+$show_timer = false;
 $remaining_seconds = 0;
-if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
-    $start_time = strtotime($order['start_time']); 
-    $target_time = $start_time + (30 * 60); // ၃၀ မိနစ်
-    $current_time = time(); 
-    $remaining_seconds = $target_time - $current_time;
-    if ($remaining_seconds < 0) $remaining_seconds = 0;
+$current_time = time();
+
+if ($order['status'] == 'Rejected') {
+    // Rejected ဖြစ်နေလျှင်
+    $status_text = "❌ ဤအော်ဒါကို ဆိုင်မှ ပယ်ဖျက်လိုက်ပါသည်";
+    $status_color = "#c0392b";
+} elseif ($order['status'] == 'Pending') {
+    $status_text = "အော်ဒါ လက်ခံရရှိထားပါသည် (Waiting)";
+    $status_color = "#f39c12";
+} elseif ($order['status'] == 'Cooking') {
+    $status_text = "👨‍🍳 စားဖိုမှူး ချက်ပြုတ်နေပါသည် (Cooking)";
+    $status_color = "#d35400";
+    $show_timer = true;
+    if (!empty($order['start_time'])) {
+        $start = strtotime($order['start_time']);
+        $target = $start + (30 * 60); // မိနစ် ၃၀
+        $remaining_seconds = $target - $current_time;
+    }
+} elseif ($order['status'] == 'Delivering') {
+    $status_text = "🛵 လူကြီးမင်းထံ လာပို့နေပါပြီ (On the way)";
+    $status_color = "#2980b9";
+    $show_timer = true;
+    
+    // Timer ကို Departure Time ကနေ ၁၅ မိနစ် တွက်မယ်
+    if (!empty($order['departure_time'])) {
+        $dept = strtotime($order['departure_time']);
+        $target = $dept + (15 * 60); // ၁၅ မိနစ်
+        $remaining_seconds = $target - $current_time;
+    } else {
+        // Departure time မရှိရင် (Error ကာကွယ်ရန်) Start time နဲ့ပဲ ဆက်ပြ
+        $start = strtotime($order['start_time']);
+        $remaining_seconds = ($start + (30*60)) - $current_time;
+    }
+} elseif ($order['status'] == 'Completed') {
+    $status_text = "✅ ပို့ဆောင်မှု ပြီးစီးပါပြီ (Completed)";
+    $status_color = "#27ae60";
 }
+
+if ($remaining_seconds < 0) $remaining_seconds = 0;
 ?>
 
 <!DOCTYPE html>
@@ -91,14 +84,13 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Status</title>
-    <meta http-equiv="refresh" content="10"> <style>
+    <meta http-equiv="refresh" content="10">
+    <style>
         body { font-family: sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
         .card { background: white; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .status-box { background-color: <?php echo $status_color; ?>; color: white; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; }
         .timer-box { font-size: 2.5em; font-weight: bold; color: #333; margin: 10px 0; }
-        .details { text-align: left; margin-top: 20px; line-height: 1.8; border-top: 1px solid #ddd; padding-top: 10px; }
-        .price-row { display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; color: #2c3e50; border-top: 2px dashed #ccc; padding-top: 10px; margin-top: 10px; }
-        .btn { display: inline-block; margin-top: 20px; padding: 12px 25px; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-size: 16px; }
+        .btn { display: inline-block; padding: 12px 25px; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -106,48 +98,50 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
     <div class="card">
         <h2>အော်ဒါ အခြေအနေ</h2>
 
-        <div class="status-box">
-            <?php echo $status_text; ?>
-        </div>
-
-        <?php if ($order['status'] == 'Pending'): ?>
-            <p>ဆိုင်မှ အော်ဒါကို အတည်ပြုရန် စောင့်ဆိုင်းနေပါသည်...</p>
-        <?php elseif ($show_timer): ?>
-            <p>ခန့်မှန်း ကြာချိန်:</p>
-            <div class="timer-box">
-                ⏱ <span id="timer">...</span>
+        <?php if ($order['status'] == 'Rejected'): ?>
+            <div class="status-box">
+                <?php echo $status_text; ?>
             </div>
+            <p>တောင်းပန်ပါသည်။ ပစ္စည်းကုန်နေခြင်း (သို့) ဆိုင်ပိတ်ချိန် နီးကပ်နေခြင်း ဖြစ်နိုင်ပါသည်။</p>
+            <a href="../customer/index.php" class="btn" style="background: darkred;">ပင်မစာမျက်နှာသို့</a>
+
         <?php else: ?>
-            <div style="font-size: 1.2em; color: green; margin-bottom: 20px;">
-                🙏 ကျေးဇူးတင်ပါသည်။ အစားကောင်းကောင်း သုံးဆောင်ပါ!
+            <div class="status-box">
+                <?php echo $status_text; ?>
             </div>
-        <?php endif; ?>
 
-        <?php if ($order['status'] == 'Delivering'): ?>
-            <form method="post" style="margin-top: 10px;">
-                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
-                <button type="submit" name="confirm_receive" class="btn" style="background: #27ae60;">
-                    ✅ အော်ဒါလက်ခံရရှိပါပြီ
-                </button>
-            </form>
-        <?php endif; ?>
+            <?php if ($show_timer): ?>
+                <p>ခန့်မှန်း ကြာချိန်:</p>
+                <div class="timer-box">
+                    ⏱ <span id="timer">...</span>
+                </div>
+            <?php elseif ($order['status'] == 'Completed'): ?>
+                <div style="font-size: 1.2em; color: green; margin-bottom: 20px;">
+                    🙏 ကျေးဇူးတင်ပါသည်။ အစားကောင်းကောင်း သုံးဆောင်ပါ!
+                </div>
+            <?php endif; ?>
 
-        <div class="details">
-            <p><strong>Order ID:</strong> #<?php echo $order['id']; ?></p>
-            <p><strong>အမည်:</strong> <?php echo htmlspecialchars($order['customer_name']); ?></p>
-            <p><strong>လိပ်စာ:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
-            <p><strong>ပီဇာ:</strong> Size <?php echo htmlspecialchars($order['pizza_type']); ?> (<?php echo $order['quantity']; ?> ခု)</p>
+            <?php if ($order['status'] == 'Delivering'): ?>
+                <form method="post">
+                    <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                    <button type="submit" name="confirm_receive" class="btn" style="background: #27ae60; width: 100%;">
+                        ✅ အော်ဒါလက်ခံရရှိပါပြီ
+                    </button>
+                </form>
+            <?php endif; ?>
 
-            <div class="price-row">
-                <span>စုစုပေါင်း:</span>
-                <span style="color: green;">¥<?php echo number_format($total_price); ?></span>
+            <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; text-align: left;">
+                <p><strong>ID:</strong> #<?php echo $order['id']; ?></p>
+                <p><strong>အမည်:</strong> <?php echo htmlspecialchars($order['customer_name']); ?></p>
+                <p><strong>ပီဇာ:</strong> <?php echo htmlspecialchars($order['pizza_type']); ?> (x<?php echo $order['quantity']; ?>)</p>
             </div>
-        </div>
+            
+            <a href="../customer/index.php" class="btn" style="background: #555; margin-top: 20px;">Back to Home</a>
 
-        <a href="../customer/index.php" class="btn" style="background: #555;">ပင်မစာမျက်နှာသို့</a>
+        <?php endif; ?>
     </div>
 
-    <?php if ($show_timer && $order['status'] != 'Pending'): ?>
+    <?php if ($show_timer): ?>
     <script>
         let timeLeft = <?php echo $remaining_seconds; ?>;
         const timerElement = document.getElementById('timer');

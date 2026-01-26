@@ -3,19 +3,19 @@
  * Database schema installation script
  * 
  * Creates all required tables for the pizza delivery application:
+ * - roles: User roles (admin, user, moderator, guest)
+ * - users: User accounts with authentication
  * - customer: Customer information with privacy consent tracking
  * - menu: Menu items with S/M/L pricing
  * - orders: Order records with delivery info (DATETIME format)
  * - order_items: Individual items in each order
  * - store_hours: Store operating hours and shift configuration
  * 
- * Version: 2.0
+ * Version: 3.0
  * Changes:
- * - Added privacy_consent and consent_time to customer table
- * - Changed delivery_time from VARCHAR to DATETIME in orders table
- * - Added index on delivery_time for faster queries
- * 
- * Note: DDL statements auto-commit in MySQL, but we stop on first error
+ * - Added roles table with 4 predefined roles
+ * - Added users table with authentication (username, email, password, role_id)
+ * - Added automatic timestamp management (created_at, updated_at)
  */
 require __DIR__ . '/../config/db.php';
 
@@ -25,7 +25,42 @@ $mysqli->set_charset('utf8mb4');
 $queries = [];
 
 /* =========================
-   1) customer table
+   1) roles table
+   Stores the 4 user roles (admin, user, moderator, guest)
+   ========================= */
+$queries[] = "
+CREATE TABLE IF NOT EXISTS roles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+";
+
+/* =========================
+   2) users table
+   Stores user accounts with authentication and role assignment
+   ========================= */
+$queries[] = "
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role_id INT NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_users_email (email),
+  INDEX idx_users_username (username),
+  INDEX idx_users_role (role_id),
+  CONSTRAINT fk_users_role
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+";
+
+/* =========================
+   3) customer table
    Stores customer information with privacy consent tracking
    ========================= */
 $queries[] = "
@@ -46,7 +81,7 @@ CREATE TABLE IF NOT EXISTS customer (
 ";
 
 /* =========================
-   2) menu table
+   4) menu table
    Supports S/M/L pricing - at least one price must be set
    Uses soft deletion (deleted flag) to preserve order history
    ========================= */
@@ -69,7 +104,7 @@ CREATE TABLE IF NOT EXISTS menu (
 ";
 
 /* =========================
-   3) orders table
+   5) orders table
    Stores order information with delivery details
    delivery_comment stored separately from delivery_address
    delivery_time is DATETIME for proper date/time handling
@@ -95,7 +130,7 @@ CREATE TABLE IF NOT EXISTS orders (
 ";
 
 /* =========================
-   4) order_items table
+   6) order_items table
    Stores individual items in each order
    - size: S/M/L (defaults to M)
    - price: unit price at time of order (price snapshot)
@@ -123,7 +158,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 ";
 
 /* =========================
-   5) store_hours table
+   7) store_hours table
    Store operating hours and shift configuration
    Single record with id=1 (singleton pattern)
    ========================= */
@@ -146,6 +181,15 @@ CREATE TABLE IF NOT EXISTS store_hours (
 /* =========================
    Initial Data
    ========================= */
+
+// Insert the 4 roles
+$queries[] = "
+INSERT IGNORE INTO roles (name) VALUES 
+  ('admin'),
+  ('user'),
+  ('moderator'),
+  ('guest')
+";
 
 // Insert default store hours if not exists
 $queries[] = "
@@ -171,10 +215,11 @@ foreach ($queries as $i => $sql) {
     echo "✅ OK query #" . ($i + 1) . "\n";
 }
 
-echo "\n🎉 Schema ready: customer, menu, orders, order_items, store_hours\n";
-echo "\nSchema version: 2.0\n";
+echo "\n🎉 Schema ready: roles, users, customer, menu, orders, order_items, store_hours\n";
+echo "\nSchema version: 3.0\n";
 echo "Features:\n";
-echo "  ✅ Privacy consent tracking (consent, consent_time)\n";
+echo "  ✅ User authentication (users table with roles)\n";
+echo "  ✅ 4 predefined roles (admin, user, moderator, guest)\n";
+echo "  ✅ Privacy consent tracking\n";
 echo "  ✅ DATETIME format for delivery_time\n";
-echo "  ✅ Indexed delivery_time for efficient queries\n";
 echo "</pre>";

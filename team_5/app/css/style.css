@@ -1,0 +1,84 @@
+:root {
+  --bg-cream: #f9f3e6;
+  --pizza-brown: #a5472a;
+  --pizza-orange: #e38d60;
+  --dark-red: #9e2317;
+  --bg-beige-light: #fef5e6;
+}
+.navbar {
+  background-color: var(--bg-beige-light);
+}
+.btn-outline-custom {
+  border: 2px solid var(--pizza-brown);
+  color: #333;
+  background-color: #f1dfc3;
+  border-radius: 0;
+  font-weight: bold;
+}
+
+.btn-filled-custom {
+  background-color: var(--pizza-orange);
+  color: #333;
+  border: 2px solid var(--pizza-brown);
+  border-radius: 0;
+  font-weight: bold;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  transition: all 0.2s;
+  color: white;
+  background-color: #9e2317;
+}   
+.btn-contact {
+  background-color: var(--dark-red);
+  color: white;
+  font-weight: bold;
+  border-radius: 50px;
+}
+.hero-section {
+  min-height: 50vh;
+  overflow: hidden;
+}
+
+.pizza-container {
+  margin-left: -50%;
+}
+.pizza-image {
+  width: 120%;
+  max-width: none;
+  transform: rotate(-20deg);
+}
+.main-headline {
+  color: var(--pizza-brown);
+  line-height: 1.4;
+}
+
+/* Subtle drop shadows for depth */
+.main-headline {
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.btn-outline-custom,
+.btn-filled-custom,
+.btn-contact {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Footer styles */
+.site-footer {
+  background-color: var(--bg-cream);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+.site-footer .footer-links a {
+  color: var(--pizza-brown);
+  text-decoration: none;
+  padding: 0 0.5rem;
+}
+.site-footer .footer-links a:hover {
+  text-decoration: underline;
+}
+.site-footer small {
+  color: #555;
+}

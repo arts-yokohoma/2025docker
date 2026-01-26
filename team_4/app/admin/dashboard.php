@@ -19,39 +19,11 @@ if (!isset($_SESSION['user_id'])) {
             <h1>Pizza Sales Dashboard</h1>
         </div>
         
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('sales')">Sales Analysis</div>
-            <div class="tab" onclick="switchTab('shifts')">Shift Management</div>
-        </div>
-        
-        <!-- Sales Analysis Tab -->
-        <div id="sales-tab" class="tab-content active">
-            <div class="controls">
-                <label>Time Period:</label>
-                <select id="periodSelect">
-                    <option value="daily">Daily (Last 7 Days)</option>
-                    <option value="weekly">Weekly (Last 12 Weeks)</option>
-                    <option value="monthly">Monthly (Last 12 Months)</option>
-                </select>
-                <label>Pizza Type:</label>
-                <select id="pizzaSelect">
-                    <option value="">small size</option>
-                    <option value="">medium</option>
-                    <option value="">local</option>
-                </select>
-                <button onclick="loadSalesData()">Load Data</button>
-                <button onclick="generateReport()">Generate Python Report</button>
-            </div>
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Sales Data</h3>
-                <div id="salesTable"></div>
-            </div>
-        </div>
-        
-        <!-- Shift Management Tab -->
+ <div class="tabs">
+    <div class="tab" onclick="switchTab('shifts')">Shift Management</div>
+    <div class="tab" onclick="switchTab('orders')">Orders Management</div> 
+</div>  
+                <!-- Shift Management Tab -->
         <div id="shifts-tab" class="tab-content">
             <div class="controls">
                 <h2>Tomorrow's Shift Schedule</h2>
@@ -105,6 +77,71 @@ if (!isset($_SESSION['user_id'])) {
                 <div id="shiftHistory"></div>
             </div>
         </div>
+        <!-- Orders Management Tab -->
+<div id="orders-tab" class="tab-content">
+    <div class="controls">
+        <h2>Customer Orders Management</h2>
+        <p>View and manage all customer pizza orders.</p>
+        
+        <!-- Filters -->
+        <div class="filter-controls">
+            <label>Status:</label>
+            <select id="orderStatusFilter" onchange="loadOrders()">
+                <option value="">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="preparing">Preparing</option>
+                <option value="out_for_delivery">Out for Delivery</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            
+            <label>Date Range:</label>
+            <input type="date" id="orderDateFrom" onchange="loadOrders()">
+            <input type="date" id="orderDateTo" onchange="loadOrders()">
+            
+            <label>Search:</label>
+            <input type="text" id="orderSearch" placeholder="Customer name/phone/order#" 
+                   onkeyup="loadOrders()">
+            
+            <button onclick="exportOrdersExcel()" style="background: #28a745;">
+                Export to Excel
+            </button>
+            
+            <button onclick="loadOrders()" style="background: #007bff;">
+                Refresh
+            </button>
+        </div>
+    </div>
+    
+    <div class="orders-container">
+        <div class="orders-summary">
+            <div class="summary-card">
+                <h4>Today's Orders</h4>
+                <p id="todayOrders">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Pending</h4>
+                <p id="pendingOrders">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Revenue Today</h4>
+                <p id="todayRevenue">¥0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Avg Order Value</h4>
+                <p id="avgOrderValue">¥0</p>
+            </div>
+        </div>
+        
+        <div class="orders-table-container">
+            <h3>All Orders</h3>
+            <div id="ordersTable">
+                <p>Loading orders...</p>
+            </div>
+        </div>
+    </div>
+</div>
         
     </div>
 
@@ -125,7 +162,201 @@ if (!isset($_SESSION['user_id'])) {
         document.getElementById('nightEfficiency').addEventListener('input', function() {
             document.getElementById('nightEfficiencyValue').textContent = this.value + '%';
         });
+        // Add to your existing JavaScript
+function loadOrders() {
+    const status = document.getElementById('orderStatusFilter').value;
+    const dateFrom = document.getElementById('orderDateFrom').value;
+    const dateTo = document.getElementById('orderDateTo').value;
+    const search = document.getElementById('orderSearch').value;
+    
+    let url = 'orders_data.php?action=get_orders';
+    if (status) url += `&status=${status}`;
+    if (dateFrom) url += `&date_from=${dateFrom}`;
+    if (dateTo) url += `&date_to=${dateTo}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayOrdersTable(data.orders);
+            updateOrdersSummary(data.summary);
+        })
+        .catch(error => {
+            console.error('Error loading orders:', error);
+            document.getElementById('ordersTable').innerHTML = 
+                '<p>Error loading orders. Please try again.</p>';
+        });
+}
+
+function displayOrdersTable(orders) {
+    const tableContainer = document.getElementById('ordersTable');
+    
+    if (!orders || orders.length === 0) {
+        tableContainer.innerHTML = '<p>No orders found.</p>';
+        return;
+    }
+    
+    let tableHTML = `
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    orders.forEach(order => {
+        // Calculate items summary
+        const items = [];
+        if (order.small_quantity > 0) items.push(`${order.small_quantity} Small`);
+        if (order.medium_quantity > 0) items.push(`${order.medium_quantity} Medium`);
+        if (order.large_quantity > 0) items.push(`${order.large_quantity} Large`);
         
+        // Status badge color
+        const statusColors = {
+            'pending': '#ffc107',
+            'confirmed': '#17a2b8',
+            'preparing': '#007bff',
+            'out_for_delivery': '#6f42c1',
+            'delivered': '#28a745',
+            'cancelled': '#dc3545'
+        };
+        
+        tableHTML += `
+            <tr data-order-id="${order.id}">
+                <td>${order.order_number}</td>
+                <td>${order.customer_name}</td>
+                <td>${order.customer_phone}</td>
+                <td>${items.join(', ')}</td>
+                <td>¥${parseFloat(order.total_amount).toLocaleString()}</td>
+                <td>
+                    <span class="status-badge" style="background: ${statusColors[order.status] || '#6c757d'}">
+                        ${order.status}
+                    </span>
+                </td>
+                <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                <td>
+                    <button onclick="viewOrderDetails(${order.id})" class="btn-view">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <select onchange="updateOrderStatus(${order.id}, this.value)" 
+                            class="status-select">
+                        <option value="">Change Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="preparing">Preparing</option>
+                        <option value="out_for_delivery">Out for Delivery</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += '</tbody></table>';
+    tableContainer.innerHTML = tableHTML;
+}
+
+function updateOrdersSummary(summary) {
+    document.getElementById('todayOrders').textContent = summary.today_orders || 0;
+    document.getElementById('pendingOrders').textContent = summary.pending_orders || 0;
+    document.getElementById('todayRevenue').textContent = 
+        '¥' + (parseFloat(summary.today_revenue) || 0).toLocaleString();
+    document.getElementById('avgOrderValue').textContent = 
+        '¥' + (parseFloat(summary.avg_order_value) || 0).toLocaleString();
+}
+
+function viewOrderDetails(orderId) {
+    // Open order details in modal or new page
+    window.open(`order_details.php?id=${orderId}`, '_blank');
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    if (!newStatus) return;
+    
+    if (confirm('Change order status to ' + newStatus + '?')) {
+        fetch('orders_data.php?action=update_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Order status updated successfully!');
+                loadOrders(); // Refresh the list
+            } else {
+                alert('Error updating status: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error updating order status');
+        });
+    }
+}
+
+function exportOrdersExcel() {
+    const status = document.getElementById('orderStatusFilter').value;
+    const dateFrom = document.getElementById('orderDateFrom').value;
+    const dateTo = document.getElementById('orderDateTo').value;
+    const search = document.getElementById('orderSearch').value;
+    
+    let url = 'orders_data.php?action=export_excel';
+    if (status) url += `&status=${status}`;
+    if (dateFrom) url += `&date_from=${dateFrom}`;
+    if (dateTo) url += `&date_to=${dateTo}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    
+    // Trigger download
+    window.location.href = url;
+}
+
+// Update tab switching function
+function switchTab(tabName) {
+    // Update tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Activate selected tab
+    event.target.classList.add('active');
+    document.getElementById(tabName + '-tab').classList.add('active');
+    
+    // Load data for specific tabs
+    if (tabName === 'shifts') {
+        loadShiftSchedule();
+    } else if (tabName === 'orders') {
+        loadOrders(); // Load orders when tab is switched
+    } else if (tabName === 'sales') {
+        loadSalesData();
+    }
+}
+
+// Initialize orders when page loads if on orders tab
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're on orders tab (for direct access)
+    if (window.location.hash === '#orders' || 
+        document.querySelector('.tab[onclick*="orders"]').classList.contains('active')) {
+        loadOrders();
+    }
+});
         // Tab switching function
         function switchTab(tabName) {
             // Update tabs

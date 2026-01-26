@@ -1,0 +1,28 @@
+/* ===== User Info Page ===== */
+.user-info-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 16px 140px;
+}
+
+.user-info-page h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+@media (max-width: 767px) {
+    .user-info-page {
+        padding: 24px 16px 140px;
+    }
+    
+    .user-info-form {
+        padding: 24px 16px;
+    }
+    
+    .user-info-page h2 {
+        font-size: 28px;
+    }
+}

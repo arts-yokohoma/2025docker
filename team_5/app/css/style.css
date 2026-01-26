@@ -4,6 +4,7 @@
   --pizza-orange: #e38d60;
   --dark-red: #9e2317;
   --bg-beige-light: #fef5e6;
+  --bg-orange-light: #eecb8b;
 }
 .navbar {
   background-color: var(--bg-beige-light);
@@ -30,12 +31,96 @@
   transition: all 0.2s;
   color: white;
   background-color: #9e2317;
-}   
+}
 .btn-contact {
   background-color: var(--dark-red);
   color: white;
   font-weight: bold;
   border-radius: 50px;
+}
+/* Increment / decrement buttons (plus/minus) */
+.btn-incr,
+.btn-decr {
+  background-color: var(--dark-red);
+  color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: 44px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.btn-incr:hover,
+.btn-decr:hover {
+  background-color: #7c1811; /* slightly darker on hover */
+  color: #fff;
+}
+
+/* Make - / qty / + controls the same width (order_select.php) */
+.product .input-group .btn-decr,
+.product .input-group .qty,
+.product .input-group .btn-incr {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0;
+}
+
+/* Slightly taller +/- buttons (order_select.php) */
+.product .input-group .btn-decr,
+.product .input-group .btn-incr {
+  height: 52px;
+}
+
+/* Shift period (radio) buttons */
+.shift-period .btn-outline-primary {
+  --bs-btn-color: var(--dark-red);
+  --bs-btn-border-color: var(--dark-red);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--dark-red);
+  --bs-btn-hover-border-color: var(--dark-red);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--dark-red);
+  --bs-btn-active-border-color: var(--dark-red);
+  --bs-btn-focus-shadow-rgb: 158, 35, 23;
+}
+
+/* Safety net in case Bootstrap vars are overridden elsewhere */
+.shift-period .btn-check:checked + .btn-outline-primary {
+  color: #fff;
+  background-color: var(--dark-red);
+  border-color: var(--dark-red);
+}
+
+.shift-period .btn-check:focus + .btn {
+  box-shadow: 0 0 0 0.25rem rgba(158, 35, 23, 0.25);
+}
+
+/* Time slots (time.php) */
+.time-slot-btn {
+  background-color: var(--bg-orange-light) !important;
+  border: none !important;
+  color: #222 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+.time-slot-btn:hover {
+  background-color: var(--dark-red) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+.time-slot-btn.is-selected {
+  background-color: var(--dark-red) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+}
+.time-slot-btn.is-selected:hover {
+  background-color: var(--dark-red) !important;
+  color: #fff !important;
+}
+.time-slot-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 .hero-section {
   min-height: 50vh;
@@ -65,7 +150,112 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Location section */
+.location-section {
+  min-height: 80vh;
+}
 
+/* Info card */
+.location-card {
+  background-color: var(--pizza-orange);
+  padding: 50px;
+  border-radius: 20px;
+  max-width: 650px;
+  text-align: center;
+}
+
+/* Center the info card horizontally within its container */
+.location-section .location-card {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Icons */
+.icon-row {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+/* ================= PIZZA ANIMATION ================= */
+
+.pizza-slice {
+  width: 420px;
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: sliceEnter 0.9s ease-out forwards;
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3));
+}
+
+/* Animation keyframes */
+@keyframes sliceEnter {
+  0% {
+    opacity: 0;
+    transform: translate(120px, -50%) scale(0.95) rotate(5deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1) rotate(0);
+  }
+}
+.container_def_button {
+  background-color: var(--bg-orange-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+  margin: 50px auto;
+  padding: 20px;
+}
+.container_def {
+  background-color: var(--bg-orange-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+  margin: 10px auto;
+  padding: 20px 15px;
+}
+
+.container_def_button:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+.contact_form {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: var(--bg-orange-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.login_form {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: var(--bg-orange-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 /* Footer styles */
 .site-footer {
   background-color: var(--bg-cream);
@@ -81,4 +271,9 @@
 }
 .site-footer small {
   color: #555;
+}
+
+/* S-size specific image width (larger than default but smaller than M) */
+.img-s {
+  width: 60% !important;
 }

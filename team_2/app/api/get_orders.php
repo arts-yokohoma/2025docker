@@ -1,6 +1,5 @@
 <?php
-include 'db.php';
+include '../db_conn.php';
 $result = $db->query("SELECT * FROM orders ORDER BY created_at DESC");
-$orders = $result->fetchAll(PDO::FETCH_ASSOC);
 echo json_encode($orders);
 ?>

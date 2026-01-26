@@ -1,11 +1,29 @@
+<?php
+// index.php - Updated with database integration
+require_once 'db/db.php';
+
+// Get pizza prices from database
+$pizza = ['small_price' => 800, 'medium_price' => 1200, 'large_price' => 1500];
+if (isset($pdo)) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM pizzas LIMIT 1");
+        $db_pizza = $stmt->fetch();
+        if ($db_pizza) {
+            $pizza = array_merge($pizza, $db_pizza);
+        }
+    } catch (Exception $e) {
+        // Use default prices if database fails
+    }
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PizzaHouse</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.0" />
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -18,46 +36,100 @@
 </header>
 
 <section class="hero">
-  <div class="vertical-text"> 
+  <div class="vertical-text">
     <span>ピザマッチ</span>
     <span>ピザマッチ</span>
     <span>ピザマッチ</span>
   </div>
-  <div class="hero-card">
-    <div class="badge"></div>
-    <img src="https://images.unsplash.com/photo-1601924638867-3ec62c7e5c79" alt="Pizza">
+
+  <div class="header-pizza">
+    <img src="image/pi3.png" alt="Pizza">
   </div>
 </section>
 
 <section class="menu">
   <div class="menu-card">
-    <img src="image/pi.jpg"  style="width:"120px;height:160px>
-    <p>Classic tomato,<br>SMALL</p>
+    <img src="2025DOCKER/team_4/pi.jpg">
+    <p>Classic tomato,<br>mozzarella, basil</p>
   </div>
   <div class="menu-card">
-    <img src="image/pi.jpg"  style="width:"160px;height:180p>
-    <p>Peppers, olives,<br>MEDIUM</p>
+    <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png">
+    <p>Peppers, olives,<br>fresh herbs</p>
   </div>
   <div class="menu-card">
-    <img src="image/pi.jpg"  style="width:"180px;height:200p>
-    <p>Sausage, bacon,<br>LARGE</p>
+    <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png">
+    <p>Sausage, bacon,<br>premium toppings</p>
   </div>
 </section>
 
 <div class="order-btn">
-  <form action="order.php" method="get">
-    <button type="submit">注文</button>
-  </form>
+  <button>注文</button>
 </div>
 
-<section class="about" id="about">
-  <h2>当店について</h2>
-  <div class="about-box">
-    <div class="about-inner">
-      <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" alt="About">
+  <section class="about" id="about">
+    <h2>当店について</h2>
+    <div class="about-box">
+      <div class="about-inner">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" alt="Chef">
+        <p style="margin-top: 15px;">
+          一枚一枚、心を込めて焼き上げています。<br>
+          最高の素材と技術で、本物の味をお届けします。
+        </p>
+        <a href="order.php" class="order-button" style="margin-top: 20px;">今すぐ注文する</a>
+      </div>
     </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>お問い合わせ</h2>
+    <div class="contact-box">
+      <p>ご予約・ご質問はこちらから</p>
+      <p class="email">Email: info@pizzamatch.jp</p>
+      <p class="phone">電話: 03-1234-5678</p>
+      <a href="order.php" class="order-button" style="margin-top: 20px;">オンライン注文はこちら</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p>© 2026 Pizza Match. All Rights Reserved.</p>
+    <nav class="footer-nav">
+      <a href="#about">会社案内</a>
+      <a href="#contact">お問い合わせ</a>
+      <a href="order.php">オンライン注文</a>
+    </nav>
   </div>
-</section>
+</footer>
+
+<script>
+  function toggleMenu() {
+    const nav = document.getElementById('nav-menu');
+    nav.classList.toggle('active');
+  }
+
+  function scrollToContact() {
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Add smooth scrolling for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if(targetId === '#') return;
+      
+      const targetElement = document.querySelector(targetId);
+      if(targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+</script>
 
 </body>
 </html>

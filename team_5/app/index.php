@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Team 5 App</title>
+	<title>ピザのマッハ</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
@@ -20,7 +20,7 @@
             </button>
 			<div class="collapse navbar-collapse" id="navMenu">
 				<ul class="navbar-nav ms-auto">
-					<button class="btn btn-contact rounded-pill px-4">お問い合わせ</button>
+					<a href="/contact.php"><button class="btn btn-contact rounded-pill px-4">お問い合わせ</button></a>
 				</ul>
 			</div>
 		</div>
@@ -72,7 +72,7 @@
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/location.php">店舗情報</a></li>
-                        <li class="list-inline-item"><a href="/time.php">Login</a></li>
+                        <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
                     </ul>
                 </div>

@@ -1,0 +1,368 @@
+/* ===== RESET & VARIABLES ===== */
+:root {
+  --primary: #d19758; /* Tomato Red */
+  --bg-cream: #fdf8f3;
+  --text-dark: #333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+  background: var(--bg-cream);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* ===== HEADER ===== */
+.main-header {
+  position: relative;
+  background: #ce9851;
+  height: 300px;
+  border-bottom-left-radius: 50% 70px;
+  border-bottom-right-radius: 50% 70px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-img {
+  height: 70px;
+}
+
+/* Navigation Links (Desktop) */
+.main-header nav a {
+  color: #fff;
+  margin-left: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.main-header nav a:hover {
+  opacity: 0.8;
+}
+
+/* ===== PIZZA */
+.header-pizza {
+  position: absolute;
+  left: 50%;
+  bottom: -110px;
+  transform: translateX(-50%);
+  padding: 10px;
+  border-radius: 50%;
+  
+  z-index: 10;
+}
+
+.header-pizza img {
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== MENU ===== */
+.menu {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* Allows cards to wrap on smaller screens */
+  gap: 40px;
+  padding: 160px 20px 60px; /* Top padding clears the pizza */
+}
+
+.menu-card {
+  width: 260px;
+  background: #fff; /* Changed to white for cleaner look */
+  padding: 30px;
+  text-align: center;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transition: transform 0.3s;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+}
+
+.menu-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.menu-card h3 {
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+/* ===== ORDER BUTTON ===== */
+.order-btn {
+  text-align: center;
+  margin: 20px 0 60px;
+}
+
+.order-btn button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 15px 50px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-shadow: 0 5px 15px rgba(177, 53, 47, 0.4);
+}
+
+.order-btn button:hover {
+  background: #c18832;
+}
+
+/* ===== ABOUT ===== */
+.about {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.about h2 {
+  margin-bottom: 30px;
+  color: var(--primary);
+}
+
+.about-box {
+  background: #efe3d6;
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-inner {
+  background: #f4d6c2;
+  padding: 40px;
+  border-radius: 20px;
+}
+
+.about-inner img {
+  width: 100px;
+}
+
+/* ===== CONTACT ===== */
+.contact {
+  background: #fff7e6;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(210,151,88,0.10);
+  padding: 40px 30px;
+  margin: 40px auto;
+  max-width: 500px;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.contact:hover {
+  box-shadow: 0 8px 32px rgba(210,151,88,0.25);
+  transform: translateY(-6px) scale(1.03);
+}
+
+.contact h2 {
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+
+.contact-box {
+  background: #fff;
+  display: inline-block;
+  padding: 30px 60px;
+  border-radius: 15px;
+  border: 2px solid var(--primary);
+  text-align: center;
+}
+
+.contact .email {
+  font-weight: bold;
+  color: #902b26;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #2b1a18;
+  color: #fff;
+  padding: 40px 20px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: #ccc;
+  margin-left: 20px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.footer-nav a:hover {
+  color: #fff;
+}
+
+/* ===== RESPONSIVE (MOBILE) ===== */
+@media (max-width: 768px) {
+  .main-header {
+    height: 250px;
+  }
+
+  .header-content {
+    padding: 15px 20px;
+  }
+
+  .logo-img {
+    height: 50px;
+  }
+
+  /* Mobile Navigation Logic */
+  .hamburger {
+    display: block; /* Show hamburger on mobile */
+    z-index: 100;
+  }
+
+  .main-header nav {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Hidden off-screen */
+    width: 70%;
+    height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 99;
+  }
+
+  .main-header nav.active {
+    right: 0; /* Slide in */
+  }
+
+  .main-header nav a {
+    color: #333;
+    font-size: 20px;
+    margin: 20px 0;
+  }
+
+  /* Adjust Pizza Size */
+  .header-pizza {
+    bottom: -80px;
+  }
+
+  .header-pizza img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .menu {
+    padding-top: 120px;
+  }
+}
+ /* Add price display styles */
+    .price-tag {
+      background: linear-gradient(135deg,#ff9a6a,#ff6a2b);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    
+    .order-button {
+      background: linear-gradient(135deg,#ff9a6a,#ff6a2b);
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 15px;
+    }
+    
+    .order-button:hover {
+      background: linear-gradient(135deg,#ff8a5a,#ff5a1b);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,106,43,0.3);
+    }
+    
+    .price-section {
+      text-align: center;
+      padding: 40px 20px;
+      background: #fdf8f3;
+      border-radius: 20px;
+      margin: 30px auto;
+      max-width: 1000px;
+    }
+    
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 30px;
+    }
+    
+    .price-card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    
+    .price-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .price-card h4 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+    
+    .price-card p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    
+    @media (max-width: 768px) {
+      .price-grid {
+        grid-template-columns: 1fr;
+      }
+    }

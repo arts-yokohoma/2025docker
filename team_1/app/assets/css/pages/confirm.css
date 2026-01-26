@@ -1,0 +1,362 @@
+/* ===== Confirm Page ===== */
+.confirm-page-wrapper {
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 0 16px 16px;
+}
+
+.confirm-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+/* ===== Layout Grid ===== */
+.confirm-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 968px) {
+    .confirm-layout-grid {
+        grid-template-columns: 1fr 340px;
+        gap: 16px;
+    }
+}
+
+/* На мобилке sidebar растягивается на всю ширину */
+@media (max-width: 967px) {
+    .confirm-sidebar {
+        order: -1; /* Блок платежей показывается первым на мобилке */
+    }
+}
+
+.confirm-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.confirm-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-summary-box {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+}
+
+.confirm-container h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.confirm-container > p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+/* ===== Section Box ===== */
+.section-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid #f0f0f0;
+}
+
+.section-box h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e2dcdc;
+    padding-bottom: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.section-box p {
+    margin: 3px 0;
+    color: #555;
+    line-height: 1.4;
+    font-size: 13px;
+}
+
+.section-box a {
+    color: #ff8c42;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.section-box a:hover {
+    text-decoration: underline;
+}
+
+.section-box a.editable-field {
+    color: #ff8c42;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px dashed #ff8c42;
+    transition: all 0.2s;
+}
+
+.section-box a.editable-field:hover {
+    color: #ff7a2e;
+    border-bottom-color: #ff7a2e;
+    text-decoration: none;
+}
+
+/* ===== Items ===== */
+.confirm-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.confirm-item:last-child {
+    border-bottom: none;
+}
+
+.confirm-item-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #eee;
+    flex-shrink: 0;
+}
+
+.confirm-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.confirm-item-info .name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.confirm-item-info .price {
+    font-size: 13px;
+    color: #666;
+}
+
+.confirm-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.confirm-item-actions button {
+    border: none;
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.confirm-item-actions button:hover {
+    background: #e0e0e0;
+}
+
+.confirm-item-actions button:active {
+    background: #d0d0d0;
+}
+
+.confirm-item-actions span {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ===== Payment Summary Table ===== */
+.payment-summary-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.payment-summary-box h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.payment-table {
+    margin-top: 0;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.payment-row:last-child {
+    border-bottom: none;
+}
+
+.payment-row.payment-total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid #eee;
+    border-bottom: none;
+}
+
+.payment-label {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.payment-value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.payment-row.payment-total .payment-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.payment-row.payment-total .payment-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff8c42;
+}
+
+/* ===== Form in Payment Box ===== */
+.payment-summary-box form {
+    margin-top: 20px;
+}
+
+.payment-summary-box .btn-proceed {
+    width: 100%;
+    padding: 16px;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.payment-summary-box .btn-proceed:hover {
+    background: #229954;
+}
+
+.payment-summary-box .btn-proceed:active {
+    background: #1e8449;
+}
+
+.payment-summary-box .btn-proceed:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ===== Text ===== */
+.muted {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.empty {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 16px;
+    font-size: 14px;
+}
+
+/* ===== Back Button Card ===== */
+.confirm-sidebar .sidebar-card:last-child {
+    padding: 16px;
+    text-align: center;
+}
+
+.confirm-sidebar .btn-back-cart {
+    display: inline-block;
+    padding: 12px 24px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ===== Desktop Layout ===== */
+@media (min-width: 768px) {
+    .confirm-container {
+        padding: 20px;
+    }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 967px) {
+    .confirm-sidebar {
+        order: -1; /* Блок платежей показывается первым на мобилке */
+    }
+    
+    .payment-summary-box {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .confirm-page-wrapper {
+        padding: 0 12px 20px;
+    }
+
+    .confirm-container {
+        padding: 12px;
+    }
+
+    .confirm-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .confirm-item-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 6px;
+    }
+
+    .payment-summary-box {
+        padding: 20px;
+    }
+    
+    .payment-summary-box .btn-proceed {
+        font-size: 16px;
+        padding: 14px;
+    }
+}

@@ -42,7 +42,7 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
 
 <body>
 
-<!-- navbar -->
+    <!-- navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="index.php">
@@ -74,6 +74,7 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
                 <div class="alert alert-success text-center fs-3 fw-bold" role="alert">
                     注文ID：<?php echo htmlspecialchars((string)$orderId); ?>
                 </div>
+                <div class="text-center fs-2 fw-bold mb-3">予約番号をメモしておいてください。</div>
             <?php else: ?>
                 <div class="alert alert-warning fs-3 fw-bold" role="alert">
                     注文IDを取得できませんでした。
@@ -109,7 +110,7 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
         </div>
     </div>
 
-        <!-- Site footer -->
+    <!-- Site footer -->
     <footer class="site-footer mt-5">
         <div class="container py-4">
             <div class="row align-items-center">

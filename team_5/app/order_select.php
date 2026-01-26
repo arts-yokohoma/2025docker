@@ -1,6 +1,15 @@
 <?php
+session_start();
 // load DB prices for menu (falls back to defaults on error)
 require_once __DIR__ . '/db_config.php';
+
+$time_slot = '';
+if (isset($_GET['time_slot'])) {
+    $time_slot = (string)$_GET['time_slot'];
+    $_SESSION['time_slot'] = $time_slot;
+} elseif (isset($_SESSION['time_slot'])) {
+    $time_slot = (string)$_SESSION['time_slot'];
+}
 
 $price_s = 800;
 $price_m = 1200;
@@ -17,6 +26,33 @@ try {
     }
 } catch (Exception $e) {
     // keep defaults on error
+}
+
+// Handle form submission: save selected quantities and total to session, then forward
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $qty_s = isset($_POST['qty_s']) ? (int)$_POST['qty_s'] : 0;
+    $qty_m = isset($_POST['qty_m']) ? (int)$_POST['qty_m'] : 0;
+    $qty_l = isset($_POST['qty_l']) ? (int)$_POST['qty_l'] : 0;
+
+    // compute total using prices loaded above
+    $total = $price_s * $qty_s + $price_m * $qty_m + $price_l * $qty_l;
+
+    // store order in session
+    $_SESSION['order'] = [
+        'qty_s' => $qty_s,
+        'qty_m' => $qty_m,
+        'qty_l' => $qty_l,
+        'total' => $total,
+    ];
+
+    // preserve time_slot if present in POST
+    if (isset($_POST['time_slot'])) {
+        $_SESSION['time_slot'] = (string)$_POST['time_slot'];
+    }
+
+    // redirect to address entry page
+    header('Location: address.php');
+    exit;
 }
 ?>
 
@@ -56,8 +92,19 @@ try {
     <!-- navbar -->
 
 
-    <form>
-        <div class="container container_def h-75">
+    <?php if (!empty($time_slot)): ?>
+        <div class="container mt-4">
+            <div class="alert alert-info text-center mb-0 fs-5" role="alert">
+                選択した時間帯：<?php echo htmlspecialchars($time_slot); ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <form method="post" action="">
+        <?php if (!empty($time_slot)): ?>
+            <input type="hidden" name="time_slot" value="<?php echo htmlspecialchars($time_slot); ?>">
+        <?php endif; ?>
+        <div class="container container_def h-75 pb-0 mb-0">
             <!-- Images row -->
             <div class="row text-center mb-3 align-items-center">
                 <div class="col-md-4 mb-2 d-flex align-items-center justify-content-center">
@@ -80,9 +127,9 @@ try {
                     <p class="price fw-bold fs-3"><?= $price_s ?>¥</p>
 
                     <div class="input-group justify-content-center w-50 mx-auto">
-                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder">−</button>
-                        <input type="number" class="form-control text-center qty fs-3" value="0" aria-label="S quantity">
-                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder">＋</button>
+                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder fs-1">−</button>
+                        <input type="number" name="qty_s" min="0" class="form-control text-center qty fs-3" value="0" aria-label="S quantity">
+                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder fs-1">＋</button>
                     </div>
                 </div>
                 <!-- M Size -->
@@ -92,9 +139,9 @@ try {
                     <p class="price fw-bold fs-3"><?= $price_m ?>¥</p>
 
                     <div class="input-group justify-content-center w-50 mx-auto">
-                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder">−</button>
-                        <input type="number" class="form-control text-center qty fs-3" value="0" aria-label="M quantity">
-                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder">＋</button>
+                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder fs-1">−</button>
+                        <input type="number" name="qty_m" min="0" class="form-control text-center qty fs-3" value="0" aria-label="M quantity">
+                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder fs-1">＋</button>
                     </div>
                 </div>
 
@@ -105,9 +152,9 @@ try {
                     <p class="price fw-bold fs-3"><?= $price_l ?>¥</p>
 
                     <div class="input-group justify-content-center w-50 mx-auto">
-                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder">−</button>
-                        <input type="number" class="form-control text-center qty fs-3" value="0" aria-label="L quantity">
-                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder">＋</button>
+                        <button type="button" class="btn btn-outline-secondary btn-decr fw-bolder fs-1">−</button>
+                        <input type="number" name="qty_l" min="0" class="form-control text-center qty fs-3" value="0" aria-label="L quantity">
+                        <button type="button" class="btn btn-outline-secondary btn-incr fw-bolder fs-1">＋</button>
                     </div>
                 </div>
 

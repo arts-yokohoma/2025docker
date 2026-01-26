@@ -30,10 +30,6 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-<<<<<<< HEAD
-  <title>Order Pizza</title>
-  <link rel="stylesheet" href="css/style.css?v=3.0">
-=======
   <title>Order Pizza - Pizza Match</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -300,7 +296,6 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
       }
     }
   </style>
->>>>>>> 7010c81390d20e47cf253f6115d258526d3b6d84
 </head>
 
 <body>
@@ -316,16 +311,12 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
   <div class="pizza-list">
     <!-- Small Pizza -->
     <div class="pizza-item">
-<<<<<<< HEAD
-      <img src="image/p1.jpg" style="width:120px">
-=======
       <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Small Pizza">
       <div class="pizza-info">
         <h3>Small Pizza (20cm)</h3>
         <p>Perfect for 1-2 people</p>
         <div class="price-display">¥<?php echo number_format($pizza['small_price']); ?></div>
       </div>
->>>>>>> 7010c81390d20e47cf253f6115d258526d3b6d84
       <div class="qty">
         <button type="button" onclick="changeQty('small', -1)">−</button>
         <span id="smallQty">1</span>
@@ -335,16 +326,12 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
 
     <!-- Medium Pizza -->
     <div class="pizza-item">
-<<<<<<< HEAD
-      <img src="image/p2.jpg" style="width:200px">
-=======
       <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Medium Pizza">
       <div class="pizza-info">
         <h3>Medium Pizza (30cm)</h3>
         <p>Great for 2-3 people</p>
         <div class="price-display">¥<?php echo number_format($pizza['medium_price']); ?></div>
       </div>
->>>>>>> 7010c81390d20e47cf253f6115d258526d3b6d84
       <div class="qty">
         <button type="button" onclick="changeQty('medium', -1)">−</button>
         <span id="mediumQty">2</span>
@@ -354,16 +341,12 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
 
     <!-- Large Pizza -->
     <div class="pizza-item">
-<<<<<<< HEAD
-      <img src="image/p3.jpg" style="width:300px">
-=======
       <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Large Pizza">
       <div class="pizza-info">
         <h3>Large Pizza (40cm)</h3>
         <p>Feeds 3-4 people</p>
         <div class="price-display">¥<?php echo number_format($pizza['large_price']); ?></div>
       </div>
->>>>>>> 7010c81390d20e47cf253f6115d258526d3b6d84
       <div class="qty">
         <button type="button" onclick="changeQty('large', -1)">−</button>
         <span id="largeQty">1</span>

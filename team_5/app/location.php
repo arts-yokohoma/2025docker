@@ -97,7 +97,7 @@
           <ul class="list-inline mb-0 footer-links">
             <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
             <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-            <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+            <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
           </ul>
         </div>
       </div>

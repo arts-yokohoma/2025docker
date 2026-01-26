@@ -35,7 +35,7 @@ if (empty($_SESSION['admin_id'])) {
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="customer_data.php">お問い合わせ</a>
+                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="contact.php">お問い合わせ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-filled-custom rounded-pill px-4 m-2" href="index.php">ホーム</a>
@@ -90,7 +90,7 @@ if (empty($_SESSION['admin_id'])) {
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="customer_data.php">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

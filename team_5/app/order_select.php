@@ -94,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if (!empty($time_slot)): ?>
         <div class="container mt-4">
-            <div class="alert alert-info text-center mb-0 fs-5" role="alert">
-                選択した時間帯：<?php echo htmlspecialchars($time_slot); ?>
+            <div class="alert alert-info text-center mb-0 fs-4" role="alert">
+                選択した時間帯：<span class="fw-bold"><?php echo htmlspecialchars($time_slot); ?></span>
             </div>
         </div>
     <?php endif; ?>
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="row text-center align-items-stretch">
                 <!-- S Size -->
                 <div class="col-md-4 mb-4 product" data-price="<?= $price_s ?>">
-                    <h5 class="fw-bold fs-3">Sサイズ</h5>
+                    <h5 class="fw-bold fs-3">ピザマーガリーター<br>Sサイズ</h5>
                     <p class="fs-4">20cm（1〜2人）</p>
                     <p class="price fw-bold fs-3"><?= $price_s ?>¥</p>
 
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <!-- M Size -->
                 <div class="col-md-4 mb-4 product" data-price="<?= $price_m ?>">
-                    <h5 class="fw-bold fs-3">Mサイズ</h5>
+                    <h5 class="fw-bold fs-3">ピザマーガリーター<br>Mサイズ</h5>
                     <p class="fs-4">27cm（2〜3人）</p>
                     <p class="price fw-bold fs-3"><?= $price_m ?>¥</p>
 
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- L Size -->
                 <div class="col-md-4 mb-4 product" data-price="<?= $price_l ?>">
-                    <h5 class="fw-bold fs-3">Lサイズ</h5>
+                    <h5 class="fw-bold fs-3">ピザマーガリーター<br>Lサイズ</h5>
                     <p class="fs-4">32cm（3〜4人）</p>
                     <p class="price fw-bold fs-3"><?= $price_l ?>¥</p>
 
@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

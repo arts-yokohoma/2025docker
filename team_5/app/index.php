@@ -1,36 +1,37 @@
-
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>ピザのマッハ</title>
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ピザのマッハ</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- navbar -->
-	<nav class="navbar navbar-expand-lg">
-		<div class="container">
-			<a class="navbar-brand d-flex align-items-center" href="index.php">
-				<img src="img/nav_bar_logo.png" height="60" class="me-2" alt="Team 5 logo">
-			</a>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <img src="img/nav_bar_logo.png" height="60" class="me-2" alt="Team 5 logo">
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-			<div class="collapse navbar-collapse" id="navMenu">
-				<ul class="navbar-nav ms-auto">
-					<a href="/contact.php"><button class="btn btn-contact rounded-pill px-4">お問い合わせ</button></a>
-				</ul>
-			</div>
-		</div>
-	</nav>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto">
+                    <a href="/contact.php"><button class="btn btn-contact rounded-pill px-4">お問い合わせ</button></a>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <!-- navbar -->
 
 
 
     <!-- hero -->
-	<header class="hero-section d-flex align-items-center">
+    <header class="hero-section d-flex align-items-center">
         <div class="container-fluid p-0 position-relative h-100">
             <div class="row g-0 h-100 align-items-center">
 
@@ -57,7 +58,7 @@
     </header>
     <!-- hero -->
 
-	<script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
 
     <!-- Site footer -->
     <footer class="site-footer mt-5">
@@ -73,7 +74,7 @@
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/location.php">店舗情報</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>
@@ -81,4 +82,5 @@
     </footer>
 
 </body>
+
 </html>

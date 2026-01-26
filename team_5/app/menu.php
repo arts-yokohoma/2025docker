@@ -1,3 +1,32 @@
+<?php
+session_start();
+
+if (empty($_SESSION['admin_id'])) {
+    header('Location: admin_login.php');
+    exit;
+}
+
+require_once __DIR__ . '/db_config.php';
+
+$currentS = null;
+$currentM = null;
+$currentL = null;
+$updatedAt = null;
+
+try {
+    $stmt = $pdo->prepare('SELECT size_s, size_m, size_l, updated_at FROM menu_prices WHERE id = 1');
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $currentS = $row['size_s'];
+        $currentM = $row['size_m'];
+        $currentL = $row['size_l'];
+        $updatedAt = $row['updated_at'];
+    }
+} catch (Exception $e) {
+    // keep nulls
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -43,23 +72,29 @@
 
             <h3 class="text-center mb-4 fs-1 fw-bold">価格管理</h3>
 
+            <?php if ($currentS !== null && $currentM !== null && $currentL !== null): ?>
+                <div class="alert alert-info text-center fs-4" role="alert">
+                    現在の価格：S <?php echo htmlspecialchars((string)$currentS); ?>¥ ／ M <?php echo htmlspecialchars((string)$currentM); ?>¥ ／ L <?php echo htmlspecialchars((string)$currentL); ?>¥
+                </div>
+            <?php endif; ?>
+
             <div class="row mb-4">
                 <!-- S size -->
                 <div class="col-md-4">
                     <label for="sizeS" class="form-label fs-3 text-center d-block">Sサイズ</label>
-                    <input type="number" class="form-control fs-4" id="sizeS" name="sizeS" step="0.01" min="0" placeholder="価格を入力">
+                    <input type="number" class="form-control fs-4" id="sizeS" name="sizeS" step="1" min="0" placeholder="価格を入力" value="<?php echo htmlspecialchars((string)($currentS ?? '')); ?>">
                 </div>
 
                 <!-- M size -->
                 <div class="col-md-4">
                     <label for="sizeM" class="form-label fs-3 text-center d-block">Mサイズ</label>
-                    <input type="number" class="form-control fs-4" id="sizeM" name="sizeM" step="0.01" min="0" placeholder="価格を入力">
+                    <input type="number" class="form-control fs-4" id="sizeM" name="sizeM" step="1" min="0" placeholder="価格を入力" value="<?php echo htmlspecialchars((string)($currentM ?? '')); ?>">
                 </div>
 
                 <!-- L size -->
                 <div class="col-md-4">
                     <label for="sizeL" class="form-label fs-3 text-center d-block">Lサイズ</label>
-                    <input type="number" class="form-control fs-4" id="sizeL" name="sizeL" step="0.01" min="0" placeholder="価格を入力">
+                    <input type="number" class="form-control fs-4" id="sizeL" name="sizeL" step="1" min="0" placeholder="価格を入力" value="<?php echo htmlspecialchars((string)($currentL ?? '')); ?>">
                 </div>
             </div>
 
@@ -98,7 +133,7 @@
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

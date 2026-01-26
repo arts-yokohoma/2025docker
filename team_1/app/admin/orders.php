@@ -120,6 +120,6 @@ foreach ($orders as $order) {
     <?php endforeach; ?>
   </tbody>
 </table>
-
+<script src="ordersfunction.js"></script>
 </body>
 </html>

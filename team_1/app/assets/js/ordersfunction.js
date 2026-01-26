@@ -1,76 +1,79 @@
-// Filter functionality
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Orders function loaded');
+function filterByStatus(btn) {
+  const status = btn.getAttribute('data-status');
+  console.log('Button clicked, filtering by:', status);
   
-  // Filter tabs handler
-  const filterTabs = document.querySelectorAll('.filter-tab');
-  filterTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      const filterValue = this.getAttribute('data-filter');
-      console.log('Filter clicked:', filterValue);
-      
-      // Update active tab
-      filterTabs.forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-      
-      // Filter table rows
-      const rows = document.querySelectorAll('tbody tr');
-      rows.forEach(row => {
-        if (filterValue === 'all') {
-          row.classList.add('visible');
-        } else {
-          const status = row.getAttribute('data-status');
-          if (status === filterValue) {
-            row.classList.add('visible');
-          } else {
-            row.classList.remove('visible');
-          }
-        }
-      });
-    });
+  // Get all rows and buttons
+  const rows = document.querySelectorAll('tbody tr');
+  const buttons = document.querySelectorAll('.tab-btn');
+  
+  console.log('Total rows:', rows.length);
+  
+  // Remove active class from all buttons
+  buttons.forEach(b => {
+    b.classList.remove('active');
   });
   
-  // Delete button functionality
+  // Add active class to clicked button
+  btn.classList.add('active');
+  console.log('Active button set');
+  
+  // Filter and show/hide rows
+  rows.forEach(row => {
+    const rowStatus = row.getAttribute('data-status');
+    console.log('Row status:', rowStatus, 'Filter:', status);
+    
+    if (status === 'all') {
+      // Show all rows
+      row.style.display = 'table-row';
+      console.log('Showing row (all)');
+    } else if (rowStatus === status) {
+      // Show matching rows
+      row.style.display = 'table-row';
+      console.log('Showing row (match)');
+    } else {
+      // Hide non-matching rows
+      row.style.display = 'none';
+      console.log('Hiding row');
+    }
+  });
+  
+  console.log('Filter complete');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
   // Delete button handler
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('delete-btn')) {
       e.preventDefault();
-      const orderId = this.getAttribute('data-id');
-      console.log('Delete clicked for order:', orderId);
+      const orderId = e.target.getAttribute('data-id');
+      
       if (confirm('この注文を削除してもよろしいですか？')) {
-        // Send delete request to server
         fetch('delete_order.php?id=' + orderId, {
           method: 'GET'
         })
-        .then(response => {
-          console.log('Delete response status:', response.status);
-          return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-          console.log('Delete response data:', data);
           if (data.success) {
-            // Remove the row from the table
-            this.closest('tr').remove();
+            e.target.closest('tr').remove();
             alert('注文が削除されました');
           } else {
             alert('削除に失敗しました: ' + data.message);
           }
         })
         .catch(error => {
-          console.error('Delete error:', error);
-          alert('削除エラー: ' + error.message);
+          console.error('Error:', error);
+          alert('エラー: ' + error.message);
         });
       }
-    });
+    }
   });
 
-  // Status button handler (調理開始, 完了にする)
-  document.querySelectorAll('.status-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+  // Status button handler
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('status-btn')) {
       e.preventDefault();
-      const orderId = this.getAttribute('data-id');
-      const nextStatus = this.getAttribute('data-next');
-      console.log('Status clicked for order:', orderId, 'new status:', nextStatus);
+      const orderId = e.target.getAttribute('data-id');
+      const nextStatus = e.target.getAttribute('data-next');
       
       fetch('update_order_status.php', {
         method: 'POST',
@@ -79,34 +82,27 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: 'id=' + orderId + '&status=' + encodeURIComponent(nextStatus)
       })
-      .then(response => {
-        console.log('Status response status:', response.status);
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        console.log('Status response data:', data);
         if (data.success) {
-          // Reload the page to show updated status
           location.reload();
         } else {
-          alert('ステータス更新に失敗しました: ' + data.message);
+          alert('更新に失敗しました: ' + data.message);
         }
       })
       .catch(error => {
-        console.error('Status update error:', error);
-        alert('ステータス更新エラー: ' + error.message);
+        console.error('Error:', error);
+        alert('エラー: ' + error.message);
       });
-    });
+    }
   });
 
   // Edit button handler
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('edit-btn')) {
       e.preventDefault();
-      const orderId = this.getAttribute('data-id');
-      console.log('Edit clicked for order:', orderId);
-      // Redirect to edit page or open modal
+      const orderId = e.target.getAttribute('data-id');
       window.location.href = 'edit_order.php?id=' + orderId;
-    });
+    }
   });
 });

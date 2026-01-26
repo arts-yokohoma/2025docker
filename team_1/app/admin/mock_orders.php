@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../config/db.php';
+require_once dirname(dirname(__FILE__)) . '/config/db.php';
 
 // Fetch orders from database with order items and customer details
 $query = "
@@ -26,12 +26,14 @@ if (!$result) {
 
 $orders = [];
 while ($row = $result->fetch_assoc()) {
-    // Normalize status to proper case (New, In Progress, Completed)
+    // Normalize status to proper case (New, In Progress, Completed, Canceled)
     $status = strtolower($row["status"] ?? "new");
     if (strpos($status, 'in progress') !== false) {
         $status = 'In Progress';
     } elseif ($status === 'completed') {
         $status = 'Completed';
+    } elseif ($status === 'canceled') {
+        $status = 'Canceled';
     } else {
         $status = 'New';
     }

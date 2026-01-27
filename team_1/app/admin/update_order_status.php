@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/auth.php';
+requireRoles(['admin', 'manager', 'driver', 'kitchen']); // Require specific roles
+
 require_once __DIR__ . '/../config/db.php';
 
 header('Content-Type: application/json');

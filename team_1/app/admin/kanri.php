@@ -15,7 +15,9 @@
  * - Soft deletion (deleted flag) for menu items
  */
 declare(strict_types=1);
-session_start();
+
+require_once __DIR__ . '/auth.php';
+requireAdmin(); // Require admin authentication
 
 require_once __DIR__ . '/../config/db.php';
 

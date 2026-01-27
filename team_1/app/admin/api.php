@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/auth.php';
+requireRoles(['admin', 'manager', 'driver', 'kitchen']); // Require specific roles
+
 header('Content-Type: application/json');
 
 $dataFile = __DIR__ . '/data/orders.json';

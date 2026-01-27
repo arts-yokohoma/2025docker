@@ -3,7 +3,7 @@
  * Database schema installation script
  * 
  * Creates all required tables for the pizza delivery application:
- * - roles: User roles (admin, user, moderator, guest)
+ * - roles: User roles (admin, manager, driver, kitchen)
  * - users: User accounts with authentication
  * - customer: Customer information with privacy consent tracking
  * - menu: Menu items with S/M/L pricing
@@ -26,7 +26,7 @@ $queries = [];
 
 /* =========================
    1) roles table
-   Stores the 4 user roles (admin, user, moderator, guest)
+   Stores user roles (admin, manager, driver, kitchen)
    ========================= */
 $queries[] = "
 CREATE TABLE IF NOT EXISTS roles (
@@ -182,13 +182,13 @@ CREATE TABLE IF NOT EXISTS store_hours (
    Initial Data
    ========================= */
 
-// Insert the 4 roles
+// Insert the roles
 $queries[] = "
 INSERT IGNORE INTO roles (name) VALUES 
   ('admin'),
-  ('user'),
-  ('moderator'),
-  ('guest')
+  ('manager'),
+  ('driver'),
+  ('kitchen')
 ";
 
 // Insert default store hours if not exists
@@ -219,7 +219,7 @@ echo "\n🎉 Schema ready: roles, users, customer, menu, orders, order_items, st
 echo "\nSchema version: 3.0\n";
 echo "Features:\n";
 echo "  ✅ User authentication (users table with roles)\n";
-echo "  ✅ 4 predefined roles (admin, user, moderator, guest)\n";
+echo "  ✅ 4 predefined roles (admin, manager, driver, kitchen)\n";
 echo "  ✅ Privacy consent tracking\n";
 echo "  ✅ DATETIME format for delivery_time\n";
 echo "</pre>";

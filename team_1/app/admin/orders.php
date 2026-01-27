@@ -1,4 +1,8 @@
-<?php include __DIR__ . "/mock_orders.php"; 
+<?php
+require_once __DIR__ . '/auth.php';
+requireRoles(['admin', 'manager', 'driver', 'kitchen']); // Require specific roles
+
+include __DIR__ . "/mock_orders.php"; 
 
 // Count orders by status
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];

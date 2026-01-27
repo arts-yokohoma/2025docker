@@ -47,6 +47,15 @@ CREATE TABLE IF NOT EXISTS pizzas (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS shift_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL UNIQUE,
+    morning_staff INT DEFAULT 5,
+    evening_staff INT DEFAULT 5,
+    notes TEXT,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 3. Orders table
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,

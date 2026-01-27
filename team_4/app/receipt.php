@@ -80,108 +80,22 @@ $large_total = $order['large_qty'] * $order['large_price'];
 
 // Create clean text representation for QR code
 $qr_text = "🍕 PIZZA MATCH RECEIPT 🍕\n";
-$qr_text .= "========================\n";
 $qr_text .= "Order ID: {$order['order_id']}\n";
 $qr_text .= "Date: {$order['order_date']} {$order['order_time']}\n";
+$qr_text .= "Customer: {$order['customer_name']}\n";
+$qr_text .= "Total: ¥" . number_format($order['total_amount']) . "\n";
 $qr_text .= "Status: Confirmed\n";
-$qr_text .= "\n";
-$qr_text .= "CUSTOMER:\n";
-$qr_text .= "Name: {$order['customer_name']}\n";
-$qr_text .= "Phone: {$order['customer_phone']}\n";
-$qr_text .= "Address: {$order['customer_address']}\n";
-$qr_text .= "\n";
-$qr_text .= "ORDER DETAILS:\n";
 
-if ($order['small_qty'] > 0) {
-    $qr_text .= "Small Pizza (20cm) x{$order['small_qty']} - ¥{$order['small_price']} each\n";
-}
-if ($order['medium_qty'] > 0) {
-    $qr_text .= "Medium Pizza (30cm) x{$order['medium_qty']} - ¥{$order['medium_price']} each\n";
-}
-if ($order['large_qty'] > 0) {
-    $qr_text .= "Large Pizza (40cm) x{$order['large_qty']} - ¥{$order['large_price']} each\n";
-}
+// Generate QR code URL using Google Charts API (free, reliable)
+$qr_data = urlencode($qr_text);
+$qr_size = "180x180";
+$qr_color = "d19758"; // Pizza brown color
 
-$qr_text .= "\n";
-$qr_text .= "TOTAL AMOUNT:\n";
-$qr_text .= "¥" . number_format($order['total_amount']) . "\n";
-$qr_text .= "\n";
-$qr_text .= "DELIVERY TIME:\n";
-$qr_text .= "30-45 minutes\n";
-$qr_text .= "\n";
-$qr_text .= "CONTACT:\n";
-$qr_text .= "📞 03-1234-5678\n";
-$qr_text .= "⏰ 10:00-23:00\n";
-$qr_text .= "\n";
-$qr_text .= "Thank you for your order!";
+// Generate QR code image URL using Google Charts API
+$qr_code_url = "https://chart.googleapis.com/chart?cht=qr&chs={$qr_size}&chl={$qr_data}&chco={$qr_color}";
 
-// Generate QR code image using PHP GD
-function generateQRCodeImage($text) {
-    // Create image dimensions
-    $width = 200;
-    $height = 200;
-    
-    // Create image
-    $image = imagecreatetruecolor($width, $height);
-    
-    // Colors
-    $white = imagecolorallocate($image, 255, 255, 255);
-    $brown = imagecolorallocate($image, 209, 151, 88); // Pizza brown
-    $dark_brown = imagecolorallocate($image, 180, 130, 70);
-    $yellow = imagecolorallocate($image, 255, 204, 0); // Cheese yellow
-    $black = imagecolorallocate($image, 0, 0, 0);
-    
-    // Fill background
-    imagefill($image, 0, 0, $white);
-    
-    // Draw border
-    imagerectangle($image, 5, 5, $width-5, $height-5, $brown);
-    
-    // Draw pizza icon in center
-    $center_x = $width / 2;
-    $center_y = $height / 2 - 10;
-    
-    // Pizza base (circle)
-    imagefilledellipse($image, $center_x, $center_y, 80, 80, $brown);
-    imageellipse($image, $center_x, $center_y, 80, 80, $dark_brown);
-    
-    // Cheese dots (toppings)
-    for ($i = 0; $i < 8; $i++) {
-        $angle = (2 * M_PI / 8) * $i;
-        $x = $center_x + cos($angle) * 25;
-        $y = $center_y + sin($angle) * 25;
-        imagefilledellipse($image, $x, $y, 10, 10, $yellow);
-    }
-    
-    // Text at bottom
-    imagestring($image, 4, $center_x - 45, $center_y + 50, "PIZZA MATCH", $black);
-    imagestring($image, 3, $center_x - 40, $center_y + 70, "Order Receipt", $black);
-    
-    // Add order ID
-    $order_id_short = substr($order['order_id'], 0, 12);
-    imagestring($image, 2, $center_x - 30, $center_y + 90, $order_id_short, $dark_brown);
-    
-    // Capture image as base64
-    ob_start();
-    imagepng($image);
-    $image_data = ob_get_clean();
-    imagedestroy($image);
-    
-    return 'data:image/png;base64,' . base64_encode($image_data);
-}
-
-// Generate the QR code image
-$qr_code_image = generateQRCodeImage($qr_text);
-
-// Create receipt URL
-$receipt_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") 
-             . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-if (isset($order['db_id'])) {
-    $receipt_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") 
-                 . "://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) 
-                 . "/receipt.php?order_id=" . $order['db_id'];
-}
+// Alternative API if Google fails (QRCode Monkey)
+$qr_code_url_alt = "https://api.qrserver.com/v1/create-qr-code/?size={$qr_size}&data={$qr_data}&color={$qr_color}";
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -192,7 +106,86 @@ if (isset($order['db_id'])) {
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* QR code specific styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .receipt-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .receipt-header {
+      background: linear-gradient(135deg, #d19758, #ffcc00);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .receipt-header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    
+    .receipt-content {
+      display: flex;
+      min-height: 500px;
+    }
+    
+    @media (max-width: 768px) {
+      .receipt-content {
+        flex-direction: column;
+      }
+    }
+    
+    .receipt-details {
+      flex: 1;
+      padding: 30px;
+    }
+    
+    .receipt-sidebar {
+      width: 300px;
+      background: #f8f9fa;
+      padding: 30px;
+      border-left: 3px solid #d19758;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section h2 {
+      color: #d19758;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+    
+    .info-row {
+      display: flex;
+      margin: 10px 0;
+      padding: 8px 0;
+      border-bottom: 1px dotted #eee;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      width: 150px;
+      color: #666;
+    }
+    
+    .info-value {
+      flex: 1;
+      color: #333;
+    }
+    
     .qr-code-container {
       text-align: center;
       margin: 20px 0;
@@ -211,135 +204,40 @@ if (isset($order['db_id'])) {
       width: 180px;
       height: 180px;
       display: block;
-      margin: 0 auto;
+      border-radius: 5px;
     }
     
-    .qr-text-info {
+    .qr-info-box {
       margin-top: 15px;
       padding: 15px;
-      background: #f8f9fa;
+      background: white;
       border-radius: 8px;
       text-align: left;
     }
     
-    .qr-text-info h4 {
-      color: #d19758;
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-    
-    .qr-info-item {
-      margin: 8px 0;
-      font-size: 14px;
-      display: flex;
-    }
-    
-    .qr-info-label {
-      font-weight: bold;
-      min-width: 80px;
-      color: #666;
-    }
-    
-    .qr-info-value {
-      flex: 1;
-      color: #333;
-    }
-    
-    /* Receipt layout adjustments */
-    .receipt-content {
-      display: flex;
-      gap: 40px;
-      align-items: flex-start;
-    }
-    
-    .receipt-details {
-      flex: 1;
-    }
-    
-    .receipt-sidebar {
-      width: 300px;
-      flex-shrink: 0;
-    }
-    
-    @media (max-width: 992px) {
-      .receipt-content {
-        flex-direction: column;
-      }
-      
-      .receipt-sidebar {
-        width: 100%;
-      }
-    }
-    
-    /* QR scan note */
-    .qr-scan-note {
-      background: #e6f7ff;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: #0066cc;
-      text-align: center;
-    }
-    
-    .qr-scan-note i {
-      margin-right: 5px;
-    }
-    
-    /* Print optimizations */
-    @media print {
-      .receipt-sidebar {
-        display: block !important;
-        page-break-inside: avoid;
-      }
-      
-      .qr-code-wrapper {
-        border: 1px solid #ccc;
-        box-shadow: none;
-      }
-      
-      .action-buttons {
-        display: none !important;
-      }
-    }
-    
-    /* Status box styling */
     .status-box {
-      background: #f8f9fa;
-      padding: 15px;
+      background: #e6f7ff;
+      padding: 20px;
       border-radius: 8px;
       margin: 20px 0;
       border-left: 4px solid #28a745;
     }
     
     .status {
-      padding: 8px 12px;
+      display: inline-block;
       background: #28a745;
       color: white;
-      border-radius: 5px;
-      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 20px;
       font-weight: bold;
     }
     
-    .status-note {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
-    }
-    
     .contact-box {
-      background: #e6f7ff;
-      padding: 15px;
+      background: #fff3cd;
+      padding: 20px;
       border-radius: 8px;
-      margin: 20px 0;
     }
     
-    .contact-box h3 {
-      margin-top: 0;
-      color: #007bff;
-    }
-    
-    /* Action buttons */
     .action-buttons {
       display: flex;
       gap: 10px;
@@ -347,7 +245,7 @@ if (isset($order['db_id'])) {
       flex-wrap: wrap;
     }
     
-    .print-btn, .new-order-btn, .home-btn {
+    button, .btn {
       padding: 12px 20px;
       border: none;
       border-radius: 5px;
@@ -360,13 +258,14 @@ if (isset($order['db_id'])) {
       transition: all 0.3s;
     }
     
+    button:hover, .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
     .print-btn {
       background: #28a745;
       color: white;
-    }
-    
-    .print-btn:hover {
-      background: #218838;
     }
     
     .new-order-btn {
@@ -374,17 +273,58 @@ if (isset($order['db_id'])) {
       color: #212529;
     }
     
-    .new-order-btn:hover {
-      background: #e0a800;
-    }
-    
     .home-btn {
       background: #6c757d;
       color: white;
     }
     
-    .home-btn:hover {
-      background: #5a6268;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    th {
+      background: #d19758;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    tfoot td {
+      font-weight: bold;
+      background: #f8f9fa;
+    }
+    
+    .special-instructions {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    
+    .qr-fallback {
+      display: none;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-top: 10px;
+      text-align: center;
+    }
+    
+    .qr-fallback .code {
+      font-family: monospace;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-size: 14px;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -398,7 +338,7 @@ if (isset($order['db_id'])) {
   <div class="receipt-content">
     <div class="receipt-details">
       <!-- Order info -->
-      <div class="order-info">
+      <div class="section">
         <h2>注文情報</h2>
         <div class="info-row">
           <span class="info-label">注文番号:</span>
@@ -415,7 +355,7 @@ if (isset($order['db_id'])) {
       </div>
       
       <!-- Customer info -->
-      <div class="customer-info">
+      <div class="section">
         <h2>お客様情報</h2>
         <div class="info-row">
           <span class="info-label">お名前:</span>
@@ -438,9 +378,9 @@ if (isset($order['db_id'])) {
       </div>
       
       <!-- Order items -->
-      <div class="order-items">
+      <div class="section">
         <h2>注文内容</h2>
-        <table class="order-table">
+        <table>
           <thead>
             <tr>
               <th>商品</th>
@@ -479,8 +419,8 @@ if (isset($order['db_id'])) {
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3" style="text-align: right; font-weight: bold;">合計金額:</td>
-              <td style="font-weight: bold; color: #d19758; font-size: 20px;">
+              <td colspan="3" style="text-align: right;">合計金額:</td>
+              <td style="color: #d19758; font-size: 20px;">
                 ¥<?php echo number_format($order['total_amount']); ?>
               </td>
             </tr>
@@ -489,8 +429,8 @@ if (isset($order['db_id'])) {
         
         <?php if (!empty($order['instructions'])): ?>
         <div class="special-instructions">
-          <h4>特別なご要望:</h4>
-          <p><?php echo nl2br(htmlspecialchars($order['instructions'])); ?></p>
+          <h4 style="margin-top: 0; color: #856404;">特別なご要望:</h4>
+          <p style="margin: 0;"><?php echo nl2br(htmlspecialchars($order['instructions'])); ?></p>
         </div>
         <?php endif; ?>
       </div>
@@ -500,10 +440,10 @@ if (isset($order['db_id'])) {
         <button class="print-btn" onclick="window.print()">
           <i class="fas fa-print"></i> 領収書を印刷
         </button>
-        <a href="order.php" class="new-order-btn">
+        <a href="order.php" class="btn new-order-btn">
           <i class="fas fa-pizza-slice"></i> 新規注文
         </a>
-        <a href="index.php" class="home-btn">
+        <a href="index.php" class="btn home-btn">
           <i class="fas fa-home"></i> ホームに戻る
         </a>
       </div>
@@ -512,54 +452,67 @@ if (isset($order['db_id'])) {
     <div class="receipt-sidebar">
       <!-- QR Code Section -->
       <div class="qr-code-container">
-        <h3><i class="fas fa-qrcode"></i> デジタル領収書</h3>
+        <h3 style="text-align: center; color: #d19758; margin-top: 0;">
+          <i class="fas fa-qrcode"></i> デジタル領収書
+        </h3>
+        
         <div class="qr-code-wrapper">
-          <!-- QR code image generated by PHP -->
-          <img src="<?php echo $qr_code_image; ?>" alt="QR Code" class="qr-code-image">
+          <!-- QR code image from API -->
+          <img src="<?php echo $qr_code_url; ?>" 
+               alt="QR Code" 
+               class="qr-code-image"
+               id="qrCodeImage"
+               onerror="this.onerror=null; this.src='<?php echo $qr_code_url_alt; ?>';">
         </div>
         
-        <div class="qr-scan-note">
-          <i class="fas fa-mobile-alt"></i> この画像を保存して共有できます
+        <div class="qr-info-box">
+          <h4 style="margin-top: 0; color: #666;">QRコード情報:</h4>
+          <div style="margin: 8px 0; font-size: 14px;">
+            <span style="font-weight: bold; color: #666;">注文番号:</span>
+            <span><?php echo htmlspecialchars($order['order_id']); ?></span>
+          </div>
+          <div style="margin: 8px 0; font-size: 14px;">
+            <span style="font-weight: bold; color: #666;">お名前:</span>
+            <span><?php echo htmlspecialchars($order['customer_name']); ?></span>
+          </div>
+          <div style="margin: 8px 0; font-size: 14px;">
+            <span style="font-weight: bold; color: #666;">合計金額:</span>
+            <span style="color: #d19758; font-weight: bold;">¥<?php echo number_format($order['total_amount']); ?></span>
+          </div>
+          <div style="margin: 8px 0; font-size: 14px;">
+            <span style="font-weight: bold; color: #666;">ステータス:</span>
+            <span>確認済み</span>
+          </div>
         </div>
         
-        <!-- QR Code Information Preview -->
-        <div class="qr-text-info">
-          <h4>領収書情報:</h4>
-          <div class="qr-info-item">
-            <span class="qr-info-label">店舗:</span>
-            <span class="qr-info-value">Pizza Match</span>
+        <!-- Fallback section (hidden by default) -->
+        <div class="qr-fallback" id="qrFallback">
+          <p style="color: #666; font-size: 14px;">
+            <i class="fas fa-exclamation-triangle"></i> QRコードが表示できない場合は、以下のコードを使用してください:
+          </p>
+          <div class="code">
+            <?php echo htmlspecialchars($order['order_id']); ?>
           </div>
-          <div class="qr-info-item">
-            <span class="qr-info-label">注文番号:</span>
-            <span class="qr-info-value"><?php echo htmlspecialchars($order['order_id']); ?></span>
-          </div>
-          <div class="qr-info-item">
-            <span class="qr-info-label">お名前:</span>
-            <span class="qr-info-value"><?php echo htmlspecialchars($order['customer_name']); ?></span>
-          </div>
-          <div class="qr-info-item">
-            <span class="qr-info-label">合計金額:</span>
-            <span class="qr-info-value">¥<?php echo number_format($order['total_amount']); ?></span>
-          </div>
-          <div class="qr-info-item">
-            <span class="qr-info-label">ステータス:</span>
-            <span class="qr-info-value">確認済み</span>
-          </div>
+          <button onclick="copyOrderCode()" style="background: #d19758; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+            <i class="fas fa-copy"></i> コードをコピー
+          </button>
         </div>
       </div>
       
       <!-- Order Status -->
       <div class="status-box">
-        <h3>注文ステータス</h3>
+        <h3 style="margin-top: 0;">注文ステータス</h3>
         <div class="status">
           <i class="fas fa-check-circle"></i> 確認済み
         </div>
-        <p class="status-note">配達準備中です</p>
+        <p style="margin-top: 10px; font-size: 14px; color: #666;">
+          配達準備中です。お支払いは商品到着時にお願いします。
+        </p>
       </div>
       
       <!-- Contact Info -->
       <div class="contact-box">
-        <h3>お問い合わせ</h3>
+        <h3 style="margin-top: 0;">お問い合わせ</h3>
         <p><i class="fas fa-phone"></i> 03-1234-5678</p>
         <p><i class="fas fa-clock"></i> 10:00-23:00</p>
         <p><i class="fas fa-map-marker-alt"></i> 東京都渋谷区...</p>
@@ -571,19 +524,68 @@ if (isset($order['db_id'])) {
 <script>
 // Print optimization
 window.addEventListener('beforeprint', function() {
-    const buttons = document.querySelector('.action-buttons');
-    if (buttons) buttons.style.display = 'none';
+    document.querySelector('.action-buttons').style.display = 'none';
 });
 
 window.addEventListener('afterprint', function() {
-    const buttons = document.querySelector('.action-buttons');
-    if (buttons) buttons.style.display = 'flex';
+    document.querySelector('.action-buttons').style.display = 'flex';
 });
 
-// Show QR code text on click (for debugging)
-document.querySelector('.qr-code-image').addEventListener('click', function() {
-    alert('このQRコードには次の情報が含まれています:\n\n' + 
-          '<?php echo str_replace(["\n", "'"], ["\\n", "\\'"], $qr_text); ?>');
+// Check if QR code loads successfully
+window.addEventListener('load', function() {
+    const qrImage = document.getElementById('qrCodeImage');
+    
+    // Check if image loaded successfully
+    setTimeout(function() {
+        if (!qrImage.complete || qrImage.naturalHeight === 0) {
+            // QR code failed to load, show fallback
+            document.getElementById('qrFallback').style.display = 'block';
+        }
+    }, 1000);
+});
+
+// Copy order code to clipboard
+function copyOrderCode() {
+    const code = "<?php echo htmlspecialchars($order['order_id']); ?>";
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(function() {
+            alert('注文コードをコピーしました: ' + code);
+        }).catch(function() {
+            fallbackCopy(code);
+        });
+    } else {
+        fallbackCopy(code);
+    }
+}
+
+function fallbackCopy(code) {
+    const textArea = document.createElement('textarea');
+    textArea.value = code;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            alert('注文コードをコピーしました: ' + code);
+        } else {
+            alert('コピーに失敗しました。手動でコピーしてください: ' + code);
+        }
+    } catch (err) {
+        alert('コピーに失敗しました。手動でコピーしてください: ' + code);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Right-click to save QR code
+document.getElementById('qrCodeImage').addEventListener('contextmenu', function(e) {
+    alert('QRコードを右クリックして「名前を付けて画像を保存」を選択してください。');
 });
 </script>
 </body>

@@ -20,6 +20,7 @@ if ($submitted) {
 <body>
 <div class="box">
 <h1>PIZZA-MACH</h1>
+<img src="../assets/image/logo.png" alt="Pizza Mach logo: stylized delivery person in red cap running with pizza, yellow and red circular pizza design, tagline Fast Fresh Pizza on cream background" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
 <form method="post" autocomplete="off">
 <label>ユーザー名：</label>
 <input type="text" name="user" value="<?= htmlspecialchars($user, ENT_QUOTES, 'UTF-8') ?>" required>

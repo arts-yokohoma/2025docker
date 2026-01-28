@@ -10,8 +10,8 @@ if (!isset($_GET['id'])) {
 
 $orderId = (int)$_GET['id'];
 
-// Delete order from database
-$query = "DELETE FROM orders WHERE id = ?";
+// Cancel order by updating status to 'Canceled'
+$query = "UPDATE orders SET status = 'Canceled' WHERE id = ?";
 $stmt = $mysqli->prepare($query);
 
 if (!$stmt) {
@@ -22,9 +22,9 @@ if (!$stmt) {
 $stmt->bind_param('i', $orderId);
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Order deleted']);
+    echo json_encode(['success' => true, 'message' => 'Order cancelled', 'status' => 'Canceled']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Failed to delete order: ' . $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Failed to cancel order: ' . $stmt->error]);
 }
 
 $stmt->close();

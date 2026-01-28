@@ -80,6 +80,7 @@ foreach ($orders as $order) {
       <th>日時</th>
       <th>顧客名</th>
       <th>注文詳細</th>
+      <th>合計金額</th>
       <th>ステータス</th>
       <th>操作</th>
       <th>編集</th>
@@ -92,17 +93,19 @@ foreach ($orders as $order) {
         <td><?= $order["date"] ?></td>
         <td>
           <?= $order["name"] ?><br>
-          <small><?= $order["phone"] ?></small>
+          <small><?= $order["phone"] ?></small><br>
+          <small><?= $order["address"] ?></small>
         </td>
         <td><?= $order["item"] ?></td>
+        <td>¥<?= number_format($order["total_amount"]) ?></td>
         <td>
           <span class="status <?= strtolower(str_replace(' ', '-', $order["status"])) ?>">
             <?= $order["status"] ?>
           </span>
         </td>
         <td>
-          <?php if ($order["status"] !== "Completed"): ?>
-            <button class="btn red delete-btn" data-id="<?= $order["id"] ?>"title="削除">🗑</button>
+          <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
+            <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル">❌</button>
 
             <?php if ($order["status"] === "New"): ?>
               <button class="btn blue status-btn" data-id="<?= $order["id"] ?>" data-next="In Progress">調理開始</button>
@@ -112,7 +115,7 @@ foreach ($orders as $order) {
           <?php endif; ?>
         </td>
         <td>
-          <?php if ($order["status"] !== "Completed"): ?>
+          <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
             <button class="btn edit-btn" data-id="<?= $order["id"] ?>">編集</button>
           <?php endif; ?>
         </td>

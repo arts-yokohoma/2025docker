@@ -41,23 +41,35 @@ function filterByStatus(btn) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Delete button handler
+  // Cancel button handler
   document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('delete-btn')) {
+    if (e.target.classList.contains('cancel-btn')) {
       e.preventDefault();
       const orderId = e.target.getAttribute('data-id');
+      const orderStatus = e.target.getAttribute('data-status');
       
-      if (confirm('この注文を削除してもよろしいですか？')) {
+      let confirmMessage = '';
+      
+      // Different messages based on status
+      if (orderStatus === 'New') {
+        confirmMessage = 'この新規注文をキャンセルしますか？';
+      } else if (orderStatus === 'In Progress') {
+        confirmMessage = '⚠️ 注意：調理中の注文です。キャンセルしてもよろしいですか？キャンセルすると調理が中止されます。';
+      } else {
+        confirmMessage = 'この注文をキャンセルしてもよろしいですか？';
+      }
+      
+      if (confirm(confirmMessage)) {
         fetch('delete_order.php?id=' + orderId, {
           method: 'GET'
         })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            e.target.closest('tr').remove();
-            alert('注文が削除されました');
+            alert('注文がキャンセルされました');
+            location.reload();
           } else {
-            alert('削除に失敗しました: ' + data.message);
+            alert('キャンセルに失敗しました: ' + data.message);
           }
         })
         .catch(error => {

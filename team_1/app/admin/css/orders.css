@@ -121,7 +121,7 @@ body {
 
 .status.completed {
   background: #d4edda;
-  color: #155724;
+  color: greenyellow;
 }
 
 tbody tr {

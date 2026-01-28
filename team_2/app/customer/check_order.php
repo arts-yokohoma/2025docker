@@ -1,8 +1,10 @@
 <?php
-// ၁။ အချိန်ဇုန် ညှိခြင်း (Timer မှန်ဖို့ အရေးကြီးဆုံး)
+// ၁။ အချိန်ဇုန် ညှိခြင်း
 date_default_timezone_set('Asia/Tokyo');
 
 include '../database/db_conn.php';
+// ⚠️ Logic ဖိုင်ကို လှမ်းချိတ်ထားပါတယ် (database folder ထဲမှာ functions.php ရှိရပါမယ်)
+include '../database/functions.php';
 
 $order = null;
 
@@ -16,19 +18,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['checkphonenumber'])) {
     
     if (!$order) {
         echo "<h2 style='text-align:center; color:red;'>Order not found! (အော်ဒါမရှိပါ)</h2>";
-        echo "<center><a href='../customer/index.php'>Back</a></center>";
+        echo "<center><a href='index.php'>Back</a></center>";
         exit();
     }
 } elseif (isset($_GET['id'])) {
-    // URL ကနေ ID နဲ့ လာရင်လည်း လက်ခံနိုင်အောင် (Refresh အတွက်)
     $id = mysqli_real_escape_string($conn, $_GET['id']);
     $query = "SELECT * FROM orders WHERE id = '$id'";
     $result = $conn->query($query);
     $order = $result->fetch_assoc();
 } else {
-    header("Location: ../customer/index.php");
+    header("Location: index.php");
     exit();
 }
+
+// ⚠️ Location စစ်ဆေးခြင်း
+// (ဒီနေရာမှာ တွက်ထားပေမယ့် အောက်က HTML မှာ မပြရင် အလကားဖြစ်နေပါလိမ့်မယ်)
+$delivery_check = checkDeliveryArea($order['postal_code']);
 
 // ၂။ Customer က "လက်ခံရရှိပါပြီ" ဟု နှိပ်လိုက်လျှင်
 if (isset($_POST['confirm_receive'])) {
@@ -74,7 +79,7 @@ switch ($order['status']) {
         $status_color = "grey";
 }
 
-// ၅။ အချိန်တွက်ချက်ခြင်း (Admin လက်ခံတဲ့ start_time ကနေပဲ တွက်မယ်)
+// ၅။ အချိန်တွက်ချက်ခြင်း
 $remaining_seconds = 0;
 if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
     $start_time = strtotime($order['start_time']); 
@@ -91,7 +96,8 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Status</title>
-    <meta http-equiv="refresh" content="10"> <style>
+    <meta http-equiv="refresh" content="10"> 
+    <style>
         body { font-family: sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
         .card { background: white; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .status-box { background-color: <?php echo $status_color; ?>; color: white; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; }
@@ -99,6 +105,11 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
         .details { text-align: left; margin-top: 20px; line-height: 1.8; border-top: 1px solid #ddd; padding-top: 10px; }
         .price-row { display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; color: #2c3e50; border-top: 2px dashed #ccc; padding-top: 10px; margin-top: 10px; }
         .btn { display: inline-block; margin-top: 20px; padding: 12px 25px; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-size: 16px; }
+        
+        /* ⚠️ Location Alert အတွက် CSS အသစ်များ */
+        .alert-box { padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9em; text-align: left; border: 1px solid #ddd; }
+        .ok { background: #e8f8f5; color: #27ae60; border-color: #27ae60; }
+        .warning { background: #fdedec; color: #c0392b; border-color: #c0392b; }
     </style>
 </head>
 <body>
@@ -109,6 +120,12 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
         <div class="status-box">
             <?php echo $status_text; ?>
         </div>
+        
+        <?php if ($delivery_check['status'] == 'ok'): ?>
+            <div class="alert-box ok"><?php echo $delivery_check['msg']; ?></div>
+        <?php elseif ($delivery_check['status'] == 'warning'): ?>
+            <div class="alert-box warning"><?php echo $delivery_check['msg']; ?></div>
+        <?php endif; ?>
 
         <?php if ($order['status'] == 'Pending'): ?>
             <p>ဆိုင်မှ အော်ဒါကို အတည်ပြုရန် စောင့်ဆိုင်းနေပါသည်...</p>
@@ -136,6 +153,7 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
             <p><strong>Order ID:</strong> #<?php echo $order['id']; ?></p>
             <p><strong>အမည်:</strong> <?php echo htmlspecialchars($order['customer_name']); ?></p>
             <p><strong>လိပ်စာ:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
+            <p><strong>Postal Code:</strong> <?php echo htmlspecialchars($order['postal_code']); ?></p>
             <p><strong>ပီဇာ:</strong> Size <?php echo htmlspecialchars($order['pizza_type']); ?> (<?php echo $order['quantity']; ?> ခု)</p>
 
             <div class="price-row">
@@ -144,7 +162,7 @@ if ($order['status'] != 'Pending' && !empty($order['start_time'])) {
             </div>
         </div>
 
-        <a href="../customer/index.php" class="btn" style="background: #555;">ပင်မစာမျက်နှာသို့</a>
+        <a href="index.php" class="btn" style="background: #555;">ပင်မစာမျက်နှာသို့</a>
     </div>
 
     <?php if ($show_timer && $order['status'] != 'Pending'): ?>

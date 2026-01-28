@@ -74,6 +74,10 @@ try {
         <div class="container_def">
             <h3 class="text-center fw-bold mb-4">注文履歴</h3>
 
+            <div class="d-flex justify-content-end mb-3">
+                <button type="button" id="refreshOrdersBtn" class="btn btn-outline-custom px-4">更新</button>
+            </div>
+
             <?php if ($errorMessage !== ''): ?>
                 <div class="alert alert-danger" role="alert">
                     <?php echo htmlspecialchars($errorMessage); ?>
@@ -282,6 +286,13 @@ try {
                 const directionsLink = document.getElementById('od_directions_link');
                 if (mapsLink) mapsLink.href = mapsUrl;
                 if (directionsLink) directionsLink.href = dirUrl;
+            });
+        }
+
+        const refreshOrdersBtn = document.getElementById('refreshOrdersBtn');
+        if (refreshOrdersBtn) {
+            refreshOrdersBtn.addEventListener('click', function() {
+                window.location.reload();
             });
         }
     </script>

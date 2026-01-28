@@ -356,8 +356,8 @@ tbody tr:last-child td{ border-bottom:none; }
   border-radius: var(--radius2);
   background: #fff;
   transition: border-color 0.2s, box-shadow 0.2s;
-  width: 500px;
-  min-width: 500px;
+  width: 150px;
+  min-width: 150px;
   box-sizing: border-box;
   -moz-appearance: textfield;
   appearance: textfield;

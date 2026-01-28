@@ -82,7 +82,7 @@ if ($result) {
 
 <header class="header">
     <div class="header-content">
-        <div class="logo"><img src="./assets/image/logo.png" alt="Pizza Mach logo featuring stylized pizza slice with restaurant name"></div>
+        <div class="logo"><img src="./assets/image/logo.png" alt="Pizza Mach logo featuring stylized pizza slice with restaurant name" ></div>
         <h1 class="header-title">Pizza Mach</h1>
     </div>
 </header>

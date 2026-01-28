@@ -1,0 +1,438 @@
+/* ============================================
+   ORDER PAGE STYLES
+   ============================================ */
+
+/* Color Variables */
+:root {
+  --primary-color: #d19758;
+  --dark-primary: #b87e40;
+  --header-color: #ce9851;
+  --background-light: #efe3d6;
+  --background-cream: #f4d6c2;
+  --text-dark: #2d3748;
+  --text-normal: #666;
+  --border-light: #e2e8f0;
+  --error-bg: #f8d7da;
+  --error-border: #dc3545;
+  --error-text: #721c24;
+  --shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Header Section */
+.order-header {
+  background: var(--header-color);
+  color: white;
+  padding: 20px 40px;
+  border-bottom-left-radius: 50% 30px;
+  border-bottom-right-radius: 50% 30px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.order-logo {
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.order-tagline {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+/* Main Order Layout */
+.order-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.pizza-list {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* Pizza Item Card */
+.pizza-item {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pizza-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.pizza-item img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--background-cream);
+  flex-shrink: 0;
+}
+
+.pizza-info {
+  flex: 1;
+}
+
+.pizza-info h3 {
+  color: var(--primary-color);
+  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.pizza-info p {
+  color: var(--text-normal);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.price-display {
+  color: var(--primary-color);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Quantity Selector */
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--background-cream);
+  padding: 8px 20px;
+  border-radius: 30px;
+  flex-shrink: 0;
+}
+
+.qty button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-weight: bold;
+}
+
+.qty button:hover {
+  background: var(--dark-primary);
+  transform: scale(1.1);
+}
+
+.qty button:active {
+  transform: scale(0.95);
+}
+
+.qty span {
+  font-size: 18px;
+  font-weight: bold;
+  min-width: 25px;
+  text-align: center;
+}
+
+/* Order Summary Sidebar */
+.order-summary {
+  background: var(--background-light);
+  border-radius: 20px;
+  padding: 30px;
+  min-width: 320px;
+  box-shadow: var(--shadow);
+}
+
+.order-summary h2 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 22px;
+}
+
+.date {
+  text-align: center;
+  color: var(--text-normal);
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.total-amount {
+  text-align: center;
+  font-size: 42px;
+  color: var(--primary-color);
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+/* Sizes Breakdown */
+.sizes {
+  background: rgba(255,255,255,0.5);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 25px 0;
+}
+
+.sizes p {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #ddd;
+  font-size: 14px;
+}
+
+.sizes p:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  font-weight: bold;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px solid #ddd;
+  color: var(--primary-color);
+}
+
+/* Customer Form */
+.customer-form {
+  background: rgba(255,255,255,0.5);
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 25px;
+}
+
+.customer-form h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.customer-form input,
+.customer-form textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 2px solid var(--background-cream);
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.customer-form input:focus,
+.customer-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(209, 151, 88, 0.1);
+}
+
+.customer-form input::placeholder,
+.customer-form textarea::placeholder {
+  color: #999;
+}
+
+/* Buttons */
+.confirm-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirm-btn:hover {
+  background: var(--dark-primary);
+  box-shadow: 0 5px 15px rgba(177, 126, 64, 0.3);
+  transform: translateY(-2px);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
+}
+
+.confirm-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.back-btn {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+  color: var(--dark-primary);
+  text-decoration: underline;
+}
+
+/* Error Banner */
+.error-banner {
+  background: var(--error-bg);
+  border: 2px solid var(--error-border);
+  color: var(--error-text);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.disabled-form {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .order-page {
+    gap: 30px;
+  }
+  
+  .order-summary {
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-header {
+    padding: 15px 20px;
+    margin-bottom: 40px;
+  }
+  
+  .order-logo {
+    font-size: 24px;
+  }
+  
+  .order-page {
+    flex-direction: column;
+    gap: 30px;
+    padding: 0 15px 40px;
+  }
+  
+  .pizza-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .pizza-item img {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .order-summary {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .total-amount {
+    font-size: 32px;
+  }
+  
+  .sizes p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-header {
+    padding: 15px 10px;
+  }
+  
+  .order-logo {
+    font-size: 20px;
+  }
+  
+  .order-tagline {
+    font-size: 12px;
+  }
+  
+  .pizza-item {
+    padding: 15px;
+  }
+  
+  .pizza-item img {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .qty {
+    gap: 10px;
+    padding: 6px 15px;
+  }
+  
+  .qty button {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  
+  .order-summary {
+    padding: 20px;
+  }
+  
+  .total-amount {
+    font-size: 28px;
+  }
+  
+  .customer-form input,
+  .customer-form textarea {
+    padding: 10px 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .confirm-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+}

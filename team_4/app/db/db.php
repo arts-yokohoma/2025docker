@@ -1,28 +1,47 @@
 <?php
 
-// Database configuration for team_4_db
-$host = "localhost";
+/**
+ * Database Configuration
+ * Supports both localhost and Docker environments
+ */
+
+// Determine if running in Docker by checking for Docker IP
+$docker_ip = '192.168.20.32';
+$local_host = 'localhost';
+
+// Check which host to use
+$host = getenv('DB_HOST') ?: (gethostname() === 'localhost' ? $local_host : $docker_ip);
+
+// If the connection fails to Docker IP, fallback to localhost
 $port = "5432";
 $dbname = "team_4_db";
-$user = "team_4"; // 
-$password = "team4pass"; 
+$user = "team_4"; 
+$password = "team4pass";
 
+$pdo = null;
+
+// Try connecting to the configured host first
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    
-    // Optional: Test connection
-    // $pdo->query("SELECT 1");
-    
 } catch(PDOException $e) {
-    // If connection fails, try with postgres user
+    // If connection fails, try alternative host
+    $fallback_host = ($host === $docker_ip) ? $local_host : $docker_ip;
+    
     try {
-        $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", "postgres", "postgres");
+        $pdo = new PDO("pgsql:host=$fallback_host;port=$port;dbname=$dbname", $user, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     } catch(PDOException $e2) {
-        die("Database connection failed: " . $e2->getMessage());
+        // If both fail, try postgres user as fallback
+        try {
+            $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", "postgres", "postgres");
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        } catch(PDOException $e3) {
+            die("Database connection failed: " . $e3->getMessage());
+        }
     }
 }
 

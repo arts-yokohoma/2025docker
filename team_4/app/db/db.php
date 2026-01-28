@@ -1,5 +1,4 @@
 <?php
-<?php
 // PostgreSQL configuration - defaults are the docker-compose service credentials
 // You can override by setting environment variables (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS)
 $DB_HOST = getenv('DB_HOST') ?: 'team_4_db';

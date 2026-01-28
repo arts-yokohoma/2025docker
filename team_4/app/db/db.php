@@ -1,50 +1,37 @@
 <?php
+<?php
+// PostgreSQL configuration - defaults are the docker-compose service credentials
+// You can override by setting environment variables (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS)
+$DB_HOST = getenv('DB_HOST') ?: 'team_4_db';
+$DB_PORT = getenv('DB_PORT') ?: '5432';
+$DB_NAME = getenv('DB_NAME') ?: 'team_4_db';
+$DB_USER = getenv('DB_USER') ?: 'team_4';
+$DB_PASS = getenv('DB_PASS') ?: 'team4pass';
 
-/**
- * Database Configuration
- * Supports both localhost and Docker environments
- */
+// DSN for PDO with pgsql driver
+$dsn = "pgsql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME}";
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+];
 
-// Determine if running in Docker by checking for Docker IP
-$docker_ip = '192.168.20.37';
-$local_host = 'localhost';
-
-// Check which host to use
-$host = getenv('DB_HOST') ?: (gethostname() === 'localhost' ? $local_host : $docker_ip);
-
-// If the connection fails to Docker IP, fallback to localhost
-$port = "5432";
-$dbname = "team_4_db";
-$user = "team_4"; 
-$password = "team4pass";
-
-$pdo = null;
-
-// Try connecting to the configured host first
 try {
-    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    // If connection fails, try alternative host
-    $fallback_host = ($host === $docker_ip) ? $local_host : $docker_ip;
-    
-    try {
-        $pdo = new PDO("pgsql:host=$fallback_host;port=$port;dbname=$dbname", $user, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    } catch(PDOException $e2) {
-        // If both fail, try postgres user as fallback
-        try {
-            $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", "postgres", "postgres");
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        } catch(PDOException $e3) {
-            die("Database connection failed: " . $e3->getMessage());
-        }
-    }
-}
+    $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
+} catch (PDOException $e) {
+    // Log full error for server logs
+    error_log('DB connection error: ' . $e->getMessage());
 
+    // When debugging is enabled (set SHOW_DB_ERROR=true or DEBUG=true), show the PDO error message
+    $showDebug = filter_var(getenv('SHOW_DB_ERROR') ?: getenv('DEBUG'), FILTER_VALIDATE_BOOLEAN);
+    http_response_code(500);
+    if ($showDebug) {
+        echo 'Database connection failed: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    } else {
+        echo 'Database connection failed.';
+    }
+    exit;
+}
 /**
  * Check if pizza shop can accept new orders based on staff availability
  * Returns array with 'can_accept_orders' boolean and 'message' string

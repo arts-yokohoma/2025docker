@@ -643,3 +643,157 @@ body {
             font-size: 12px;
             margin: 5px 0 0 0;
         }
+        /* Real-time Capacity Status */
+.capacity-status {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.status-card {
+    background: rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.status-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.status-label {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* Warning/Alert Styles */
+.capacity-alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.capacity-alert.warning {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    color: #856404;
+}
+
+.capacity-alert.danger {
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+    color: #721c24;
+}
+
+.capacity-alert.success {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    color: #155724;
+}
+
+/* Current Orders Simulation */
+.current-orders {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.order-simulation {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.order-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.order-btn:hover {
+    transform: translateY(-2px);
+}
+
+.order-btn.accept {
+    background: #28a745;
+    color: white;
+}
+
+.order-btn.reject {
+    background: #dc3545;
+    color: white;
+}
+
+/* Staff Grid */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.staff-slot {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.staff-slot.available {
+    background: #d4edda;
+    border: 2px solid #28a745;
+}
+
+.staff-slot.busy {
+    background: #f8d7da;
+    border: 2px solid #dc3545;
+}
+
+.staff-number {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Utilization Meter */
+.utilization-meter {
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.meter-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #718096;
+}

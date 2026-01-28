@@ -50,8 +50,8 @@ body{
   padding: 50px;
   margin-bottom: 24px;
   overflow: visible;
-  width: 80%;
-  min-width: 80%;
+  width: 90%;
+  min-width: 90%;
   box-sizing: border-box;
 }
 
@@ -240,6 +240,7 @@ input[readonly]{
   cursor: not-allowed;
   border-color: #e0e0e0;
   color: #555;
+
 }
 
 /* Checkboxes and toggles */
@@ -271,7 +272,7 @@ input[readonly]{
 
 /* table (pizza prices) */
 table{
-  width: auto;
+  width: 100%;
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -342,6 +343,7 @@ tbody tr:last-child td{ border-bottom:none; }
 
 .price{
   text-align: right;
+  
 }
 
 .price input{
@@ -354,8 +356,8 @@ tbody tr:last-child td{ border-bottom:none; }
   border-radius: var(--radius2);
   background: #fff;
   transition: border-color 0.2s, box-shadow 0.2s;
-  width: 100%;
-  min-width: 140px;
+  width: 500px;
+  min-width: 500px;
   box-sizing: border-box;
   -moz-appearance: textfield;
   appearance: textfield;
@@ -382,6 +384,9 @@ tbody tr:last-child td{ border-bottom:none; }
   cursor: not-allowed;
   border-color: #e0e0e0;
   color: #555;
+  padding: 16px 18px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .actions{

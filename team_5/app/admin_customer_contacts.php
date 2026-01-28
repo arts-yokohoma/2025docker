@@ -179,10 +179,10 @@ $buildQuery = static function (array $overrides = []) use ($qRaw, $fromRaw, $toR
                         placeholder="名前 or 電話番号">
 
                     <label for="from" class="fw-bold mb-0">from</label>
-                    <input type="date" id="from" name="from" value="<?php echo htmlspecialchars($fromRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="form-control">
+                    <input type="date" id="from" name="from" value="<?php echo htmlspecialchars($fromRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="form-control w-25">
 
                     <label for="to" class="fw-bold mb-0">to</label>
-                    <input type="date" id="to" name="to" value="<?php echo htmlspecialchars($toRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="form-control">
+                    <input type="date" id="to" name="to" value="<?php echo htmlspecialchars($toRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="form-control w-25">
 
                     <button type="submit" class="btn btn-filled-custom px-4">検索</button>
                     <a class="btn btn-outline-secondary px-4" href="admin_customer_contacts.php">クリア</a>

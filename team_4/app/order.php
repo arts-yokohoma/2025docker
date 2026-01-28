@@ -2,6 +2,9 @@
 // order.php - Updated to match your CSS design
 require_once 'db/db.php';
 
+// Check staff availability before showing order page
+$capacity = checkOrderCapacity();
+
 // Get pizza prices from database
 $pizza = ['small_price' => 800, 'medium_price' => 1200, 'large_price' => 1500];
 $image_url = 'https://images.unsplash.com/photo-1601924638867-3ec62c7e5c79';
@@ -276,6 +279,23 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
       text-decoration: underline;
     }
     
+    .error-banner {
+      background: #f8d7da;
+      border: 2px solid #dc3545;
+      color: #721c24;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .disabled-form {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
     @media (max-width: 768px) {
       .order-page {
         flex-direction: column;
@@ -305,6 +325,20 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
   </div>
   <div class="order-tagline">Online Order • Free Delivery in 30 mins</div>
 </div>
+
+<?php if (!$capacity['can_accept_orders']): ?>
+  <div style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
+    <div class="error-banner">
+      ❌ <?php echo htmlspecialchars($capacity['message']); ?>
+    </div>
+    <div style="text-align: center;">
+      <p style="color: #666; margin-bottom: 20px; font-size: 16px;">
+        We are unable to accept new orders at the moment. Please check back soon!
+      </p>
+      <a href="index.php" class="order-button" style="display: inline-block;">← Back to Home</a>
+    </div>
+  </div>
+<?php else: ?>
 
 <div class="order-page">
   <!-- LEFT : PIZZA LIST -->
@@ -399,6 +433,7 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
     </div>
   </form>
 </div>
+<?php endif; ?>
 
 <script>
 // JavaScript for quantity adjustment and price calculation

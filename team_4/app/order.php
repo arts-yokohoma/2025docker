@@ -25,9 +25,6 @@ if (isset($pdo)) {
         // Use default prices if database fails
     }
 }
-
-// Calculate initial total
-$initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($pizza['large_price'] * 1);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -35,7 +32,7 @@ $initial_total = ($pizza['small_price'] * 1) + ($pizza['medium_price'] * 2) + ($
   <meta charset="UTF-8">
   <title>Order Pizza - Pizza Match</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/test.css">
   <link rel="stylesheet" href="css/order-page.css">
 </head>
 

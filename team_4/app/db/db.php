@@ -6,7 +6,7 @@
  */
 
 // Determine if running in Docker by checking for Docker IP
-$docker_ip = '192.168.20.32';
+$docker_ip = '192.168.20.37';
 $local_host = 'localhost';
 
 // Check which host to use

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../config/db.php';
 
 header('Content-Type: application/json');
 
@@ -12,7 +12,7 @@ $orderId = (int)$_POST['id'];
 $newStatus = $_POST['status'];
 
 // Validate status
-$validStatuses = ['New', 'In Progress', 'Completed'];
+$validStatuses = ['New', 'In Progress', 'Completed', 'Canceled'];
 if (!in_array($newStatus, $validStatuses)) {
     echo json_encode(['success' => false, 'message' => 'Invalid status']);
     exit;

@@ -50,7 +50,7 @@
                 </div>
                 <div class="text-center m-3">
                     <a href="index.php" class="text-decoration-none text-center">
-                    <button type="submit" class="btn btn-filled-custom fw-bold fs-3">ホームに戻る</button>
+                        <button type="submit" class="btn btn-filled-custom fw-bold fs-3">ホームに戻る</button>
                     </a>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

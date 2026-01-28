@@ -1,6 +1,16 @@
 <?php
 session_start();
 require_once 'db/db.php';
+// Check capacity before processing order
+$capacity = checkOrderCapacity();
+
+if (!$capacity['can_accept_orders']) {
+    // Redirect back with error message
+    session_start();
+    $_SESSION['order_error'] = $capacity['message'];
+    header('Location: order.php?error=capacity');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
@@ -101,3 +111,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
+<script>
+    // In your order.php or order processing page:
+function submitOrder() {
+    const capacityCheck = checkOrderCapacity();
+    
+    if (!capacityCheck.canAcceptOrders) {
+        alert(capacityCheck.message);
+        return false; // Stop order submission
+    }
+    
+    // If capacity available, proceed with order
+    const orderResult = processNewOrder();
+    
+    if (orderResult.success) {
+        // Process payment and save order
+        alert(orderResult.message);
+        return true;
+    } else {
+        alert(orderResult.message);
+        return false;
+    }
+}
+
+</script>

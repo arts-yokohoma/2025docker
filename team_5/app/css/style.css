@@ -56,6 +56,86 @@
   background-color: #7c1811; /* slightly darker on hover */
   color: #fff;
 }
+
+/* Make - / qty / + controls the same width (order_select.php) */
+.product .input-group .btn-decr,
+.product .input-group .qty,
+.product .input-group .btn-incr {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0;
+}
+
+/* Slightly taller +/- buttons (order_select.php) */
+.product .input-group .btn-decr,
+.product .input-group .btn-incr {
+  height: 52px;
+}
+
+/* Shift period (radio) buttons */
+.shift-period .btn-outline-primary {
+  --bs-btn-color: var(--dark-red);
+  --bs-btn-border-color: var(--dark-red);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--dark-red);
+  --bs-btn-hover-border-color: var(--dark-red);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--dark-red);
+  --bs-btn-active-border-color: var(--dark-red);
+  --bs-btn-focus-shadow-rgb: 158, 35, 23;
+}
+
+/* Safety net in case Bootstrap vars are overridden elsewhere */
+.shift-period .btn-check:checked + .btn-outline-primary {
+  color: #fff;
+  background-color: var(--dark-red);
+  border-color: var(--dark-red);
+}
+
+.shift-period .btn-check:focus + .btn {
+  box-shadow: 0 0 0 0.25rem rgba(158, 35, 23, 0.25);
+}
+
+/* Time slots (time.php) */
+.time-slot-btn {
+  background-color: var(--bg-orange-light) !important;
+  border: none !important;
+  color: #222 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+.time-slot-btn:hover {
+  background-color: var(--dark-red) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+.time-slot-btn.is-selected {
+  background-color: var(--dark-red) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+}
+.time-slot-btn.is-selected:hover {
+  background-color: var(--dark-red) !important;
+  color: #fff !important;
+}
+.time-slot-btn:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  background-color: #d0d0d0 !important;
+  color: #666 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Some buttons also carry a .disabled class in markup */
+.time-slot-btn.disabled,
+.time-slot-btn.disabled:hover,
+.time-slot-btn:disabled:hover {
+  background-color: #d0d0d0 !important;
+  color: #666 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
 .hero-section {
   min-height: 50vh;
   overflow: hidden;

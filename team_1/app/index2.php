@@ -13,3 +13,8 @@ if ($mysqli->connect_error) {
     echo "<p>Server time: " . date('Y-m-d H:i:s') . "</p>";
 }
 ?>
+
+
+
+ALTER TABLE orders
+ADD COLUMN deleted TINYINT(1) NOT NULL DEFAULT 0;

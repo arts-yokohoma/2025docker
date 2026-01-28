@@ -54,7 +54,7 @@ if (isset($pdo)) {
 
   <!-- Price Section Added -->
   <section class="price-section">
-    <h2 style="color: #333; font-size: 28px; margin-bottom: 20px;">お手頃価格で本格ピザ</h2>
+    <h2 style="color: #333; font-size: 28px; margin-bottom: 20px; margin-top:30px;">お手頃価格で本格ピザ</h2>
     <p style="color: #666; margin-bottom: 30px;">新鮮な食材で作る当店自慢のピザを30分以内にお届けします</p>
     
     <div class="price-grid">

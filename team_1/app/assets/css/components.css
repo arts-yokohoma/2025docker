@@ -195,6 +195,7 @@
     box-shadow: none;
 }
 
+
 @media (max-width: 767px) {
     .form-actions {
         flex-direction: column;

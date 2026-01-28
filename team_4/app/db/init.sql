@@ -47,7 +47,26 @@ CREATE TABLE IF NOT EXISTS pizzas (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Orders table
+-- 3. Staff Shifts table (for staff availability and capacity management)
+CREATE TABLE IF NOT EXISTS staff_shifts (
+    id SERIAL PRIMARY KEY,
+    shift_date DATE NOT NULL,
+    shift_type VARCHAR(20) NOT NULL CHECK (shift_type IN ('morning', 'evening')),
+    morning_start TIME DEFAULT '08:00:00',
+    morning_end TIME DEFAULT '16:00:00',
+    evening_start TIME DEFAULT '16:00:00',
+    evening_end TIME DEFAULT '23:59:59',
+    staff_count INTEGER DEFAULT 0 CHECK (staff_count >= 0),
+    max_orders_per_hour INTEGER DEFAULT 4,
+    current_orders INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(shift_date, shift_type)
+);
+
+-- 4. Orders table
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     

@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="location.php">店舗情報</a>
+                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="admin_panel.php">管理メニュー</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-filled-custom rounded-pill px-4 m-2" href="time.php">今すぐ注文</a>
@@ -51,7 +51,7 @@
                 <div class="row text-center mb-4 mx-auto justify-content-center">
                     <div class="col-12 mb-3">
                         <label class="form-label fs-4 fw-bold d-block">勤務区分</label>
-                        <div class="btn-group" role="group" aria-label="shift period">
+                        <div class="btn-group shift-period" role="group" aria-label="shift period">
                             <input type="radio" class="btn-check" name="shift_period" id="period_morning" value="morning" autocomplete="off" checked>
                             <label class="btn btn-outline-primary" for="period_morning">日勤（10:00〜16:00）</label>
 
@@ -155,7 +155,7 @@
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

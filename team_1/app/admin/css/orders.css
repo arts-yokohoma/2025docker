@@ -24,6 +24,68 @@ body {
   font-size: 40px;
 }
 
+.filter-container {
+  margin: 20px 0;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  color: #333;
+}
+
+.tab-btn.active {
+  color: #2196F3;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #2196F3;
+  border-radius: 2px;
+}
+
+.tab-btn .count {
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.tab-btn.active .count {
+  background: #2196F3;
+  color: white;
+}
+
 .orders {
   width: 100%;
   background: white;
@@ -55,6 +117,78 @@ body {
 .status.canceled {
   background: #f8d7da;
   color: #721c24;
+}
+
+.status.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+tbody tr {
+  display: table-row;
+}
+
+tbody tr:not(.visible) {
+  display: none;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 16px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.filter-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.filter-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.badge {
+  background: rgba(0,0,0,0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.filter-btn.active .badge {
+  background: rgba(255,255,255,0.3);
+}
+
+.filter-btn span svg {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.edit-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.edit-btn:hover:not(:disabled) {
+  background: #4b5563;
 }
 
 .btn {

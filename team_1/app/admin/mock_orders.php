@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../config/db.php';
+require_once dirname(dirname(__FILE__)) . '/config/db.php';
 
 // Fetch orders from database with order items and customer details
 $query = "
@@ -8,13 +8,15 @@ SELECT
   o.create_time as date,
   c.name,
   c.phone,
+  c.address,
   GROUP_CONCAT(CONCAT(m.name, ' x', oi.quantity) SEPARATOR ', ') as item,
-  o.status
+  o.status,
+  COALESCE(SUM(oi.price * oi.quantity), 0) as total_amount
 FROM orders o
 LEFT JOIN customer c ON o.customer_id = c.id
 LEFT JOIN order_items oi ON o.id = oi.order_id
 LEFT JOIN menu m ON oi.menu_id = m.id
-GROUP BY o.id, o.create_time, c.name, c.phone, o.status
+GROUP BY o.id, o.create_time, c.id, c.name, c.phone, c.address, o.status
 ORDER BY o.create_time DESC
 ";
 
@@ -26,12 +28,14 @@ if (!$result) {
 
 $orders = [];
 while ($row = $result->fetch_assoc()) {
-    // Normalize status to proper case (New, In Progress, Completed)
+    // Normalize status to proper case (New, In Progress, Completed, Canceled)
     $status = strtolower($row["status"] ?? "new");
     if (strpos($status, 'in progress') !== false) {
         $status = 'In Progress';
     } elseif ($status === 'completed') {
         $status = 'Completed';
+    } elseif ($status === 'canceled') {
+        $status = 'Canceled';
     } else {
         $status = 'New';
     }
@@ -41,7 +45,9 @@ while ($row = $result->fetch_assoc()) {
         "date" => date('Y-m-d H:i', strtotime($row["date"])),
         "name" => $row["name"] ?? "Unknown",
         "phone" => $row["phone"] ?? "N/A",
+        "address" => $row["address"] ?? "N/A",
         "item" => $row["item"] ?? "No items",
-        "status" => $status
+        "status" => $status,
+        "total_amount" => $row["total_amount"] ?? 0
     ];
 }

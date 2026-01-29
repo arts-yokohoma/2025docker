@@ -119,8 +119,22 @@
   color: #fff !important;
 }
 .time-slot-btn:disabled {
-  opacity: 0.65;
+  opacity: 1;
   cursor: not-allowed;
+  background-color: #d0d0d0 !important;
+  color: #666 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Some buttons also carry a .disabled class in markup */
+.time-slot-btn.disabled,
+.time-slot-btn.disabled:hover,
+.time-slot-btn:disabled:hover {
+  background-color: #d0d0d0 !important;
+  color: #666 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 .hero-section {
   min-height: 50vh;

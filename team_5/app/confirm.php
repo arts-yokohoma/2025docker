@@ -53,6 +53,11 @@ $generateOrderNumber = static function (): string {
     return $result;
 };
 
+$normalizePhone = static function (string $raw): string {
+    // Keep digits only (e.g., "080-1234-5678" -> "08012345678")
+    return preg_replace('/\D+/', '', $raw) ?? '';
+};
+
 $tz = new DateTimeZone('Asia/Tokyo');
 $today = (new DateTime('now', $tz))->format('Y-m-d');
 
@@ -180,6 +185,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($insertedOrderNumber === null) {
                 throw new Exception('注文番号の生成に失敗しました。再度お試しください。');
+            }
+
+            // Save/update customer contact for promotions (best-effort).
+            // Do not fail the order if this insert fails or the table isn't created yet.
+            try {
+                $normalizedPhone = $normalizePhone($phone);
+                if ($normalizedPhone !== '') {
+                    $contactSql = "INSERT INTO customer_contacts (phone, name, zipcode, address, building, room, last_seen_at)
+                                  VALUES (:phone, :name, :zipcode, :address, :building, :room, NOW())
+                                  ON CONFLICT (phone) DO UPDATE
+                                    SET name = EXCLUDED.name,
+                                        zipcode = EXCLUDED.zipcode,
+                                        address = EXCLUDED.address,
+                                        building = EXCLUDED.building,
+                                        room = EXCLUDED.room,
+                                        last_seen_at = NOW()";
+                    $pdo->prepare($contactSql)->execute([
+                        ':phone' => $normalizedPhone,
+                        ':name' => $name,
+                        ':zipcode' => $zipcode !== '' ? $zipcode : null,
+                        ':address' => $address !== '' ? $address : null,
+                        ':building' => $building !== '' ? $building : null,
+                        ':room' => $room !== '' ? $room : null,
+                    ]);
+                }
+            } catch (PDOException $e) {
+                error_log('customer_contacts upsert failed: ' . $e->getMessage());
             }
 
             // If this order fills the slot, mark it inactive.
@@ -317,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

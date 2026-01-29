@@ -4,6 +4,9 @@ session_start();
 $errorMessage = '';
 $orders = [];
 
+$orderNumberQueryRaw = trim((string)($_GET['order_number'] ?? ''));
+$phoneQueryRaw = trim((string)($_GET['phone'] ?? ''));
+
 require_once __DIR__ . '/db_config.php';
 
 try {
@@ -17,12 +20,43 @@ try {
                 <= (now() AT TIME ZONE 'Asia/Tokyo'))"
     );
 
-    $stmt = $pdo->query(
-        "SELECT order_number, time_slot, qty_s, qty_m, qty_l, total_yen, customer_name, customer_phone, zipcode, address, building, room, status,
-                to_char(created_at AT TIME ZONE 'Asia/Tokyo', 'YYYY-MM-DD HH24:MI') AS created_at_jst
-         FROM orders
-         ORDER BY created_at DESC"
-    );
+    $sql = "SELECT order_number, time_slot, qty_s, qty_m, qty_l, total_yen, customer_name, customer_phone, zipcode, address, building, room, status,
+                   to_char(created_at AT TIME ZONE 'Asia/Tokyo', 'YYYY-MM-DD HH24:MI') AS created_at_jst
+            FROM orders";
+
+    $where = [];
+    $params = [];
+
+    if ($orderNumberQueryRaw !== '') {
+        $orderNumberUpper = strtoupper($orderNumberQueryRaw);
+        if (preg_match('/^[A-Z]{3}\d{3}$/', $orderNumberUpper)) {
+            $where[] = 'order_number = :order_number';
+            $params[':order_number'] = $orderNumberUpper;
+        } else {
+            $where[] = 'order_number ILIKE :order_number_like';
+            $params[':order_number_like'] = '%' . $orderNumberQueryRaw . '%';
+        }
+    }
+
+    if ($phoneQueryRaw !== '') {
+        if (preg_match('/^\d+$/', $phoneQueryRaw)) {
+            // Digits-only search: compare against digits-only version of stored phone.
+            $where[] = "regexp_replace(customer_phone, '\\D', '', 'g') LIKE :phone_digits_like";
+            $params[':phone_digits_like'] = '%' . $phoneQueryRaw . '%';
+        } else {
+            // Fallback: raw text search (supports hyphens/spaces in input).
+            $where[] = 'customer_phone ILIKE :phone_like';
+            $params[':phone_like'] = '%' . $phoneQueryRaw . '%';
+        }
+    }
+
+    if ($where) {
+        $sql .= ' WHERE ' . implode(' AND ', $where);
+    }
+    $sql .= ' ORDER BY created_at DESC';
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll();
 } catch (PDOException $e) {
     $errorMessage = '注文履歴を取得できませんでした。（DB未準備の可能性）';
@@ -73,6 +107,49 @@ try {
     <div class="container my-4">
         <div class="container_def">
             <h3 class="text-center fw-bold mb-4">注文履歴</h3>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <form class="d-flex gap-2 align-items-center flex-wrap" method="get" action="orders.php">
+                    <label for="orderNumberSearch" class="fw-bold mb-0">予約番号</label>
+                    <input
+                        type="text"
+                        id="orderNumberSearch"
+                        name="order_number"
+                        value="<?php echo htmlspecialchars($orderNumberQueryRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                        class="form-control"
+                        style="max-width: 220px;"
+                        placeholder="例: ABC123">
+
+                    <label for="phoneSearch" class="fw-bold mb-0">電話番号</label>
+                    <input
+                        type="text"
+                        id="phoneSearch"
+                        name="phone"
+                        value="<?php echo htmlspecialchars($phoneQueryRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                        class="form-control"
+                        style="max-width: 240px;"
+                        placeholder="例: 09012345678">
+
+                    <button type="submit" class="btn btn-filled-custom px-4">検索</button>
+                    <a class="btn btn-outline-secondary px-4" href="orders.php">クリア</a>
+                </form>
+
+                <button type="button" id="refreshOrdersBtn" class="btn btn-outline-custom px-4">更新</button>
+            </div>
+
+            <?php if ($orderNumberQueryRaw !== '' || $phoneQueryRaw !== ''): ?>
+                <div class="alert alert-light border" role="alert">
+                    <?php if ($orderNumberQueryRaw !== ''): ?>
+                        予約番号: <span class="fw-bold"><?php echo htmlspecialchars($orderNumberQueryRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                    <?php endif; ?>
+                    <?php if ($orderNumberQueryRaw !== '' && $phoneQueryRaw !== ''): ?>
+                        <span class="mx-2">/</span>
+                    <?php endif; ?>
+                    <?php if ($phoneQueryRaw !== ''): ?>
+                        電話番号: <span class="fw-bold"><?php echo htmlspecialchars($phoneQueryRaw, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <?php if ($errorMessage !== ''): ?>
                 <div class="alert alert-danger" role="alert">
@@ -284,6 +361,13 @@ try {
                 if (directionsLink) directionsLink.href = dirUrl;
             });
         }
+
+        const refreshOrdersBtn = document.getElementById('refreshOrdersBtn');
+        if (refreshOrdersBtn) {
+            refreshOrdersBtn.addEventListener('click', function() {
+                window.location.reload();
+            });
+        }
     </script>
 
     <!-- Site footer -->
@@ -300,7 +384,7 @@ try {
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

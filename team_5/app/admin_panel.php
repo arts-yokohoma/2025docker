@@ -35,7 +35,7 @@ if (empty($_SESSION['admin_id'])) {
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="customer_data.php">お問い合わせ</a>
+                        <a class="nav-link btn btn-contact rounded-pill px-4 m-2" href="contact.php">お問い合わせ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-filled-custom rounded-pill px-4 m-2" href="index.php">ホーム</a>
@@ -65,6 +65,11 @@ if (empty($_SESSION['admin_id'])) {
                 <a href="menu.php" class="text-decoration-none text-dark d-block">メニュー<br>管理</a>
             </div>
         </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-4 container_def_button m-4 fs-1">
+                <a href="admin_customer_contacts.php" class="text-decoration-none text-dark d-block">顧客<br>連絡先</a>
+            </div>
+        </div>
         <div class="text-center mt-4">
             <a href="admin_create_user.php" class="btn btn-filled-custom btn-lg rounded-2 fw-bold">管理者ユーザー作成</a>
         </div>
@@ -90,7 +95,7 @@ if (empty($_SESSION['admin_id'])) {
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
                         <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
-                        <li class="list-inline-item"><a href="customer_data.php">お問い合わせ</a></li>
+                        <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 /* login.css - Enhanced login form styles */
 :root {
-    --accent: #ff6b35;
-    --accent-dark: #e55a24;
+    --accent: #4816dc;
+    --accent-dark: #353ee7;
     --text-primary: #2c3e50;
     --text-secondary: #7f8c8d;
     --border: #ecf0f1;
@@ -17,7 +17,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3769a2 0%, #764ba2 100%);
     display: flex;
     height: 100vh;
     align-items: center;
@@ -94,7 +94,7 @@ button {
 button:hover {
     background: var(--accent-dark);
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(255, 107, 53, 0.3);
+    box-shadow: 0 8px 16px rgba(75, 5, 238, 0.3);
 }
 
 button:active {

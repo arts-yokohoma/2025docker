@@ -21,50 +21,69 @@ if (isset($pdo)) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PizzaHouse</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <title>Pizza Match</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/test.css">
+  <style>
+   
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="logo"><img src="image/8.png"pizzaMach" class="logo-img"></div>
-  <nav>
-    <a href="#">会社案内</a>
-    <a href="#">お問い合わせ</a>
-  </nav>
-</header>
+<header class="main-header">
+  <div class="header-content">
+    <a href="#" class="logo-link">
+       <img src="image/8.png" alt="Pizza Match Logo" class="logo-img">
+    </a>
 
-<section class="hero">
-  <div class="vertical-text">
-    <span>ピザマッチ</span>
-    <span>ピザマッチ</span>
-    <span>ピザマッチ</span>
+    <nav id="nav-menu">
+      <a href="#about" onclick="toggleMenu()">会社案内</a>
+      <a href="#contact" onclick="toggleMenu()">お問い合わせ</a>
+      <a href="order.php" class="order-button" style="margin-left: 15px; padding: 8px 20px; font-size: 14px;">オンライン注文</a>
+    </nav>
   </div>
 
   <div class="header-pizza">
     <img src="image/pi3.png" alt="Pizza">
   </div>
-</section>
+</header>
 
-<section class="menu">
-  <div class="menu-card">
-    <img src="2025DOCKER/team_4/pi.jpg">
-    <p>Classic tomato,<br>mozzarella, basil</p>
-  </div>
-  <div class="menu-card">
-    <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png">
-    <p>Peppers, olives,<br>fresh herbs</p>
-  </div>
-  <div class="menu-card">
-    <img src="https://cdn-icons-png.flaticon.com/512/1404/1404945.png">
-    <p>Sausage, bacon,<br>premium toppings</p>
-  </div>
-</section>
+<main>
 
-<div class="order-btn">
-  <button>注文</button>
-</div>
+  <!-- Price Section Added -->
+  <section class="price-section">
+    <h2 style="color: #333; font-size: 28px; margin-bottom: 20px; margin-top:30px;">お手頃価格で本格ピザ</h2>
+    <p style="color: #666; margin-bottom: 30px;">新鮮な食材で作る当店自慢のピザを30分以内にお届けします</p>
+    
+    <div class="price-grid">
+      <div class="price-card">
+        <h4>Small (20cm)</h4>
+        <p>1-2人前</p>
+        <div class="price-tag">¥<?php echo number_format($pizza['small_price']); ?></div>
+        <a href="order.php" class="order-button" style="margin-top: 15px; width: 100%; text-align: center;">注文する</a>
+      </div>
+      
+      <div class="price-card">
+        <h4>Medium (30cm)</h4>
+        <p>2-3人前</p>
+        <div class="price-tag">¥<?php echo number_format($pizza['medium_price']); ?></div>
+        <a href="order.php" class="order-button" style="margin-top: 15px; width: 100%; text-align: center;">注文する</a>
+      </div>
+      
+      <div class="price-card">
+        <h4>Large (40cm)</h4>
+        <p>3-4人前</p>
+        <div class="price-tag">¥<?php echo number_format($pizza['large_price']); ?></div>
+        <a href="order.php" class="order-button" style="margin-top: 15px; width: 100%; text-align: center;">注文する</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="order-btn">
+    <a href="order.php" class="order-button" style="text-decoration: none; display: inline-block;">オンラインで注文する</a>
+  </div>
 
   <section class="about" id="about">
     <h2>当店について</h2>

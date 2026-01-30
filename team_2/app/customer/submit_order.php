@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt = $conn->prepare($sql)) {
         // s = string, i = integer
         // types: name(s), phone(s), address(s), size(s), qty(i), postal(s)
-        $stmt->bind_param("ssssis", $name, $phone, $full_address, $size, $qty, $postal_code);
+        $stmt->bind_param("ssssss", $name, $phone, $full_address, $size, $qty, $postal_code);
 
         if ($stmt->execute()) {
             // ✅ အောင်မြင်ရင် Order ID ယူပြီး Status Page ကို ပို့မယ်

@@ -19,6 +19,7 @@ function getTrafficStatus()
 
 $msg = '';
 $msg_type = '';
+$postal_code = '';
 
 /* ===============================
    POST Handling

@@ -14,9 +14,7 @@ foreach ($orders as $order) {
 <head>
   <meta charset="UTF-8">
   <title>注文ページ</title>
-  <!-- Cache-busted stylesheet to force reload after CSS changes -->
   <link rel="stylesheet" href="css/orders.css?v=<?= filemtime(__DIR__ . '/css/orders.css') ?>">
-  <!-- Temporary debug styles: force completed styles to confirm CSS is applied (remove after verification) -->
   <style>
     .status.completed { background: #e7f3ff !important; color: #0a58d4 !important; border: 1px solid #bfd9ff !important; }
     .tab-btn[data-status="Completed"].active { color: #28a745 !important; }
@@ -88,8 +86,8 @@ foreach ($orders as $order) {
       <th>注文詳細</th>
       <th>合計金額</th>
       <th>ステータス</th>
-      <th>操作</th>
-      <th>編集</th>
+      <th class="text-center">操作</th>
+      <th class="text-center">編集</th>
     </tr>
   </thead>
   <tbody>
@@ -109,7 +107,7 @@ foreach ($orders as $order) {
             <?= $order["status"] ?>
           </span>
         </td>
-        <td>
+        <td class="text-center">
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
             <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル">❌</button>
 
@@ -120,7 +118,7 @@ foreach ($orders as $order) {
             <?php endif; ?>
           <?php endif; ?>
         </td>
-        <td>
+        <td class="text-center">
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
             <button class="btn edit-btn" data-id="<?= $order["id"] ?>">編集</button>
           <?php endif; ?>

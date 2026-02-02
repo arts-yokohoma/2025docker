@@ -11,12 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $username = trim($_POST['username'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
-// Query user with role information
-$stmt = $pdo->prepare("
-    SELECT id, username, password, role 
-    FROM users 
-    WHERE username = ?
-");
+$stmt = $pdo->prepare(
+    "SELECT id, username, password, role FROM users WHERE username = ?"
+);
 $stmt->execute([$username]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

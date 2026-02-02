@@ -171,7 +171,7 @@ $qr_code_url_alt = "https://api.qrserver.com/v1/create-qr-code/?size={$qr_size}&
           <tbody>
             <?php if ($order['small_qty'] > 0): ?>
             <tr>
-              <td>Small Pizza (20cm)</td>
+              <td>スモールピザ (20cm)</td>
               <td><?php echo $order['small_qty']; ?></td>
               <td>¥<?php echo number_format($order['small_price']); ?></td>
               <td>¥<?php echo number_format($small_total); ?></td>
@@ -180,7 +180,7 @@ $qr_code_url_alt = "https://api.qrserver.com/v1/create-qr-code/?size={$qr_size}&
             
             <?php if ($order['medium_qty'] > 0): ?>
             <tr>
-              <td>Medium Pizza (30cm)</td>
+              <td>ミディアムピザ (30cm)</td>
               <td><?php echo $order['medium_qty']; ?></td>
               <td>¥<?php echo number_format($order['medium_price']); ?></td>
               <td>¥<?php echo number_format($medium_total); ?></td>
@@ -189,7 +189,7 @@ $qr_code_url_alt = "https://api.qrserver.com/v1/create-qr-code/?size={$qr_size}&
             
             <?php if ($order['large_qty'] > 0): ?>
             <tr>
-              <td>Large Pizza (40cm)</td>
+              <td>ラージピザ (40cm)</td>
               <td><?php echo $order['large_qty']; ?></td>
               <td>¥<?php echo number_format($order['large_price']); ?></td>
               <td>¥<?php echo number_format($large_total); ?></td>

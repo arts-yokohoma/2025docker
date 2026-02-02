@@ -149,11 +149,12 @@ if ($menuRes) {
                         <input type="hidden" name="cart_json" id="cartJson">
                         <button type="submit" id="submitBtn" class="btn-proceed">注文を確定する</button>
                     </form>
-                </div>
-                
-                <div class="sidebar-card">
+                    <div class="sidebar-card">
                     <a href="cart.php" class="btn-back-cart">← カートへ戻る</a>
                 </div>
+                </div>
+                
+                
             </div>
         </div>
     </div>

@@ -116,7 +116,7 @@ try {
                 <tbody>
                     <?php if ($order['small_quantity'] > 0): ?>
                     <tr>
-                        <td>Small Pizza (20cm)</td>
+                        <td>スモールピザ (20cm)</td>
                         <td><?php echo $order['small_quantity']; ?></td>
                         <td>¥<?php echo number_format($order['small_price']); ?></td>
                         <td>¥<?php echo number_format($small_total); ?></td>
@@ -125,7 +125,7 @@ try {
                     
                     <?php if ($order['medium_quantity'] > 0): ?>
                     <tr>
-                        <td>Medium Pizza (30cm)</td>
+                        <td>ミディアムピザ (30cm)</td>
                         <td><?php echo $order['medium_quantity']; ?></td>
                         <td>¥<?php echo number_format($order['medium_price']); ?></td>
                         <td>¥<?php echo number_format($medium_total); ?></td>
@@ -134,7 +134,7 @@ try {
                     
                     <?php if ($order['large_quantity'] > 0): ?>
                     <tr>
-                        <td>Large Pizza (40cm)</td>
+                        <td>ラージピザ (40cm)</td>
                         <td><?php echo $order['large_quantity']; ?></td>
                         <td>¥<?php echo number_format($order['large_price']); ?></td>
                         <td>¥<?php echo number_format($large_total); ?></td>

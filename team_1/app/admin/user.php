@@ -13,22 +13,22 @@ $maxPage = 99;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page = max(1, min($page, $maxPage));
 
-// Search functionality
+// Search functionality (staff_users: login, first_name, last_name)
 $search = trim($_GET['search'] ?? '');
 $searchCondition = '';
 $searchParams = [];
 
 if (!empty($search)) {
-    $searchCondition = " AND (u.username LIKE ? OR u.email LIKE ?)";
+    $searchCondition = " AND (u.login LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?)";
     $searchPattern = '%' . $search . '%';
-    $searchParams = [$searchPattern, $searchPattern];
+    $searchParams = [$searchPattern, $searchPattern, $searchPattern];
 }
 
 // Get total count
-$countQuery = "SELECT COUNT(*) as total FROM users u JOIN roles r ON u.role_id = r.id WHERE 1=1" . $searchCondition;
+$countQuery = "SELECT COUNT(*) as total FROM staff_users u JOIN roles r ON u.role_id = r.id WHERE r.active = 1" . $searchCondition;
 $countStmt = $mysqli->prepare($countQuery);
 if (!empty($searchParams)) {
-    $countStmt->bind_param("ss", ...$searchParams);
+    $countStmt->bind_param("sss", ...$searchParams);
 }
 $countStmt->execute();
 $totalUsers = $countStmt->get_result()->fetch_assoc()['total'];
@@ -39,17 +39,17 @@ $offset = ($page - 1) * $perPage;
 
 // Get users with pagination
 $query = "
-    SELECT u.id, u.username, u.email, u.active, u.created_at, r.name as role_name
-    FROM users u 
+    SELECT u.id, u.login, u.first_name, u.last_name, u.active, u.create_time, r.code as role_code, r.role_name
+    FROM staff_users u 
     JOIN roles r ON u.role_id = r.id 
-    WHERE 1=1" . $searchCondition . "
-    ORDER BY u.created_at DESC 
+    WHERE r.active = 1" . $searchCondition . "
+    ORDER BY u.create_time DESC 
     LIMIT ? OFFSET ?
 ";
 
 $stmt = $mysqli->prepare($query);
 if (!empty($searchParams)) {
-    $stmt->bind_param("ssii", ...array_merge($searchParams, [$perPage, $offset]));
+    $stmt->bind_param("sssii", ...array_merge($searchParams, [$perPage, $offset]));
 } else {
     $stmt->bind_param("ii", $perPage, $offset);
 }
@@ -112,7 +112,7 @@ td{padding:16px;border-bottom:1px solid #f0f0f0;font-size:14px}
 
   <div class="search-area">
     <form method="get" class="search-box" style="display: flex; gap: 8px;">
-      <input type="text" name="search" value="<?= h($search) ?>" placeholder="名前またはメールアドレスで検索...">
+      <input type="text" name="search" value="<?= h($search) ?>" placeholder="ログイン名または氏名で検索...">
       <button type="submit">検索</button>
       <?php if (!empty($search)): ?>
         <a href="user.php" style="padding: 10px 18px; background: #f3f4f6; color: #333; text-decoration: none; border-radius: 10px;">クリア</a>
@@ -125,8 +125,7 @@ td{padding:16px;border-bottom:1px solid #f0f0f0;font-size:14px}
     <table>
       <thead>
         <tr>
-          <th>名前</th>
-          <th>メールアドレス</th>
+          <th>ログイン/氏名</th>
           <th>ロール</th>
           <th>ステータス</th>
           <th>登録日</th>
@@ -136,31 +135,34 @@ td{padding:16px;border-bottom:1px solid #f0f0f0;font-size:14px}
       <tbody>
         <?php if (empty($users)): ?>
           <tr>
-            <td colspan="6" style="text-align: center; padding: 32px; color: #999;">
+            <td colspan="5" style="text-align: center; padding: 32px; color: #999;">
               <?= !empty($search) ? '検索結果が見つかりませんでした' : 'ユーザーが登録されていません' ?>
             </td>
           </tr>
         <?php else: ?>
           <?php foreach ($users as $u): ?>
             <?php
-              $initial = strtoupper(substr($u['username'], 0, 1));
+              $fullName = $u['last_name'] . ' ' . $u['first_name'];
+              $initial = mb_substr($u['last_name'], 0, 1);
               $roleColors = [
                 'admin' => ['bg' => '#fee2e2', 'color' => '#991b1b'],
                 'manager' => ['bg' => '#dbeafe', 'color' => '#1e40af'],
                 'driver' => ['bg' => '#d1fae5', 'color' => '#065f46'],
                 'kitchen' => ['bg' => '#fef3c7', 'color' => '#92400e']
               ];
-              $roleColor = $roleColors[$u['role_name']] ?? ['bg' => '#f3f4f6', 'color' => '#374151'];
+              $roleColor = $roleColors[$u['role_code']] ?? ['bg' => '#f3f4f6', 'color' => '#374151'];
             ?>
             <tr>
               <td class="name">
-                <div class="avatar" style="background: <?= $roleColor['bg'] ?>; color: <?= $roleColor['color'] ?>;"><?= $initial ?></div>
-                <?= h($u['username']) ?>
+                <div class="avatar" style="background: <?= $roleColor['bg'] ?>; color: <?= $roleColor['color'] ?>;"><?= h($initial) ?></div>
+                <div>
+                  <div><?= h($fullName) ?></div>
+                  <div style="font-size: 12px; color: #999;">@<?= h($u['login']) ?></div>
+                </div>
               </td>
-              <td><?= h($u['email']) ?></td>
               <td>
                 <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; background: <?= $roleColor['bg'] ?>; color: <?= $roleColor['color'] ?>;">
-                  <?= h($u['role_name']) ?>
+                  <?= h($u['role_name'] ?? $u['role_code']) ?>
                 </span>
               </td>
               <td>
@@ -168,7 +170,7 @@ td{padding:16px;border-bottom:1px solid #f0f0f0;font-size:14px}
                   <?= $u['active'] ? '有効' : '無効' ?>
                 </span>
               </td>
-              <td><?= date('Y/m/d H:i', strtotime($u['created_at'])) ?></td>
+              <td><?= date('Y/m/d H:i', strtotime($u['create_time'])) ?></td>
               <td class="action">
                 <a href="users.php" style="background: #f3f4f6; color: #333; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 14px;">管理</a>
               </td>

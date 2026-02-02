@@ -547,36 +547,74 @@ if ($res) {
                 <span class="material-symbols-outlined" style="color: var(--success);">calendar_month</span>
                 シフト時間設定
             </h2>
+            <p style="color: var(--muted); font-size: 14px; margin: -8px 0 20px;">
+                スタッフのシフトスケジュール管理のための時間枠を設定します。営業時間内で設定してください。
+            </p>
 
             <form method="post">
                 <input type="hidden" name="action" value="save_shifts">
 
-                <h3>🌞 早番（任意）</h3>
-                <div class="row">
-                    <div>
-                        <label>から</label>
-                        <input type="time" name="early_shift_start" value="<?= h($store['early_shift_start'] ?? '') ?>">
+                <div class="shift-cards">
+                    <!-- Early Shift Card -->
+                    <div class="shift-card early-shift">
+                        <div class="shift-card-header">
+                            <span class="material-symbols-outlined" style="color: #f59e0b;">wb_sunny</span>
+                            <h3>早番（任意）</h3>
+                        </div>
+                        <div class="shift-card-body">
+                            <div class="time-range-input">
+                                <div class="time-input-group">
+                                    <label>開始時間</label>
+                                    <input type="time" name="early_shift_start" value="<?= h($store['early_shift_start'] ?? '') ?>" placeholder="09:00">
+                                </div>
+                                <span class="time-separator">→</span>
+                                <div class="time-input-group">
+                                    <label>終了時間</label>
+                                    <input type="time" name="early_shift_end" value="<?= h($store['early_shift_end'] ?? '') ?>" placeholder="15:00">
+                                </div>
+                            </div>
+                            <?php if ($store['early_shift_start'] && $store['early_shift_end']): ?>
+                            <div class="shift-info">
+                                <span class="material-symbols-outlined">schedule</span>
+                                現在の設定: <?= h($store['early_shift_start']) ?> - <?= h($store['early_shift_end']) ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <div>
-                        <label>まで</label>
-                        <input type="time" name="early_shift_end" value="<?= h($store['early_shift_end'] ?? '') ?>">
-                    </div>
-                </div>
 
-                <h3>🌙 遅番（任意）</h3>
-                <div class="row">
-                    <div>
-                        <label>から</label>
-                        <input type="time" name="late_shift_start" value="<?= h($store['late_shift_start'] ?? '') ?>">
-                    </div>
-                    <div>
-                        <label>まで</label>
-                        <input type="time" name="late_shift_end" value="<?= h($store['late_shift_end'] ?? '') ?>">
+                    <!-- Late Shift Card -->
+                    <div class="shift-card late-shift">
+                        <div class="shift-card-header">
+                            <span class="material-symbols-outlined" style="color: #6366f1;">nights_stay</span>
+                            <h3>遅番（任意）</h3>
+                        </div>
+                        <div class="shift-card-body">
+                            <div class="time-range-input">
+                                <div class="time-input-group">
+                                    <label>開始時間</label>
+                                    <input type="time" name="late_shift_start" value="<?= h($store['late_shift_start'] ?? '') ?>" placeholder="15:00">
+                                </div>
+                                <span class="time-separator">→</span>
+                                <div class="time-input-group">
+                                    <label>終了時間</label>
+                                    <input type="time" name="late_shift_end" value="<?= h($store['late_shift_end'] ?? '') ?>" placeholder="23:00">
+                                </div>
+                            </div>
+                            <?php if ($store['late_shift_start'] && $store['late_shift_end']): ?>
+                            <div class="shift-info">
+                                <span class="material-symbols-outlined">schedule</span>
+                                現在の設定: <?= h($store['late_shift_start']) ?> - <?= h($store['late_shift_end']) ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-footer">
-                    <button class="btn-save" type="submit">保存</button>
+                    <button class="btn-save" type="submit">
+                        <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">save</span>
+                        保存
+                    </button>
                 </div>
             </form>
         </section>

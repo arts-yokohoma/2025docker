@@ -14,6 +14,9 @@ $currentUser = getCurrentUser();
 </head>
 <body>
 <div class="container">
+    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <img src="../assets/image/logo.png" alt="Pizza Mach logo" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+    </div>
     <h1>管理パネル</h1>
     <p class="sub">管理メニューを選択してください。</p>
     <?php if ($currentUser): ?>
@@ -28,11 +31,6 @@ $currentUser = getCurrentUser();
         <a href="orders.php" class="card">
             <div class="icon">📦</div>
             <p class="title">注文ページ</p>
-        </a>
-
-        <a href="users.php" class="card">
-            <div class="icon">👥</div>
-            <p class="title">ユーザー管理</p>
         </a>
 
         <a href="user.php" class="card">

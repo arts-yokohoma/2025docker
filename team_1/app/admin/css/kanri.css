@@ -134,7 +134,6 @@ body{
 
 .card:hover{
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
 }
 
 .card h2{
@@ -152,6 +151,125 @@ body{
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
+}
+
+/* Shift time cards */
+.shift-cards{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px){
+  .shift-cards{
+    grid-template-columns: 1fr;
+  }
+}
+
+.shift-card{
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius2);
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.shift-card:hover{
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.shift-card.early-shift{
+  border-left: 4px solid #f59e0b;
+}
+
+.shift-card.late-shift{
+  border-left: 4px solid #6366f1;
+}
+
+.shift-card-header{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.shift-card-header h3{
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.shift-card-body{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.time-range-input{
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.time-input-group{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-input-group label{
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0;
+}
+
+.time-input-group input[type="time"]{
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius2);
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.time-input-group input[type="time"]:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  background: #fff;
+}
+
+.time-separator{
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 12px;
+  user-select: none;
+}
+
+.shift-info{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: var(--radius2);
+  font-size: 13px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.shift-info .material-symbols-outlined{
+  font-size: 18px;
+  color: #10b981;
 }
 
 /* forms */

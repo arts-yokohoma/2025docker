@@ -131,7 +131,10 @@ if ($result) {
         </a>
     </div>
 </div>
+<footer class="footer">
+    <p>© 2025 Pizza Mach. All rights reserved.</p>
 
+</footer>
 <script>
 const CART_KEY = 'cart';
 let cart = {};

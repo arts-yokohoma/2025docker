@@ -2,8 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理パネル</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./css/admin.css">
 </head>
 <body>
 <div class="container">
@@ -12,22 +14,30 @@
 
     <div class="menu">
         <a href="orders.php" class="card">
-            <div class="icon">📦</div>
+            <div class="icon">
+                <span class="material-icons">inventory_2</span>
+            </div>
             <p class="title">注文ページ</p>
         </a>
 
         <a href="user.php" class="card">
-            <div class="icon">👤</div>
+            <div class="icon">
+                <span class="material-icons">person</span>
+            </div>
             <p class="title">ユーザーページ</p>
         </a>
 
         <a href="kanri.php" class="card">
-            <div class="icon">🏪</div>
+            <div class="icon">
+                <span class="material-icons">store</span>
+            </div>
             <p class="title">店舗設定ページ</p>
         </a>
 
         <a href="shift.php" class="card">
-            <div class="icon">📅</div>
+            <div class="icon">
+                <span class="material-icons">calendar_month</span>
+            </div>
             <p class="title">シフトページ</p>
         </a>
     </div>

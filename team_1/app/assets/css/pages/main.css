@@ -1,0 +1,203 @@
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 2.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 3rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-weight: 300;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.5;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+        }
+
+        .content-grid {
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 7rem;
+            font-weight: 800;
+            line-height: 0.95;
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+        }
+
+        .highlight {
+            color: #ff3b30;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0.7;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.3rem 2.5rem;
+            background: #1a1a1a;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #1a1a1a;
+        }
+
+        .cta-button:hover {
+            background: white;
+            color: #1a1a1a;
+        }
+
+        .pizza-image {
+            width: 100%;
+            height: 600px;
+            background: 
+                linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pizza-image::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ff3b30;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.7;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-section a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 4rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }

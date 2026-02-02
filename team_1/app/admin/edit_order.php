@@ -70,171 +70,254 @@ $orderToEdit = [
     'status' => $orderData['status'] ?? 'New',
     'customer_id' => $orderData['customer_id']
 ];
+
+$ORDER_STATUSES = [
+    ['value' => 'New', 'label' => '新規', 'color' => '#F59E0B'],
+    ['value' => 'In Progress', 'label' => '調理中', 'color' => '#3B82F6'],
+    ['value' => 'Completed', 'label' => '完了', 'color' => '#10B981'],
+    ['value' => 'Canceled', 'label' => 'キャンセル', 'color' => '#EF4444'],
+];
+
+$currentStatus = ['value' => 'New', 'label' => '新規', 'color' => '#F59E0B'];
+foreach ($ORDER_STATUSES as $status) {
+    if ($status['value'] === $orderToEdit['status']) {
+        $currentStatus = $status;
+        break;
+    }
+}
+
+$subtotal = 0;
+foreach ($orderItems as $item) {
+    $subtotal += $item['price'] * $item['quantity'];
+}
+
+function formatPrice($price) {
+    return '¥' . number_format($price);
+}
+
+$totalItems = 0;
+foreach ($orderItems as $item) {
+    $totalItems += $item['quantity'];
+}
+
+// Prepare menu data for JavaScript
+$menuDataForJs = [];
+foreach ($menuItems as $m) {
+    $menuDataForJs[] = [
+        'id' => $m['id'],
+        'name' => $m['name'],
+        'price' => $m['price_s']
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>注文編集</title>
-  <link rel="stylesheet" href="css/orders.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注文編集 - <?= htmlspecialchars($orderToEdit['id']) ?></title>
+    <link rel="stylesheet" href="css/order_edit.css">
 </head>
 <body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">注文 #<?= htmlspecialchars($orderToEdit['id']) ?></h1>
+                <p class="subtitle">
+                    作成日時: <?= htmlspecialchars($orderToEdit['date']) ?>
+                </p>
+            </div>
+        </div>
 
-<h2>注文編集 - #<?= $orderToEdit['id'] ?></h2>
+        <form method="POST" action="save_order.php" id="orderForm">
+            <input type="hidden" name="id" value="<?= $orderToEdit['id'] ?>">
+            <input type="hidden" name="customer_id" value="<?= $orderToEdit['customer_id'] ?>">
 
-<form method="POST" action="save_order.php">
-  <input type="hidden" name="id" value="<?= $orderToEdit['id'] ?>">
-  
-  <label>顧客名:</label>
-  <input type="text" name="name" value="<?= htmlspecialchars($orderToEdit['name']) ?>" required>
-  
-  <label>電話:</label>
-  <input type="text" name="phone" value="<?= htmlspecialchars($orderToEdit['phone']) ?>" required>
-  
-  <label>住所:</label>
-  <input type="text" name="address" value="<?= htmlspecialchars($orderToEdit['address']) ?>" required>
-  
-  <label>ステータス:</label>
-  <select name="status" required>
-    <option value="New" <?= $orderToEdit['status'] === 'New' ? 'selected' : '' ?>>新規</option>
-    <option value="In Progress" <?= $orderToEdit['status'] === 'In Progress' ? 'selected' : '' ?>>調理中</option>
-    <option value="Completed" <?= $orderToEdit['status'] === 'Completed' ? 'selected' : '' ?>>完了</option>
-    <option value="Canceled" <?= $orderToEdit['status'] === 'Canceled' ? 'selected' : '' ?>>キャンセル</option>
-  </select>
+            <!-- Status Block -->
+            <div class="card">
+                <div class="status-bar">
+                    <span class="status-label">注文ステータス:</span>
+                    <span class="status-badge" id="statusBadge" style="background: <?= $currentStatus['color'] ?>20; color: <?= $currentStatus['color'] ?>">
+                        <span class="status-dot" id="statusDot" style="background: <?= $currentStatus['color'] ?>"></span>
+                        <span id="statusText"><?= htmlspecialchars($currentStatus['label']) ?></span>
+                    </span>
+                    <div class="status-change">
+                        <span class="status-change-label">変更:</span>
+                        <select name="status" id="statusSelect" class="status-select">
+                            <?php foreach ($ORDER_STATUSES as $status): ?>
+                                <option value="<?= $status['value'] ?>" 
+                                        data-color="<?= $status['color'] ?>"
+                                        data-label="<?= $status['label'] ?>"
+                                        <?= $status['value'] === $orderToEdit['status'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($status['label']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-  <h3>注文アイテム</h3>
-  <table id="items-table" style="width: 100%; border-collapse: collapse;">
-    <thead>
-      <tr style="border-bottom: 2px solid #ddd;">
-        <th style="text-align: left; padding: 8px;">メニュー</th>
-        <th style="text-align: left; padding: 8px;">数量</th>
-        <th style="text-align: left; padding: 8px;">価格</th>
-        <th style="text-align: left; padding: 8px;">小計</th>
-        <th style="text-align: left; padding: 8px;">操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($orderItems as $item): ?>
-        <tr class="item-row" style="border-bottom: 1px solid #ddd;">
-          <td style="padding: 8px;">
-            <select name="menu_id[]" class="menu-select" data-item-id="<?= $item['id'] ?>" onchange="updatePrice(this)">
-              <option value="">メニューを選択</option>
-              <?php foreach ($menuItems as $menu): ?>
-                <option value="<?= $menu['id'] ?>" data-price="<?= $menu['price_s'] ?>" <?= $item['menu_id'] == $menu['id'] ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($menu['name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </td>
-          <td style="padding: 8px;">
-            <input type="number" name="quantity[]" class="quantity-input" value="<?= $item['quantity'] ?>" min="1" onchange="updatePrice(this)" style="width: 60px;">
-          </td>
-          <td style="padding: 8px;">
-            <input type="hidden" name="item_id[]" value="<?= $item['id'] ?>">
-            <input type="hidden" name="price[]" class="price-input" value="<?= $item['price'] ?>">
-            <span class="price-display">¥<?= number_format($item['price']) ?></span>
-          </td>
-          <td style="padding: 8px;">
-            <span class="subtotal-display">¥<?= number_format($item['price'] * $item['quantity']) ?></span>
-          </td>
-          <td style="padding: 8px;">
-            <button type="button" onclick="removeItem(this)" class="btn red" style="padding: 5px 10px;">削除</button>
-          </td>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+            <!-- Customer Data Block -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">👤</span>
+                        顧客情報
+                    </h2>
+                    <button type="button" class="btn-edit" id="editCustomerBtn">✏️ 編集</button>
+                </div>
 
-  <div style="margin-top: 15px;">
-    <button type="button" onclick="addItem()" class="btn blue">アイテムを追加</button>
-  </div>
+                <div id="customerView" class="customer-view">
+                    <div class="customer-grid">
+                        <div>
+                            <span class="field-label">氏名</span>
+                            <p class="field-value" id="displayName">
+                                <?= htmlspecialchars($orderToEdit['name']) ?>
+                            </p>
+                        </div>
+                        <div>
+                            <span class="field-label">電話番号</span>
+                            <p class="field-value" id="displayPhone"><?= htmlspecialchars($orderToEdit['phone']) ?></p>
+                        </div>
+                        <div class="full-width">
+                            <span class="field-label">配送先住所</span>
+                            <p class="field-value" id="displayAddress"><?= htmlspecialchars($orderToEdit['address']) ?></p>
+                        </div>
+                    </div>
+                </div>
 
-  <div style="margin-top: 20px; font-size: 18px; font-weight: bold;">
-    合計金額: <span id="total-amount">¥0</span>
-  </div>
-  
-  <button type="submit" class="btn blue">保存</button>
-  <a href="orders.php" class="btn">キャンセル</a>
-</form>
+                <div id="customerEdit" class="customer-edit" style="display: none;">
+                    <div class="name-grid">
+                        <div class="full-width-input">
+                            <label class="input-label">顧客名</label>
+                            <input type="text" class="input-field" name="name" id="customerName" 
+                                   value="<?= htmlspecialchars($orderToEdit['name']) ?>" required>
+                        </div>
+                    </div>
+                    <div class="contact-grid">
+                        <div>
+                            <label class="input-label">電話番号</label>
+                            <input type="text" class="input-field" name="phone" id="customerPhone" 
+                                   value="<?= htmlspecialchars($orderToEdit['phone']) ?>" required>
+                        </div>
+                        <div>
+                            <label class="input-label">配送先住所</label>
+                            <input type="text" class="input-field" name="address" id="customerAddress" 
+                                   value="<?= htmlspecialchars($orderToEdit['address']) ?>" required>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" id="cancelCustomerBtn">キャンセル</button>
+                        <button type="button" class="btn-primary" id="saveCustomerBtn">💾 保存表示</button>
+                    </div>
+                </div>
+            </div>
 
-<script>
-  // Menu items data for JavaScript
-  const menuData = <?php echo json_encode(array_map(fn($m) => ['id' => $m['id'], 'name' => $m['name'], 'price' => $m['price_s']], $menuItems)); ?>;
+            <!-- Products Block -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📦</span>
+                        商品
+                    </h2>
+                    <button type="button" class="btn-add-product" id="addProductBtn">➕ 商品を追加</button>
+                </div>
 
-  function updatePrice(element) {
-    const row = element.closest('tr');
-    const menuSelect = row.querySelector('.menu-select');
-    const quantityInput = row.querySelector('.quantity-input');
-    const priceInput = row.querySelector('.price-input');
-    const priceDisplay = row.querySelector('.price-display');
-    const subtotalDisplay = row.querySelector('.subtotal-display');
+                <!-- Product Search Modal -->
+                <div id="productSearch" class="product-search" style="display: none;">
+                    <input type="text" class="search-input" id="searchInput" placeholder="商品名で検索..." autocomplete="off">
+                    <div class="product-list" id="productList">
+                        <?php foreach ($menuItems as $menu): ?>
+                            <div class="product-item" 
+                                 data-id="<?= $menu['id'] ?>" 
+                                 data-name="<?= htmlspecialchars($menu['name']) ?>" 
+                                 data-price="<?= $menu['price_s'] ?>">
+                                <span><?= htmlspecialchars($menu['name']) ?></span>
+                                <span class="product-price"><?= formatPrice($menu['price_s']) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="button" class="btn-close-search" id="closeSearchBtn">閉じる</button>
+                </div>
 
-    const selectedOption = menuSelect.options[menuSelect.selectedIndex];
-    const price = selectedOption.dataset.price || 0;
-    const quantity = quantityInput.value || 0;
+                <!-- Items Table -->
+                <div class="table-container">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>商品</th>
+                                <th class="text-right">単価</th>
+                                <th class="text-center">数量</th>
+                                <th class="text-right">小計</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <?php if (empty($orderItems)): ?>
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">
+                                        商品がありません
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($orderItems as $item): ?>
+                                    <tr data-item-id="<?= $item['id'] ?>">
+                                        <td>
+                                            <input type="hidden" name="item_id[]" value="<?= $item['id'] ?>">
+                                            <input type="hidden" name="menu_id[]" value="<?= $item['menu_id'] ?>">
+                                            <span class="item-name"><?= htmlspecialchars($item['name']) ?></span>
+                                        </td>
+                                        <td class="text-right price-cell">
+                                            <input type="hidden" name="price[]" class="price-input" value="<?= $item['price'] ?>">
+                                            <span class="price-display"><?= formatPrice($item['price']) ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="quantity-control">
+                                                <button type="button" class="qty-btn qty-minus">−</button>
+                                                <input type="number" name="quantity[]" class="qty-input" 
+                                                       value="<?= $item['quantity'] ?>" 
+                                                       data-price="<?= $item['price'] ?>" min="1">
+                                                <button type="button" class="qty-btn qty-plus">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="text-right subtotal-cell"><?= formatPrice($item['price'] * $item['quantity']) ?></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn-delete">🗑️</button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
 
-    priceInput.value = price;
-    priceDisplay.textContent = '¥' + parseInt(price).toLocaleString('ja-JP');
-    subtotalDisplay.textContent = '¥' + (parseInt(price) * parseInt(quantity)).toLocaleString('ja-JP');
+                <!-- Totals -->
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>商品 (<span id="totalItemsCount"><?= $totalItems ?></span> 点)</span>
+                        <span id="subtotalAmount"><?= formatPrice($subtotal) ?></span>
+                    </div>
+                    <div class="total-final">
+                        <span>合計</span>
+                        <span id="totalAmount"><?= formatPrice($subtotal) ?></span>
+                    </div>
+                </div>
+            </div>
 
-    calculateTotal();
-  }
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <a href="orders.php" class="btn-secondary-large">キャンセル</a>
+                <button type="submit" class="btn-save-large">💾 注文を保存</button>
+            </div>
+        </form>
+    </div>
 
-  function removeItem(button) {
-    button.closest('tr').remove();
-    calculateTotal();
-  }
-
-  function addItem() {
-    const tbody = document.querySelector('#items-table tbody');
-    const newRow = document.createElement('tr');
-    newRow.className = 'item-row';
-    newRow.style.borderBottom = '1px solid #ddd';
-    newRow.innerHTML = `
-      <td style="padding: 8px;">
-        <select name="menu_id[]" class="menu-select" onchange="updatePrice(this)">
-          <option value="">メニューを選択</option>
-          <?php foreach ($menuItems as $menu): ?>
-            <option value="<?= $menu['id'] ?>" data-price="<?= $menu['price_s'] ?>">
-              <?= htmlspecialchars($menu['name']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </td>
-      <td style="padding: 8px;">
-        <input type="number" name="quantity[]" class="quantity-input" value="1" min="1" onchange="updatePrice(this)" style="width: 60px;">
-      </td>
-      <td style="padding: 8px;">
-        <input type="hidden" name="item_id[]" value="">
-        <input type="hidden" name="price[]" class="price-input" value="0">
-        <span class="price-display">¥0</span>
-      </td>
-      <td style="padding: 8px;">
-        <span class="subtotal-display">¥0</span>
-      </td>
-      <td style="padding: 8px;">
-        <button type="button" onclick="removeItem(this)" class="btn red" style="padding: 5px 10px;">削除</button>
-      </td>
-    `;
-    tbody.appendChild(newRow);
-    calculateTotal();
-  }
-
-  function calculateTotal() {
-    let total = 0;
-    document.querySelectorAll('.item-row').forEach(row => {
-      const priceInput = row.querySelector('.price-input');
-      const quantityInput = row.querySelector('.quantity-input');
-      const price = parseInt(priceInput.value) || 0;
-      const quantity = parseInt(quantityInput.value) || 0;
-      total += price * quantity;
-    });
-    document.getElementById('total-amount').textContent = '¥' + total.toLocaleString('ja-JP');
-  }
-
-  // Calculate total on page load
-  document.addEventListener('DOMContentLoaded', calculateTotal);
-</script>
-
+    <script>
+        // Menu items data for JavaScript
+        var menuData = <?= json_encode($menuDataForJs) ?>;
+        var ORDER_STATUSES = <?= json_encode($ORDER_STATUSES) ?>;
+    </script>
+    <script src="./order_edit.js"></script>
 </body>
 </html>

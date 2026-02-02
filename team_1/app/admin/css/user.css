@@ -1,0 +1,16 @@
+body { font-family: Arial; margin:0; background:#f4f4f4; }
+header { background:#35424a; color:#fff; padding:15px; text-align:center; }
+.container { max-width:1000px; margin:20px auto; background:#fff; padding:20px; border-radius:8px; }
+.searchBox { margin-bottom:15px; display:flex; justify-content:center; gap:10px; }
+.searchBox input { width:300px; padding:8px; }
+.link-btn { padding:8px 14px; background:#eee; border-radius:6px; text-decoration:none; color:#000; border:none; cursor:pointer; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+button.link-btn:hover, a.link-btn:hover {
+     background:#a5ad5d; 
+     color:#fff;
+     transition:0.3s;
+
+    }
+
+    

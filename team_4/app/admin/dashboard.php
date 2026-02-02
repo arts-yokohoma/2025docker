@@ -4,6 +4,10 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+
+// Get user role (default to 'staff' if not set)
+$userRole = $_SESSION['role'] ?? 'staff';
+$isSupervisor = ($userRole === 'supervisor');
 ?>
 <html lang="en">
 <head>
@@ -16,16 +20,31 @@ if (!isset($_SESSION['user_id'])) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Pizza Sales Dashboard</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <h1>Pizza Sales Dashboard</h1>
+                <div style="display: flex; align-items: center; gap: 15px; font-size: 14px;">
+                    <span style="background: #e2e8f0; padding: 6px 12px; border-radius: 20px;">
+                        👤 <?php echo htmlspecialchars($_SESSION['username']); ?>
+                    </span>
+                    <span style="background: <?php echo $isSupervisor ? '#c3e7d4' : '#fce4ec'; ?>; 
+                                 color: <?php echo $isSupervisor ? '#22543d' : '#880e4f'; ?>;
+                                 padding: 6px 12px; border-radius: 20px; font-weight: 600;">
+                        <?php echo $isSupervisor ? '👨‍💼 Supervisor' : '👷 Staff'; ?>
+                    </span>
+                    <a href="logout.php" style="color: #e53e3e; text-decoration: none; font-weight: 600;">Logout</a>
+                </div>
+            </div>
         </div>
         
         <div class="tabs">
-            <div class="tab" onclick="switchTab('shifts')">Shift Management</div>
-            <div class="tab" onclick="switchTab('orders')">Orders Management</div> 
+            <?php if ($isSupervisor): ?>
+            <div class="tab active" onclick="switchTab('shifts')">📋 Shift Management</div>
+            <?php endif; ?>
+            <div class="tab <?php echo !$isSupervisor ? 'active' : ''; ?>" onclick="switchTab('orders')">📦 Orders Management</div> 
         </div>  
         
-        <!-- Shift Management Tab -->
-        <div id="shifts-tab" class="tab-content">
+        <!-- Shift Management Tab (Supervisor Only) -->
+        <div id="shifts-tab" class="tab-content" style="<?php echo !$isSupervisor ? 'display: none;' : ''; ?>">
             <!-- Capacity Rules -->
             <div class="capacity-rules">
                 <h3>Staff Capacity Rules</h3>

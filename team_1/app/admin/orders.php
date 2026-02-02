@@ -14,7 +14,14 @@ foreach ($orders as $order) {
 <head>
   <meta charset="UTF-8">
   <title>注文ページ</title>
-  <link rel="stylesheet" href="css/orders.css">
+  <!-- Cache-busted stylesheet to force reload after CSS changes -->
+  <link rel="stylesheet" href="css/orders.css?v=<?= filemtime(__DIR__ . '/css/orders.css') ?>">
+  <!-- Temporary debug styles: force completed styles to confirm CSS is applied (remove after verification) -->
+  <style>
+    .status.completed { background: #e7f3ff !important; color: #0a58d4 !important; border: 1px solid #bfd9ff !important; }
+    .tab-btn[data-status="Completed"].active { color: #28a745 !important; }
+    .tab-btn[data-status="Completed"].active::after { background: #28a745 !important; }
+  </style>
   <script>
     function filterByStatus(btn) {
       const status = btn.getAttribute('data-status');
@@ -61,8 +68,7 @@ foreach ($orders as $order) {
 </head>
 <body>
 
-<h2>注文ページ</h2>
-
+<h2 class="page-title">注文ページ</h2>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>

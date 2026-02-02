@@ -18,8 +18,8 @@ $currentUser = getCurrentUser();
     <p class="sub">管理メニューを選択してください。</p>
     <?php if ($currentUser): ?>
         <p style="text-align: center; color: #666; margin-bottom: 20px;">
-            ログイン中: <?= htmlspecialchars($currentUser['username'], ENT_QUOTES, 'UTF-8') ?> 
-            (<?= htmlspecialchars($currentUser['role_name'], ENT_QUOTES, 'UTF-8') ?>)
+            ログイン中: <?= htmlspecialchars($currentUser['login'] ?? $currentUser['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?> 
+            (<?= htmlspecialchars($currentUser['role_name'] ?? $currentUser['role_code'] ?? '', ENT_QUOTES, 'UTF-8') ?>)
             | <a href="logout.php" style="color: #4f6ef7;">ログアウト</a>
         </p>
     <?php endif; ?>

@@ -2,15 +2,33 @@
 /**
  * Authentication helper functions
  * 
- * Provides functions for checking user authentication and role-based access
+ * Provides functions for checking user authentication and role-based access.
+ * All protected admin pages must require this file and call requireAdmin() or requireRoles().
+ * Session is validated against DB (staff_users + roles by code); inactive users are logged out.
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../config/db.php';
 
 /**
- * Check if user is logged in
- * Returns true if user is authenticated, false otherwise
+ * Clear session and redirect to login (e.g. when user is inactive or access denied)
+ */
+function clearSessionAndRedirectToLogin(): void {
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    }
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
+/**
+ * Check if user is logged in (session has user_id)
+ * Does not validate against DB — use requireAuth() / requireAdmin() for that
  */
 function isLoggedIn(): bool {
     return isset($_SESSION['user_id']) && isset($_SESSION['username']);
@@ -29,17 +47,17 @@ function isAdmin(): bool {
     $userId = $_SESSION['user_id'];
     
     $stmt = $mysqli->prepare("
-        SELECT r.name 
-        FROM users u 
+        SELECT r.code 
+        FROM staff_users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1
+        WHERE u.id = ? AND u.active = 1 AND r.active = 1
     ");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($row = $result->fetch_assoc()) {
-        return $row['name'] === 'admin';
+        return $row['code'] === 'admin';
     }
     
     return false;
@@ -56,13 +74,13 @@ function requireAuth(): void {
 }
 
 /**
- * Require admin role - redirects to login if not admin
+ * Require admin role - redirects to login if not admin.
+ * Clears session if user exists but is inactive or not admin (avoids redirect loop).
  */
 function requireAdmin(): void {
     requireAuth();
     if (!isAdmin()) {
-        header('Location: login.php');
-        exit;
+        clearSessionAndRedirectToLogin();
     }
 }
 
@@ -83,10 +101,10 @@ function hasRole(array $allowedRoles): bool {
     $placeholders = str_repeat('?,', count($allowedRoles) - 1) . '?';
     
     $stmt = $mysqli->prepare("
-        SELECT r.name 
-        FROM users u 
+        SELECT r.code 
+        FROM staff_users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1 AND r.name IN ($placeholders)
+        WHERE u.id = ? AND u.active = 1 AND r.active = 1 AND r.code IN ($placeholders)
     ");
     
     $types = 'i' . str_repeat('s', count($allowedRoles));
@@ -99,14 +117,14 @@ function hasRole(array $allowedRoles): bool {
 }
 
 /**
- * Require one of the specified roles - redirects to login if user doesn't have any of them
+ * Require one of the specified roles - redirects to login if user doesn't have any of them.
+ * Clears session when access denied (e.g. user deactivated) to avoid redirect loop.
  * @param array $allowedRoles Array of role names (e.g., ['admin', 'manager', 'driver'])
  */
 function requireRoles(array $allowedRoles): void {
     requireAuth();
     if (!hasRole($allowedRoles)) {
-        header('Location: login.php');
-        exit;
+        clearSessionAndRedirectToLogin();
     }
 }
 
@@ -123,10 +141,10 @@ function getCurrentUser(): ?array {
     $userId = $_SESSION['user_id'];
     
     $stmt = $mysqli->prepare("
-        SELECT u.id, u.username, u.email, r.name as role_name
-        FROM users u 
+        SELECT u.id, u.login, u.first_name, u.last_name, r.code as role_code, r.role_name
+        FROM staff_users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1
+        WHERE u.id = ? AND u.active = 1 AND r.active = 1
     ");
     $stmt->bind_param("i", $userId);
     $stmt->execute();

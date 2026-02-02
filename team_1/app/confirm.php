@@ -38,7 +38,8 @@ if ($menuRes) {
 
 <header class="header">
     <div class="header-content">
-        <div class="logo">PM</div>
+         <div class="logo"><img src="./assets/image/logo.png" alt="Pizza Mach logo featuring stylized pizza slice with restaurant name" ></div>
+       
         <h1 class="header-title">Pizza Match</h1>
     </div>
 </header>

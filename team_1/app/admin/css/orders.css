@@ -41,10 +41,37 @@ body{
   box-shadow:var(--surface-shadow);
 } 
 
-/* Page title alignment: align with table cell content */
+/* Page title / header */
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+  padding-left:12px; /* match .orders td left padding */
+  padding-right:12px;
+  justify-content:space-between;
+}
+
+.page-header .back-btn{
+  background:#fff;
+  color:#374151;
+  border:1px solid #e5e7eb;
+  height:40px;
+  padding:0 12px;
+  border-radius:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  font-weight:600;
+  font-size:14px;
+  gap:8px;
+}
+.page-header .back-btn svg{ width:20px; height:20px; display:block; flex-shrink:0; }
+.page-header .back-btn .back-text{ line-height:1; display:inline-block; }
+
 h2.page-title{
-  margin: 0 0 12px;
-  padding-left: 12px; /* match .orders td left padding */
+  margin: 0;
   font-size: 20px;
   font-weight: 700;
   color: #222;

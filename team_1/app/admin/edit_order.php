@@ -128,6 +128,10 @@ foreach ($menuItems as $m) {
                     作成日時: <?= htmlspecialchars($orderToEdit['date']) ?>
                 </p>
             </div>
+            <a href="orders.php" class="back-btn" title="戻る">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#0000F5" aria-hidden="true" focusable="false"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                <span class="back-text">戻る</span>
+            </a>
         </div>
 
         <form method="POST" action="save_order.php" id="orderForm">

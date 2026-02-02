@@ -66,7 +66,13 @@ foreach ($orders as $order) {
 </head>
 <body>
 
-<h2 class="page-title">注文ページ</h2>
+<div class="page-header">
+  <h2 class="page-title">注文ページ</h2>
+  <a href="admin.php" class="btn back-btn" title="戻る">
+    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#0000F5" aria-hidden="true" focusable="false"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+    <span class="back-text">戻る</span>
+  </a>
+</div>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>

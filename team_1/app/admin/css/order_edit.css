@@ -1,3 +1,61 @@
+/* Make input and textarea borders visible on white background */
+.card input[type="text"],
+.card input[type="number"],
+.card textarea {
+    border: 1.5px solid #b0b6be !important;
+    color: #222;
+    background: #fff;
+    box-shadow: none;
+}
+.card input[type="text"]:focus,
+.card input[type="number"]:focus,
+.card textarea:focus {
+    border: 1.5px solid #3B82F6 !important;
+    outline: none;
+}
+/* Make select dropdowns have a visible border on white */
+.card select,
+.status-select {
+    border: 1.5px solid #b0b6be !important;
+    background: #fff;
+    color: #222;
+}
+/* Make all main buttons have a more visible border on white */
+.btn-edit,
+.btn-add-product,
+.btn-secondary,
+.btn-primary,
+.btn-save-large,
+.btn-secondary-large,
+.qty-btn,
+.btn-delete,
+.btn-close-search,
+.back-btn {
+    border: 1.5px solid #b0b6be !important;
+    box-shadow: none;
+}
+.card,
+.card * {
+    color: #222 !important;
+}
+
+/* Make sure table header and cell text is dark */
+.card th,
+.card td {
+    color: #222 !important;
+}
+
+/* Totals section text color */
+.totals-section span,
+.totals-section .total-final span {
+    color: #222 !important;
+}
+
+/* Status bar and badge text color */
+.status-bar,
+.status-bar * {
+    color: #222 !important;
+}
 * {
     margin: 0;
     padding: 0;
@@ -24,6 +82,32 @@ body {
     margin-bottom: 32px;
 }
 
+/* Back button in header */
+.back-btn{
+    background: #fff;
+    color: #374151;
+    border: 1px solid rgba(6,6,6,0.06);
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.back-btn svg{ width:20px; height:20px; display:block; flex-shrink:0; }
+.back-btn .back-text{ line-height:1; display:inline-block; }
+
+.back-btn:hover{
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
 .title {
     font-size: 28px;
     font-weight: 700;
@@ -39,11 +123,28 @@ body {
 
 /* Card */
 .card {
-    background: #1E293B;
+    background: #fff !important;
+    color: #222 !important;
     border: 1px solid rgba(6, 6, 6, 0.08);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
+}
+.card .card-title,
+.card .field-label,
+.card .field-value {
+    color: #222 !important;
+}
+
+/* Make only the customer info card white with black text */
+.card:nth-of-type(2) {
+    background: #fff !important;
+    color: #222 !important;
+}
+.card:nth-of-type(2) .card-title,
+.card:nth-of-type(2) .field-label,
+.card:nth-of-type(2) .field-value {
+    color: #222 !important;
 }
 
 .card-header {

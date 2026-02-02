@@ -1,196 +1,301 @@
 <?php
 session_start();
-// အချိန်ဇုန် ညှိခြင်း
 date_default_timezone_set('Asia/Tokyo');
 include '../database/db_conn.php';
 
-// --- ၁။ Settings (Traffic & Staff) ---
+// --- ၁။ AJAX Call for Notification ---
+if (isset($_GET['check_new_orders'])) {
+    $result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'");
+    $row = $result->fetch_assoc();
+    echo $row['count'];
+    exit();
+}
+
+// --- ၂။ Settings & Action Handling ---
 if (isset($_POST['toggle_traffic'])) {
-    $current_status = file_exists('traffic_status.txt') ? file_get_contents('traffic_status.txt') : '0';
-    $new_status = ($current_status == '1') ? '0' : '1';
-    file_put_contents('traffic_status.txt', $new_status);
+    $current = file_exists('traffic_status.txt') ? file_get_contents('traffic_status.txt') : '0';
+    file_put_contents('traffic_status.txt', ($current == '1' ? '0' : '1'));
+    header("Location: admin.php"); exit();
 }
 
-// ဝန်ထမ်းအင်အား Update
-if (isset($_POST['update_staff'])) {
-    $_SESSION['kitchen_staff'] = $_POST['kitchen_staff'];
-    $_SESSION['delivery_staff'] = $_POST['delivery_staff'];
-}
-
-$traffic_mode = file_exists('traffic_status.txt') ? file_get_contents('traffic_status.txt') : '0';
-$kitchen_staff = isset($_SESSION['kitchen_staff']) ? $_SESSION['kitchen_staff'] : 3;
-$total_riders = isset($_SESSION['delivery_staff']) ? $_SESSION['delivery_staff'] : 2;
-
-// --- ၂။ Rider Availability (Rider အားမအား တွက်ခြင်း) ---
-// Delivering ဖြစ်နေသူများကိုသာ "မအား (Busy)" ဟု သတ်မှတ်မည်။
-// Customer လက်ခံပြီးလို့ Completed ဖြစ်သွားရင် (Returning အနေအထား) "အားသည်" ဟု ယူဆမည်။
-$sql_busy = "SELECT COUNT(*) as busy_count FROM orders WHERE status = 'Delivering'";
-$busy_result = $conn->query($sql_busy);
-$busy_data = $busy_result->fetch_assoc();
-$busy_riders = $busy_data['busy_count'];
-$free_riders = $total_riders - $busy_riders;
-if ($free_riders < 0) $free_riders = 0;
-
-
-// --- ၃။ Order Action Logic ---
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $action = $_GET['action'];
-    $current_time = date('Y-m-d H:i:s');
-    $sql = "";
+    $act = $_GET['action'];
+    $now = date('Y-m-d H:i:s');
 
-    if ($action == 'cook') {
-        // စချက်ပြီ - start_time ထည့်မယ်
-        $sql = "UPDATE orders SET status = 'Cooking', start_time = '$current_time' WHERE id = $id";
-    
-    } elseif ($action == 'deliver') {
-        // ပို့ပြီ - departure_time ထည့်မယ် (start_time ကို မထိတော့ဘူး)
-        $sql = "UPDATE orders SET status = 'Delivering', departure_time = '$current_time' WHERE id = $id";
-    
-    } elseif ($action == 'rider_back') {
-        // ဆိုင်ပြန်ရောက်ပြီ - return_time ထည့်မယ် (ဒါဆို ဇယားက ပျောက်ပြီး History ရောက်မယ်)
-        $sql = "UPDATE orders SET return_time = '$current_time' WHERE id = $id";
-    
-    } elseif ($action == 'reject') {
-        // အော်ဒါပယ်ဖျက် - Rejected (Database ကမဖျက်ဘူး)
-        $sql = "UPDATE orders SET status = 'Rejected' WHERE id = $id";
-    
-    } elseif ($action == 'cancel') {
-        // အပြီးဖျက် - Delete
-        $sql = "DELETE FROM orders WHERE id = $id";
+    if ($act == 'deliver') {
+        $conn->query("UPDATE orders SET status='Delivering', departure_time='$now' WHERE id=$id");
+    } elseif ($act == 'rider_back') {
+        $conn->query("UPDATE orders SET status='Completed', return_time='$now' WHERE id=$id");
+    } elseif ($act == 'reject') {
+        $reason = isset($_GET['reason']) ? urldecode($_GET['reason']) : 'Shop Busy';
+        $stmt = $conn->prepare("UPDATE orders SET status='Rejected', reject_reason=? WHERE id=?");
+        $stmt->bind_param("si", $reason, $id);
+        $stmt->execute();
     }
-
-    if ($sql != "") {
-        $conn->query($sql);
-        header("Location: admin.php"); // Refresh to clear URL
-        exit();
-    }
+    header("Location: admin.php");
+    exit();
 }
 
-// --- ၄။ Order စာရင်း ဆွဲထုတ်ခြင်း ---
-// Rejected မဟုတ်တာ၊ ဆိုင်ပြန်မရောက်သေးတာ(return_time NULL) တွေကို ပြမယ်
-$sql_orders = "SELECT * FROM orders WHERE status != 'Rejected' AND return_time IS NULL ORDER BY FIELD(status, 'Pending', 'Cooking', 'Delivering', 'Completed'), order_date DESC";
-$result = mysqli_query($conn, $sql_orders);
+// --- ၃။ Tab & Date Filter Logic ---
+$tab = isset($_GET['tab']) ? $_GET['tab'] : 'active';
+$filter_date = isset($_GET['date']) ? $_GET['date'] : ''; // Date Filter ယူမည်
+
+$sql = "";
+$date_sql = "";
+
+// ရက်စွဲရွေးထားရင် SQL မှာ ထည့်ပေါင်းမည်
+if (!empty($filter_date)) {
+    $date_sql = " AND DATE(order_date) = '$filter_date' ";
+}
+
+if ($tab == 'active') {
+    // Active tab မှာတော့ ရက်စွဲ filter မသုံးဘဲ အကုန်ပြတာ ပိုကောင်းပါတယ်
+    $sql = "SELECT * FROM orders WHERE status IN ('Pending', 'Cooking', 'Delivering') 
+            ORDER BY FIELD(status, 'Pending', 'Cooking', 'Delivering'), order_date DESC";
+} elseif ($tab == 'completed') {
+    // Date ရွေးထားရင် Limit မထားတော့ပါ (အကုန်ပြမယ်)
+    $limit = empty($filter_date) ? "LIMIT 50" : "";
+    $sql = "SELECT * FROM orders WHERE status = 'Completed' $date_sql ORDER BY order_date DESC $limit";
+} elseif ($tab == 'rejected') {
+    $limit = empty($filter_date) ? "LIMIT 50" : "";
+    $sql = "SELECT * FROM orders WHERE status = 'Rejected' $date_sql ORDER BY order_date DESC $limit";
+}
+
+$result = $conn->query($sql);
+
+// Count Pending
+$pending_res = $conn->query("SELECT COUNT(*) as c FROM orders WHERE status='Pending'");
+$pending_count = $pending_res->fetch_assoc()['c'];
+
+$traffic_mode = file_exists('traffic_status.txt') ? file_get_contents('traffic_status.txt') : '0';
 ?>
 
 <!DOCTYPE html>
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Control Panel</title>
-    <meta http-equiv="refresh" content="10">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
-        .dashboard-grid { display: flex; gap: 20px; margin-bottom: 20px; }
-        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; }
-        .traffic-on { background-color: #ffcccc; border: 2px solid red; color: red; font-weight: bold; }
-        .traffic-off { background-color: #ccffcc; border: 2px solid green; color: green; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; color: #333; }
         
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #333; color: white; }
-        
-        .btn { padding: 6px 10px; text-decoration: none; color: white; border-radius: 4px; font-size: 13px; margin-right: 5px; display: inline-block; }
-        .btn-cook { background: orange; }
-        .btn-go { background: #2980b9; }
-        .btn-back { background: #27ae60; animation: blink 2s infinite; }
-        .btn-reject { background: #c0392b; }
-        .btn-cancel { background: #7f8c8d; }
+        /* Overlay for Audio Policy */
+        #audioOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .overlay-content {
+            background: white; padding: 30px; border-radius: 10px; text-align: center;
+        }
+        .btn-start {
+            background: #28a745; color: white; padding: 10px 20px; border: none; 
+            border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 15px;
+        }
 
-        /* Row Highlighting for Returning Rider */
-        .row-returning { background-color: #d5f5e3; border-left: 5px solid #2ecc71; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .top-bar { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .card { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; }
+        .heavy-traffic { border-left: 5px solid #c62828; background: #ffebee; }
+        .normal-traffic { border-left: 5px solid #2e7d32; }
+
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px; align-items: center; }
+        .tab-link { 
+            padding: 12px 25px; text-decoration: none; color: #555; 
+            font-weight: bold; border-radius: 8px 8px 0 0; background: #e9ecef; margin-right: 5px;
+            position: relative;
+        }
+        .tab-link.active { background: #007bff; color: white; }
+        .badge-count {
+            background: #dc3545; color: white; border-radius: 50%; 
+            padding: 2px 8px; font-size: 12px; position: absolute; top: -5px; right: -5px;
+        }
+
+        /* Filter Form */
+        .filter-form { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+        .date-input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-filter { background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #343a40; color: white; text-transform: uppercase; font-size: 14px; }
+        tr:hover { background: #f1f1f1; }
+
+        .status-label { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .st-pending { background: #ffc107; color: #856404; animation: pulse 2s infinite; }
+        .st-cooking { background: #fd7e14; color: white; }
+        .st-delivering { background: #17a2b8; color: white; }
+        .st-completed { background: #28a745; color: white; }
+        .st-rejected { background: #dc3545; color: white; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .btn { padding: 8px 12px; border: none; border-radius: 4px; color: white; cursor: pointer; text-decoration: none; font-size: 13px; margin-right: 5px; }
+        .btn-go { background: #007bff; }
+        .btn-back { background: #28a745; }
+        .btn-reject { background: #dc3545; }
     </style>
 </head>
 <body>
 
-    <h1>🍕 Admin Dashboard</h1>
-    <a href="order_history.php" class="btn" style="background:#555; padding: 10px;">📜 Order History ကြည့်ရန်</a>
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
-    <div class="dashboard-grid" style="margin-top: 20px;">
-        <div class="card <?php echo ($traffic_mode == '1') ? 'traffic-on' : 'traffic-off'; ?>">
-            <h3>🚦 Traffic</h3>
-            <p>Status: <?php echo ($traffic_mode == '1') ? 'Heavy Traffic' : 'Normal'; ?></p>
-            <form method="POST">
-                <button type="submit" name="toggle_traffic" style="cursor: pointer; padding: 5px;">Change Status</button>
-            </form>
+    <div id="audioOverlay">
+        <div class="overlay-content">
+            <h2>🍕 Admin Panel</h2>
+            <p>အော်ဒါသစ်ဝင်လာပါက အသံမြည်ရန်အတွက်<br>အောက်ပါခလုတ်ကို နှိပ်ပြီး စတင်ပါ။</p>
+            <button class="btn-start" onclick="enableAudio()">🔊 Start Dashboard</button>
         </div>
+    </div>
 
-        <div class="card">
-            <h3>🛵 Rider Availability</h3>
-            <div style="margin-bottom: 10px; padding: 8px; border-radius: 4px; background: <?php echo ($free_riders > 0) ? '#d5f5e3' : '#fadbd8'; ?>;">
-                <strong style="color: <?php echo ($free_riders > 0) ? 'green' : 'red'; ?>;">
-                    <?php echo ($free_riders > 0) ? "✔ $free_riders ယောက် အားသည်" : "❌ Rider မရှိပါ (All Busy)"; ?>
-                </strong>
-                <br><small>Total: <?php echo $total_riders; ?> | Busy: <?php echo $busy_riders; ?></small>
+    <div class="top-bar">
+        <h2>Admin Dashboard</h2>
+        <div class="card <?php echo ($traffic_mode == '1') ? 'heavy-traffic' : 'normal-traffic'; ?>">
+            <div>
+                <strong>Traffic:</strong> 
+                <?php echo ($traffic_mode == '1') ? '<span style="color:red">Heavy ⛔</span>' : '<span style="color:green">Normal ✅</span>'; ?>
             </div>
-
             <form method="POST">
-                <small>Kitchen:</small> <input type="number" name="kitchen_staff" value="<?php echo $kitchen_staff; ?>" style="width: 40px;">
-                <small>Riders:</small> <input type="number" name="delivery_staff" value="<?php echo $total_riders; ?>" style="width: 40px;">
-                <button type="submit" name="update_staff" style="cursor: pointer;">Set</button>
+                <button type="submit" name="toggle_traffic" class="btn" style="background: #555;">Switch</button>
             </form>
         </div>
     </div>
 
+    <div class="tabs">
+        <a href="?tab=active" class="tab-link <?php echo $tab == 'active' ? 'active' : ''; ?>">
+            🔥 Active
+            <?php if($pending_count > 0): ?>
+                <span class="badge-count" id="pendingBadge"><?php echo $pending_count; ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="?tab=completed" class="tab-link <?php echo $tab == 'completed' ? 'active' : ''; ?>">
+            ✅ History
+        </a>
+        <a href="?tab=rejected" class="tab-link <?php echo $tab == 'rejected' ? 'active' : ''; ?>">
+            ❌ Rejected
+        </a>
+
+        <?php if($tab != 'active'): ?>
+        <form method="GET" class="filter-form">
+            <input type="hidden" name="tab" value="<?php echo $tab; ?>">
+            <input type="date" name="date" class="date-input" value="<?php echo $filter_date; ?>">
+            <button type="submit" class="btn-filter">🔎 Filter</button>
+            <?php if($filter_date): ?>
+                <a href="admin.php?tab=<?php echo $tab; ?>" style="color:red; text-decoration:none;">✖ Clear</a>
+            <?php endif; ?>
+        </form>
+        <?php endif; ?>
+    </div>
+
     <table>
-        <tr>
-            <th>ID</th>
-            <th>Info</th>
-            <th>Order Detail</th>
-            <th>Status / Timer</th>
-            <th>Action</th>
-        </tr>
-
-        <?php while ($row = mysqli_fetch_assoc($result)) { 
-            // Customer received but rider not back yet
-            $is_returning = ($row['status'] == 'Completed' && $row['return_time'] == NULL);
-            $row_class = $is_returning ? 'row-returning' : '';
-        ?>
-            <tr class="<?php echo $row_class; ?>">
-                <td>#<?php echo $row['id']; ?></td>
-                <td>
-                    <b><?php echo htmlspecialchars($row['customer_name']); ?></b><br>
-                    <?php echo htmlspecialchars($row['phonenumber']); ?><br>
-                    <small><?php echo htmlspecialchars($row['address']); ?></small>
-                </td>
-                <td>
-                    <?php echo htmlspecialchars($row['pizza_type']); ?> (x<?php echo $row['quantity']; ?>)
-                </td>
-                
-                <td>
-                    <?php if ($is_returning): ?>
-                        <span style="color: green; font-weight: bold;">🛵 Returning...</span><br>
-                        <small>Customer received.</small>
-                    <?php else: ?>
-                        <span style="font-weight: bold;"><?php echo $row['status']; ?></span>
-                        <?php if($row['status'] == 'Delivering') echo "<br><small>Sending...</small>"; ?>
-                    <?php endif; ?>
-                </td>
-
-                <td>
-                    <?php if ($row['status'] == 'Pending'): ?>
-                        <a href="admin.php?action=cook&id=<?php echo $row['id']; ?>" class="btn btn-cook">👨‍🍳 Cook</a>
-                        <a href="admin.php?action=reject&id=<?php echo $row['id']; ?>" class="btn btn-reject" onclick="return confirm('Reject this order?');">❌ Reject</a>
-                        <a href="admin.php?action=cancel&id=<?php echo $row['id']; ?>" class="btn btn-cancel" onclick="return confirm('Delete completely?');">🗑</a>
-                    
-                    <?php elseif ($row['status'] == 'Cooking'): ?>
-                        <?php if ($free_riders > 0): ?>
-                            <a href="admin.php?action=deliver&id=<?php echo $row['id']; ?>" class="btn btn-go">🛵 Depart</a>
-                        <?php else: ?>
-                            <a href="admin.php?action=deliver&id=<?php echo $row['id']; ?>" class="btn" style="background:grey;" onclick="return confirm('Rider မအားပါ။ ပို့မှာသေချာလား?');">⚠ No Rider</a>
-                        <?php endif; ?>
-                    
-                    <?php elseif ($row['status'] == 'Delivering'): ?>
-                        <span style="color: blue; font-size: 0.9em;">Wait for Customer...</span>
-                    
-                    <?php elseif ($is_returning): ?>
-                        <a href="admin.php?action=rider_back&id=<?php echo $row['id']; ?>" class="btn btn-back">✅ Rider Arrived (Close)</a>
-                    <?php endif; ?>
-                </td>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Customer</th>
+                <th>Order Detail</th>
+                <th>Status</th>
+                <?php if($tab == 'active'): ?><th>Actions</th><?php endif; ?>
+                <?php if($tab == 'rejected'): ?><th>Reason</th><?php endif; ?>
             </tr>
-        <?php } ?>
+        </thead>
+        <tbody>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td>#<?php echo $row['id']; ?></td>
+                    <td>
+                        <?php echo date('Y-m-d', strtotime($row['order_date'])); ?><br>
+                        <?php echo date('h:i A', strtotime($row['order_date'])); ?>
+                    </td>
+                    <td>
+                        <b><?php echo htmlspecialchars($row['customer_name'] ?? $row['name'] ?? '-'); ?></b><br>
+                        <?php echo htmlspecialchars($row['phonenumber'] ?? $row['phone'] ?? '-'); ?><br>
+                        <small style="color:#666;"><?php echo htmlspecialchars($row['address'] ?? '-'); ?></small>
+                    </td>
+                    <td>
+                        <?php echo $row['pizza_type'] ?? $row['size']; ?> x <?php echo $row['quantity']; ?>
+                    </td>
+                    <td>
+                        <?php 
+                            $st = $row['status'];
+                            $cls = 'st-' . strtolower($st);
+                            echo "<span class='status-label $cls'>$st</span>";
+                        ?>
+                    </td>
+                    
+                    <?php if($tab == 'active'): ?>
+                    <td>
+                        <?php if($st == 'Pending' || $st == 'Cooking'): ?>
+                            <a href="admin.php?action=deliver&id=<?php echo $row['id']; ?>" class="btn btn-go">🛵 Go</a>
+                            <button onclick="rejectOrder(<?php echo $row['id']; ?>)" class="btn btn-reject">❌</button>
+                        <?php elseif($st == 'Delivering'): ?>
+                            <a href="admin.php?action=rider_back&id=<?php echo $row['id']; ?>" class="btn btn-back">🏁 Done</a>
+                        <?php endif; ?>
+                    </td>
+                    <?php endif; ?>
+
+                    <?php if($tab == 'rejected'): ?>
+                        <td style="color: #c62828;"><?php echo htmlspecialchars($row['reject_reason']); ?></td>
+                    <?php endif; ?>
+                </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr><td colspan="6" style="text-align:center; padding: 30px; color: #999;">No orders found.</td></tr>
+            <?php endif; ?>
+        </tbody>
     </table>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // --- 1. Audio Policy Logic ---
+        function enableAudio() {
+            const sound = document.getElementById('notifSound');
+            // အသံတိုးတိုးလေး ဖွင့်ပြီး ချက်ချင်းပြန်ပိတ် (Browser ကို Unlock လုပ်ရန်)
+            sound.volume = 0.1;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = 1.0; // အသံပြန်ကျယ်
+                document.getElementById('audioOverlay').style.display = 'none'; // Overlay ဖျောက်
+            }).catch((e) => {
+                console.log("Audio still blocked");
+            });
+        }
+
+        // --- 2. Notification Logic ---
+        let lastCount = <?php echo $pending_count; ?>;
+        
+        function checkNewOrders() {
+            fetch('admin.php?check_new_orders=1')
+                .then(response => response.text())
+                .then(currentCount => {
+                    currentCount = parseInt(currentCount);
+                    if (currentCount > lastCount) {
+                        document.getElementById('notifSound').play().catch(e => console.log("Sound blocked"));
+                        document.title = "(" + currentCount + ") New Order! 🍕";
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                    lastCount = currentCount;
+                });
+        }
+        setInterval(checkNewOrders, 5000);
+
+        // --- 3. Reject Logic ---
+        function rejectOrder(id) {
+            Swal.fire({
+                title: 'Reject Reason',
+                input: 'text',
+                inputPlaceholder: 'Out of stock / Shop closed',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `admin.php?action=reject&id=${id}&reason=${encodeURIComponent(result.value || 'Shop Busy')}`;
+                }
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,11 +1,50 @@
 <?php
-// PostgreSQL configurastion - defaults are the docker-compose service credentials
-// You can override by setting environment variables (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS)
-$DB_HOST = getenv('DB_HOST') ?: 'team_4_db';
-$DB_PORT = getenv('DB_PORT') ?: '5432';
-$DB_NAME = getenv('DB_NAME') ?: 'team_4_db';
-$DB_USER = getenv('DB_USER') ?: 'team_4';
-$DB_PASS = getenv('DB_PASS') ?: 'team4pass';
+/**
+ * Database configuration - PostgreSQL
+ * 
+ * Automatically detects environment (local XAMPP vs Docker/Remote server)
+ * and uses appropriate credentials
+ */
+
+// Local XAMPP credentials (default)
+$localHost = 'localhost';
+$localPort = '5432';
+$localUser = 'postgres';
+$localPass = '';
+$localDb   = 'team_4_db';
+
+// Remote server credentials (team 4)
+$remoteHost = 'team_4_db';
+$remotePort = '5432';
+$remoteUser = 'team_4';
+$remotePass = 'team4pass';
+$remoteDb   = 'team_4_db';
+
+// Detect environment by HTTP host
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$isLocal = in_array($host, ['localhost', '127.0.0.1', '::1']);
+
+// Select credentials based on environment
+if ($isLocal) {
+    $DB_HOST = $localHost;
+    $DB_PORT = $localPort;
+    $DB_USER = $localUser;
+    $DB_PASS = $localPass;
+    $DB_NAME = $localDb;
+} else {
+    $DB_HOST = $remoteHost;
+    $DB_PORT = $remotePort;
+    $DB_USER = $remoteUser;
+    $DB_PASS = $remotePass;
+    $DB_NAME = $remoteDb;
+}
+
+// Allow environment variable overrides
+$DB_HOST = getenv('DB_HOST') ?: $DB_HOST;
+$DB_PORT = getenv('DB_PORT') ?: $DB_PORT;
+$DB_NAME = getenv('DB_NAME') ?: $DB_NAME;
+$DB_USER = getenv('DB_USER') ?: $DB_USER;
+$DB_PASS = getenv('DB_PASS') ?: $DB_PASS;
 
 // DSN for PDO with pgsql driver
 $dsn = "pgsql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME}";

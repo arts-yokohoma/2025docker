@@ -65,6 +65,11 @@ if (empty($_SESSION['admin_id'])) {
                 <a href="menu.php" class="text-decoration-none text-dark d-block">メニュー<br>管理</a>
             </div>
         </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-4 container_def_button m-4 fs-1">
+                <a href="admin_customer_contacts.php" class="text-decoration-none text-dark d-block">顧客<br>連絡先</a>
+            </div>
+        </div>
         <div class="text-center mt-4">
             <a href="admin_create_user.php" class="btn btn-filled-custom btn-lg rounded-2 fw-bold">管理者ユーザー作成</a>
         </div>

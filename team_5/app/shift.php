@@ -87,13 +87,18 @@
                 </div>
 
                 <div class="text-center">
-                    <button class="btn btn-success btn-lg shadow-sm fw-bold">設定</button>
+                    <a id="viewShiftStatus"
+                        class="btn btn-filled-custom btn-lg shadow-sm fw-bold ms-2 rounded-2 me-4"
+                        href="shift_status.php">
+                        シフト状況
+                    </a>
+                    <button class="btn btn-success btn-lg shadow-sm fw-bold" type="submit">設定</button>
                 </div>
             </div>
 
             <!-- Bottom buttons -->
             <div class="container">
-                <div class="row justify-content-center gap-3 mt-5">
+                <div class="row justify-content-center gap-3 mt-3">
                     <div class="col-2 text-center my-4 fs-1 fw-bold">
                         <a href="admin_panel.php" class="btn btn-filled-custom btn-lg fw-bold rounded-2 text-light">ホーム</a>
                     </div>
@@ -108,6 +113,22 @@
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script>
+        // Update the status link to include the selected date
+        (function() {
+            var dateInput = document.getElementById('shift_date');
+            var statusLink = document.getElementById('viewShiftStatus');
+            if (!dateInput || !statusLink) return;
+
+            function updateHref() {
+                var d = dateInput.value || '';
+                var base = 'shift_status.php';
+                statusLink.href = d ? (base + '?shift_date=' + encodeURIComponent(d)) : base;
+            }
+
+            dateInput.addEventListener('change', updateHref);
+            updateHref();
+        })();
+
         // Confirmation before submitting the shift form (generates time slots)
         (function() {
             var form = document.getElementById('shiftForm');

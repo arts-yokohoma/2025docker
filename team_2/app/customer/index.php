@@ -1,133 +1,154 @@
 <?php
-include '../database/db_conn.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // ၁။ Postal Code Search အတွက် စစ်ဆေးခြင်း
+require_once '../database/db_conn.php';
+require_once '../database/functions.php';
+
+/* ===============================
+   Traffic Status Helper
+================================ */
+function getTrafficStatus()
+{
+    $file = __DIR__ . '/../admin/traffic_status.txt';
+    if (file_exists($file)) {
+        return trim(file_get_contents($file));
+    }
+    return '0';
+}
+
+$msg = '';
+$msg_type = '';
+$postal_code = '';
+
+/* ===============================
+   POST Handling
+================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    /* ---------- (1) Delivery Area Check ---------- */
     if (isset($_POST['postal_code'])) {
-        $postal_code = $_POST['postal_code'];
-        $stmt = $conn->prepare("SELECT * FROM locations WHERE zip_code = ?");
-        $stmt->bind_param("s", $postal_code);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0){
-            $found_data = $result->fetch_assoc();
-            include 'order_form.php';
+
+        // sanitize postal code
+        $postal_code = preg_replace('/[^0-9]/', '', $_POST['postal_code']);
+        
+        // Call the function from functions.php
+        $check = checkDeliveryArea($postal_code);
+
+        if ($check['status'] === 'error') {
+
+            $msg = '❌ ' . $check['msg'];
+            $msg_type = 'error';
+
+        } elseif ($check['status'] === 'out_of_area') {
+
+            $msg = '🚫 ' . $check['msg'];
+            $msg_type = 'error';
+
         } else {
-            echo "<h2>No address found for postal code: " . htmlspecialchars($postal_code) . "</h2>";
+
+            // SUCCESS AREA
+            $found_address = $check['address'];
+            $traffic_status = getTrafficStatus();
+
+            /* ---------- Traffic Warning Check ---------- */
+            if ($traffic_status === '1' && empty($_POST['agree_late'])) {
+                // Show Warning Interstitial
+                ?>
+                <!DOCTYPE html>
+                <html lang="my">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Traffic Warning</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body style="font-family:sans-serif;background:#f8f9fa;">
+                    <div style="max-width:500px;margin:80px auto;padding:40px;text-align:center;
+                                background:#fff3cd;border:2px solid #ffc107;border-radius:15px;">
+                        <h2>⚠️ ယာဉ်ကြောပိတ်ဆို့နေပါသည်</h2>
+                        <p>ပို့ဆောင်ချိန် <b>၄၅ မိနစ်ထက် ပိုကြာနိုင်ပါသည်</b></p>
+                        <form method="post">
+                            <input type="hidden" name="postal_code" value="<?= htmlspecialchars($postal_code) ?>">
+                            <input type="hidden" name="agree_late" value="1">
+                            <button type="submit" style="padding:10px 20px; cursor:pointer;">ရပါတယ် ဆက်မှာမယ်</button>
+                            <br><br>
+                            <a href="index.php">မမှာတော့ပါ</a>
+                        </form>
+                    </div>
+                </body>
+                </html>
+                <?php
+                exit; // Stop script here to show warning
+            }
+
+            // ✅ CORRECTED: Redirect to order_form.php
+            // We pass the code and address via URL parameters (GET)
+            $encoded_address = urlencode($found_address);
+            header("Location: order_form.php?code=$postal_code&address=$encoded_address");
+            exit();
         }
     }
 
-    // ၂။ Phone Number Check အတွက် စစ်ဆေးခြင်း (isset နဲ့ အရင်စစ်ရပါမယ်)
+    /* ---------- (2) Order Status Check ---------- */
     if (isset($_POST['checkphonenumber'])) {
-        $chkod = $_POST['checkphonenumber'];
-        $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ?");
-        $stmt->bind_param("s", $chkod);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $order_data = $result->fetch_assoc();
-            echo "<h2>Order Found:</h2>";
-            echo "Order ID: " . htmlspecialchars($order_data['id']) . "<br>";
-            echo "Status: " . htmlspecialchars($order_data['status']) . "<br>";
-        } else {
-            echo "<h2>No order found for phone number: " . htmlspecialchars($chkod) . "</h2>";
+        $phone = trim($_POST['checkphonenumber']);
+
+        if ($phone !== '') {
+            // Check for existing order
+            $stmt = $conn->prepare("SELECT id FROM orders WHERE phonenumber = ? ORDER BY id DESC LIMIT 1");
+            $stmt->bind_param('s', $phone);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($order = $result->fetch_assoc()) {
+                header('Location: check_order.php?id=' . $order['id']);
+                exit;
+            } else {
+                $msg = '❌ အော်ဒါရှာမတွေ့ပါ။ ဖုန်းနံပါတ် ပြန်စစ်ပါ။';
+                $msg_type = 'error';
+            }
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="assets/images/logo.png" type="image/x-icon">
-    <title>ピザマック</title>
+    <title>Fast Pizza Delivery</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-bottom: 10px; background: #007bff; color: white; }
+        .error { color: #dc3545; background: #ffebee; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .success { color: #155724; background: #d4edda; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>ピザマックへようこそ！
-        </h1>
-    </header>
-        <nav>
-            <form action="" method="post" name="postalForm" id="zipform">
-                <label>Search for a postal code:</label>
-                <input type="text" name="postal_code" placeholder="e.g., 1234567" required>
-                <input type="submit" value="Search">
-            </form>
-        </nav>
-        <button onclick="showform()" id="chkbtn" type="submit" name=checkod>check order</button>
-        <form id="chkform" action="check_order.php" method="post" hidden>
-            <label for="phone">phone</label>
-            <input type="text" name="checkphonenumber" required>
-            <input type="submit" value="check">
-        </form>
-        
-    <main>
-        <script>
-        
-        // စာမျက်နှာပွင့်တာနဲ့ အလုပ်လုပ်မယ်
-        window.onload = function() {
-            getLocation();
-        };
 
-        function getLocation() {
-            // Browser က Geolocation ထောက်ပံ့လား စစ်တာ
-            if (navigator.geolocation) {
-                // Permission တောင်းမယ်
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else { 
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
+<div class="card">
+    <h2 style="color:#333;">🍕 Fast Pizza</h2>
 
-        // Permission ပေးလိုက်ရင် ဒီ function အလုပ်လုပ်မယ်
-        function showPosition(position) {
-            let lat = position.coords.latitude;
-            let long = position.coords.longitude;
-            
-            // လက်ရှိ Latitude နဲ့ Longitude ကို ရပြီ
-            document.getElementById("status-msg").innerHTML = 
-                "✅ Location ရရှိပါသည်: " + lat + ", " + long;
+    <?php if ($msg): ?>
+        <div class="<?= $msg_type ?>"><?= htmlspecialchars($msg) ?></div>
+    <?php endif; ?>
 
-            // ဒီအဆင့်မှာ Lat/Long ကိုသုံးပြီး မြေပုံပြတာ (သို့) Address ရှာတာ ဆက်လုပ်လို့ရပြီ
-            console.log("Lat: " + lat + ", Long: " + long);
-        }
+    <h3>ပို့ဆောင်နိုင်သည့် ဧရိယာ စစ်ဆေးပါ</h3>
+    <form method="post">
+        <input type="text" name="postal_code" placeholder="Example: 1690073" required value="<?= htmlspecialchars($postal_code) ?>">
+        <button type="submit">Check Delivery</button>
+    </form>
 
-        // Permission မပေးဘဲ Block လိုက်ရင် (သို့) Error တက်ရင်
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById("status-msg").innerHTML = "❌ User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById("status-msg").innerHTML = "❌ Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById("status-msg").innerHTML = "❌ The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById("status-msg").innerHTML = "❌ An unknown error occurred.";
-                    break;
-            }
-        }
-    
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-            let zip = document.getElementById("zipform");
-            let fo = document.getElementById("chkbtn");
-            let chkform = document.getElementById("chkform");
-            fo.addEventListener("click", function() {
-                if (chkform.hidden) {
-                    chkform.hidden = false;
-                    fo.innerHTML = 'Back'; // Fixed typo from 'changetext.innterHTML' to 'innerHTML'
-                    zip.hidden = true;
-                } else {
-                    zip.hidden = false;
-                    chkform.hidden = true;
-                }
-            });
-        </script>
+    <h3 style="font-size: 14px; color: #666;">အော်ဒါ အခြေအနေ စစ်ဆေးရန်</h3>
+    <form method="post">
+        <input type="tel" name="checkphonenumber" placeholder="Phone Number">
+        <button type="submit" style="background: #6c757d;">Search Order</button>
+    </form>
+</div>
+
 </body>
 </html>

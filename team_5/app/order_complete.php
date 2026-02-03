@@ -72,12 +72,12 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
 
             <?php if ($orderId !== null && $orderId !== ''): ?>
                 <div class="alert alert-success text-center fs-3 fw-bold" role="alert">
-                    注文ID：<?php echo htmlspecialchars((string)$orderId); ?>
+                    注文番号：<?php echo htmlspecialchars((string)$orderId); ?>
                 </div>
-                <div class="text-center fs-2 fw-bold mb-3">予約番号をメモしておいてください。</div>
+                <div class="text-center fs-2 fw-bold mb-3">注文番号をメモしておいてください。</div>
             <?php else: ?>
                 <div class="alert alert-warning fs-3 fw-bold" role="alert">
-                    注文IDを取得できませんでした。
+                    注文番号を取得できませんでした。
                 </div>
             <?php endif; ?>
 

@@ -19,20 +19,20 @@ services:
       - teams-network
 
   apache_server:
-      build:
-        context: .
-        dockerfile: apache.Dockerfile
-      container_name: apache_teams
-      # image: php:8.0-apache
-      volumes:
-        - ./team_1/app:/var/www/html/team_1
-        - ./team_2/app:/var/www/html/team_2
-        
-      depends_on:
-        - team_1_db
-        - team_2_db
-      networks:
-        - teams-network
+    build:
+      context: .
+      dockerfile: apache.Dockerfile
+    container_name: apache_teams
+    # image: php:8.0-apache
+    volumes:
+      - ./team_1/app:/var/www/html/team_1
+      - ./team_2/app:/var/www/html/team_2
+
+    depends_on:
+      - team_1_db
+      - team_2_db
+    networks:
+      - teams-network
 
   team_1_db:
     image: mysql:8.0
@@ -197,4 +197,3 @@ volumes:
   team_5_pg_data:
   team_6_pg_data:
   team_7_pg_data:
-

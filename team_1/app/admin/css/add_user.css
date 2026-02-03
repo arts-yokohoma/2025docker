@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #fafafa;
+}
+p {
+  margin: 0 0 5;
+
+}
+
+/* ===== コンテナ ===== */
+.wrap {
+  position: relative;
+  max-width: 1000px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+/* ===== 戻る ===== */
+.back-link {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 13px;
+  color: #888;
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* ===== 見出し ===== */
+h1 {
+  margin: 0 0 5px;
+  font-size: 22px;
+}
+.sub {
+  color: #888;
+  font-size: 13px;
+}
+
+/* ===== フォーム ===== */
+.row {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.col {
+  flex: 1;
+}
+
+label {
+  font-size: 13px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* ===== ロール ===== */
+.roles {
+  display: flex;
+  gap: 10px;
+  
+}
+
+.role input[type="radio"]{
+  width: auto;       /* ← FIX */
+  margin: 0;
+  padding: 0;
+}
+
+.role {
+  display: flex;
+  align-items: center;            /* vertical center */
+  justify-content: space-between; /* text left, radio right */
+  width: 267px;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+
+/* ===== ボタン ===== */
+.btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+button {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+.primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+}
+
+/* ===== パスワード ===== */
+.pw-wrap {
+  position: relative;
+}
+
+.pw-eye {
+  position: absolute;
+  right: 12px;                   /* left固定をやめる */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+}

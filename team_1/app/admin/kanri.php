@@ -15,9 +15,7 @@
  * - Soft deletion (deleted flag) for menu items
  */
 declare(strict_types=1);
-
-require_once __DIR__ . '/auth.php';
-requireAdmin(); // Require admin authentication
+session_start();
 
 require_once __DIR__ . '/../config/db.php';
 
@@ -456,22 +454,13 @@ if ($res) {
 <head>
 <meta charset="UTF-8">
 <title>管理パネル</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="stylesheet" href="css/kanri.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
 <div class="layout">
-    <header class="kanri-header">
-        <a href="admin.php" class="kanri-back">← 戻る</a>
-        <img src="../assets/image/logo.png" alt="Pizza Mach" class="kanri-logo">
-        <span class="kanri-title">店舗設定</span>
-        <a href="logout.php" class="kanri-logout">
-            <span class="material-symbols-outlined">logout</span>
-            ログアウト
-        </a>
-    </header>
+    <h2 class="logo">管理パネル</h2>
 
     <main class="content">
         <h1>設定</h1>
@@ -504,10 +493,7 @@ if ($res) {
 
         <!-- 営業時間 -->
         <section class="card">
-            <h2>
-                <span class="material-symbols-outlined" style="color: var(--primary);">schedule</span>
-                営業時間・ラストオーダー設定
-            </h2>
+            <h2>営業時間・ラストオーダー設定</h2>
 
             <form method="post">
                 <input type="hidden" name="action" value="save_store_hours">
@@ -543,97 +529,53 @@ if ($res) {
 
         <!-- シフト時間 -->
         <section class="card">
-            <h2>
-                <span class="material-symbols-outlined" style="color: var(--success);">calendar_month</span>
-                シフト時間設定
-            </h2>
-            <p style="color: var(--muted); font-size: 14px; margin: -8px 0 20px;">
-                スタッフのシフトスケジュール管理のための時間枠を設定します。営業時間内で設定してください。
-            </p>
+            <h2>シフト時間設定</h2>
 
             <form method="post">
                 <input type="hidden" name="action" value="save_shifts">
 
-                <div class="shift-cards">
-                    <!-- Early Shift Card -->
-                    <div class="shift-card early-shift">
-                        <div class="shift-card-header">
-                            <span class="material-symbols-outlined" style="color: #f59e0b;">wb_sunny</span>
-                            <h3>早番（任意）</h3>
-                        </div>
-                        <div class="shift-card-body">
-                            <div class="time-range-input">
-                                <div class="time-input-group">
-                                    <label>開始時間</label>
-                                    <input type="time" name="early_shift_start" value="<?= h($store['early_shift_start'] ?? '') ?>" placeholder="09:00">
-                                </div>
-                                <span class="time-separator">→</span>
-                                <div class="time-input-group">
-                                    <label>終了時間</label>
-                                    <input type="time" name="early_shift_end" value="<?= h($store['early_shift_end'] ?? '') ?>" placeholder="15:00">
-                                </div>
-                            </div>
-                            <?php if ($store['early_shift_start'] && $store['early_shift_end']): ?>
-                            <div class="shift-info">
-                                <span class="material-symbols-outlined">schedule</span>
-                                現在の設定: <?= h($store['early_shift_start']) ?> - <?= h($store['early_shift_end']) ?>
-                            </div>
-                            <?php endif; ?>
-                        </div>
+                <h3>🌞 早番（任意）</h3>
+                <div class="row">
+                    <div>
+                        <label>から</label>
+                        <input type="time" name="early_shift_start" value="<?= h($store['early_shift_start'] ?? '') ?>">
                     </div>
+                    <div>
+                        <label>まで</label>
+                        <input type="time" name="early_shift_end" value="<?= h($store['early_shift_end'] ?? '') ?>">
+                    </div>
+                </div>
 
-                    <!-- Late Shift Card -->
-                    <div class="shift-card late-shift">
-                        <div class="shift-card-header">
-                            <span class="material-symbols-outlined" style="color: #6366f1;">nights_stay</span>
-                            <h3>遅番（任意）</h3>
-                        </div>
-                        <div class="shift-card-body">
-                            <div class="time-range-input">
-                                <div class="time-input-group">
-                                    <label>開始時間</label>
-                                    <input type="time" name="late_shift_start" value="<?= h($store['late_shift_start'] ?? '') ?>" placeholder="15:00">
-                                </div>
-                                <span class="time-separator">→</span>
-                                <div class="time-input-group">
-                                    <label>終了時間</label>
-                                    <input type="time" name="late_shift_end" value="<?= h($store['late_shift_end'] ?? '') ?>" placeholder="23:00">
-                                </div>
-                            </div>
-                            <?php if ($store['late_shift_start'] && $store['late_shift_end']): ?>
-                            <div class="shift-info">
-                                <span class="material-symbols-outlined">schedule</span>
-                                現在の設定: <?= h($store['late_shift_start']) ?> - <?= h($store['late_shift_end']) ?>
-                            </div>
-                            <?php endif; ?>
-                        </div>
+                <h3>🌙 遅番（任意）</h3>
+                <div class="row">
+                    <div>
+                        <label>から</label>
+                        <input type="time" name="late_shift_start" value="<?= h($store['late_shift_start'] ?? '') ?>">
+                    </div>
+                    <div>
+                        <label>まで</label>
+                        <input type="time" name="late_shift_end" value="<?= h($store['late_shift_end'] ?? '') ?>">
                     </div>
                 </div>
 
                 <div class="form-footer">
-                    <button class="btn-save" type="submit">
-                        <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">save</span>
-                        保存
-                    </button>
+                    <button class="btn-save" type="submit">保存</button>
                 </div>
             </form>
         </section>
 
         <!-- 商品設定 -->
         <section class="card">
-            <h2>
-                <span class="material-symbols-outlined" style="color: #f59e0b;">restaurant_menu</span>
-                商品設定
-            </h2>
+            <h2>商品設定</h2>
 
-            <table class="menu-table">
+            <table>
                 <thead>
                     <tr>
-                        <th class="col-product">商品</th>
-                        <th class="col-s">Sサイズ</th>
-                        <th class="col-m">Mサイズ</th>
-                        <th class="col-l">Lサイズ</th>
-                        <th class="col-actions">操作</th>
+                        <th>商品</th>
+                        <th>Sサイズ</th>
+                        <th>Mサイズ</th>
+                        <th>Lサイズ</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody id="menu-tbody">
@@ -643,15 +585,15 @@ if ($res) {
                         $photoPathWithCache = $photoPath ? ($photoPath . (strpos($photoPath, '?') !== false ? '&' : '?') . 't=' . time()) : '';
                     ?>
                     <tr data-menu-id="<?= $mid ?>">
-                        <td class="product-cell">
+                        <td style="min-width: 250px;">
+                            <input type="text" name="name" value="<?= h((string)$item['name']) ?>" form="f<?= $mid ?>" readonly style="font-size: 18px; width: 100%; margin-bottom: 12px;">
                             <input type="hidden" name="photo_path" value="<?= h($photoPath) ?>" form="f<?= $mid ?>" id="photo_path_<?= $mid ?>">
-                            <div class="product-info">
-                                <input type="text" name="name" value="<?= h((string)$item['name']) ?>" form="f<?= $mid ?>" readonly class="product-name">
-                                <div class="product-status">
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
                                     <input type="checkbox" name="active" id="active_<?= $mid ?>" form="f<?= $mid ?>" 
                                            <?= ((int)($item['active'] ?? 1)) ? 'checked' : '' ?> 
-                                           disabled class="status-checkbox">
-                                    <label for="active_<?= $mid ?>" class="status-label">表示</label>
+                                           disabled style="cursor: not-allowed;">
+                                    <label for="active_<?= $mid ?>" style="cursor: default;">表示</label>
                                 </div>
                             </div>
                         </td>
@@ -660,7 +602,9 @@ if ($res) {
                         <td><input class="price" type="number" name="price_l" value="<?= (int)$item['price_l'] ?>" form="f<?= $mid ?>" readonly min="0" step="1"></td>
                         <td class="actions">
                             <button class="btn-edit" type="button" onclick="editItem(<?= $mid ?>)">
-                                <span class="material-symbols-outlined">edit</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/>
+                                </svg>
                                 <span class="btn-text">編集</span>
                             </button>
                             <form method="post" id="f<?= $mid ?>" style="display:none;">
@@ -672,16 +616,15 @@ if ($res) {
                                 <input type="hidden" name="menu_id" value="<?= $mid ?>">
                             </form>
                             <button class="btn-upload" type="button" onclick="openUploadModal(<?= $mid ?>, '<?= h($photoPath) ?>', <?= time() ?>)">
-                                <span class="material-symbols-outlined">image</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/>
+                                </svg>
                                 <span class="btn-text">画像</span>
                             </button>
                             <form method="post" style="display:inline;" onsubmit="return confirm('削除しますか？');">
                                 <input type="hidden" name="action" value="delete_menu_item">
                                 <input type="hidden" name="menu_id" value="<?= $mid ?>">
-                                <button class="btn-delete" type="submit">
-                                    <span class="material-symbols-outlined">delete</span>
-                                    削除
-                                </button>
+                                <button class="btn-delete" type="submit">削除</button>
                             </form>
                         </td>
                     </tr>

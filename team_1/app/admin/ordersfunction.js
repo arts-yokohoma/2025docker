@@ -16,21 +16,26 @@ function filterByStatus(btn) {
     if (dateFilter === 'tomorrow') target.setDate(target.getDate() + 1);
     else if (dateFilter === 'dayafter') target.setDate(target.getDate() + 2);
 
-    const dayStart = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 0, 0, 0, 0);
-    const dayEnd = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 23, 59, 59, 999);
+    const y = target.getFullYear();
+    const m = String(target.getMonth() + 1).padStart(2, '0');
+    const d = String(target.getDate()).padStart(2, '0');
+    const targetStr = `${y}-${m}-${d}`;
+    console.log('Filtering by date:', dateFilter, '=>', targetStr);
 
+    let visibleCount = 0;
     rows.forEach(row => {
-      const rowDateStr = row.getAttribute('data-date');
-      if (!rowDateStr) { row.style.display = 'none'; return; }
-      const iso = rowDateStr.replace(' ', 'T');
-      const rowDate = new Date(iso);
-      if (rowDate >= dayStart && rowDate <= dayEnd) {
+      const rowDateStr = row.getAttribute('data-date') || '';
+      const rowDatePart = rowDateStr.slice(0, 10);
+      if (rowDatePart === targetStr) {
         row.style.display = 'table-row';
+        visibleCount++;
       } else {
         row.style.display = 'none';
       }
     });
 
+    console.log('Date filter visible rows:', visibleCount);
+    if (visibleCount === 0) console.warn('Date filter matched 0 rows - check `data-date` attributes and delivery_time values.');
     return;
   }
 

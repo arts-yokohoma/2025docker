@@ -42,6 +42,27 @@ body{
 } 
 
 /* Page title alignment: align with table cell content */
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.page-header .back-btn{ 
+  background:none; 
+  border:0; 
+  padding:8px 10px; 
+  color:var(--primary); 
+  text-decoration:none; 
+  display:inline-flex; 
+  align-items:center;
+  gap:8px;
+  border-radius:8px;
+}
+
+.page-header .back-text{ font-weight:700; color:inherit; }
+
 h2.page-title{
   margin: 0 0 12px;
   padding-left: 12px; /* match .orders td left padding */

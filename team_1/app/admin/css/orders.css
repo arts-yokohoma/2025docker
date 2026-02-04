@@ -41,37 +41,10 @@ body{
   box-shadow:var(--surface-shadow);
 } 
 
-/* Page title / header */
-.page-header{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:12px;
-  padding-left:12px; /* match .orders td left padding */
-  padding-right:12px;
-  justify-content:space-between;
-}
-
-.page-header .back-btn{
-  background:#fff;
-  color:#374151;
-  border:1px solid #e5e7eb;
-  height:40px;
-  padding:0 12px;
-  border-radius:8px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  font-weight:600;
-  font-size:14px;
-  gap:8px;
-}
-.page-header .back-btn svg{ width:20px; height:20px; display:block; flex-shrink:0; }
-.page-header .back-btn .back-text{ line-height:1; display:inline-block; }
-
+/* Page title alignment: align with table cell content */
 h2.page-title{
-  margin: 0;
+  margin: 0 0 12px;
+  padding-left: 12px; /* match .orders td left padding */
   font-size: 20px;
   font-weight: 700;
   color: #222;
@@ -140,11 +113,6 @@ h2.page-title{
   text-align: left;
   padding: 12px;
   border-bottom: 1px solid #ddd;
-}
-
-.orders th.text-center,
-.orders td.text-center {
-  text-align: center;
 }
 
 .status {
@@ -292,40 +260,33 @@ tbody tr:not(.visible) {
   box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
-/* Edit button: outlined primary style (white background, blue border/icon/text) */
+/* Edit button: centered, pill-style */
 .edit-btn{
-  background:#fff;
-  color:var(--primary);
-  border:1px solid var(--primary);
-  height:40px;
-  min-width:84px;
-  padding:0 12px;
+  background:#6b7280;
+  color:#fff;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
-  border-radius:10px;
+  padding:8px 16px;
+  min-width:72px;
+  height:40px;
+  border-radius:20px;
   font-weight:700;
   font-size:14px;
   line-height:1;
-  box-shadow:0 1px 0 rgba(33,150,243,0.04) inset;
+  text-align:center;
+  gap:6px;
+  border:none;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* Use inline SVG pen icon colored to match --primary */
-.edit-btn:before{
-  content: '';
-  width:18px;
-  height:18px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232196F3'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-size:contain;
-  display:inline-block;
-}
+/* Remove the generic button icon placeholder for edit button */
+.edit-btn:before{ display:none; }
 
 .edit-btn:hover:not(:disabled){
-  background: rgba(33,150,243,0.06);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background:#4b5563;
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
 /* -----------------------------

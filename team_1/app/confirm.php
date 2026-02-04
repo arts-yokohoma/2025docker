@@ -38,8 +38,7 @@ if ($menuRes) {
 
 <header class="header">
     <div class="header-content">
-         <div class="logo"><img src="./assets/image/logo.png" alt="Pizza Mach logo featuring stylized pizza slice with restaurant name" ></div>
-       
+        <div class="logo">PM</div>
         <h1 class="header-title">Pizza Match</h1>
     </div>
 </header>
@@ -149,12 +148,11 @@ if ($menuRes) {
                         <input type="hidden" name="cart_json" id="cartJson">
                         <button type="submit" id="submitBtn" class="btn-proceed">注文を確定する</button>
                     </form>
-                    <div class="sidebar-card">
+                </div>
+                
+                <div class="sidebar-card">
                     <a href="cart.php" class="btn-back-cart">← カートへ戻る</a>
                 </div>
-                </div>
-                
-                
             </div>
         </div>
     </div>

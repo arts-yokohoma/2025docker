@@ -187,7 +187,7 @@ foreach ($slots as $s) {
                             <div class="p-3 bg-light rounded-3 h-100">
                                 <div class="fw-bold mb-1">予約状況</div>
                                 <div>予約数: <?php echo h((string)$totals['used']); ?></div>
-                                <div class="fw-bold">残り: <?php echo h((string)$totals['remaining']); ?></div>
+                                <div>残り: <?php echo h((string)$totals['remaining']); ?></div>
                             </div>
                         </div>
                     </div>
@@ -264,6 +264,27 @@ foreach ($slots as $s) {
     </div>
 
     <script src="js/bootstrap.bundle.min.js"></script>
+
+    <!-- Site footer -->
+    <footer class="site-footer mt-5">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+                    <a class="navbar-brand d-flex align-items-center" href="index.php">
+                        <img src="img/nav_bar_logo.png" height="40" class="me-2" alt="Team 5 logo">
+                    </a>
+                    <small class="d-block">&copy; <span id="year"></span> CYBER EDGE. All rights reserved.</small>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline mb-0 footer-links">
+                        <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
+                        <li class="list-inline-item"><a href="#">お問い合わせ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 </body>
 
 </html>

@@ -82,7 +82,7 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
             <?php endif; ?>
 
             <?php if ($time_slot !== ''): ?>
-                <div class="mb-2">時間帯：<?php echo htmlspecialchars($time_slot); ?></div>
+                <div class="mb-2 fs-2">時間帯：<?php echo htmlspecialchars($time_slot); ?></div>
             <?php endif; ?>
 
             <div class="row mt-3">
@@ -123,7 +123,6 @@ unset($_SESSION['order'], $_SESSION['customer'], $_SESSION['time_slot'], $_SESSI
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
-                        <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>

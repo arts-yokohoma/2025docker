@@ -27,7 +27,9 @@ foreach ($orders as $order) {
 <head>
   <meta charset="UTF-8">
   <title>注文ページ</title>
+  <!-- Cache-busted stylesheet to force reload after CSS changes -->
   <link rel="stylesheet" href="css/orders.css?v=<?= filemtime(__DIR__ . '/css/orders.css') ?>">
+  <!-- Temporary debug styles: force completed styles to confirm CSS is applied (remove after verification) -->
   <style>
     .status.completed { background: #e7f3ff !important; color: #0a58d4 !important; border: 1px solid #bfd9ff !important; }
     .tab-btn[data-status="Completed"].active { color: #28a745 !important; }
@@ -36,13 +38,7 @@ foreach ($orders as $order) {
 </head>
 <body>
 
-<div class="page-header">
-  <h2 class="page-title">注文ページ</h2>
-  <a href="admin.php" class="btn back-btn" title="戻る">
-    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#0000F5" aria-hidden="true" focusable="false"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
-    <span class="back-text">戻る</span>
-  </a>
-</div>
+<h2 class="page-title">注文ページ</h2>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>
@@ -67,8 +63,8 @@ foreach ($orders as $order) {
       <th>注文詳細</th>
       <th>合計金額</th>
       <th>ステータス</th>
-      <th class="text-center">操作</th>
-      <th class="text-center">編集</th>
+      <th>操作</th>
+      <th>編集</th>
     </tr>
   </thead>
   <tbody>
@@ -88,7 +84,7 @@ foreach ($orders as $order) {
             <?= $order["status"] ?>
           </span>
         </td>
-        <td class="text-center">
+        <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
             <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル">❌</button>
 
@@ -99,7 +95,7 @@ foreach ($orders as $order) {
             <?php endif; ?>
           <?php endif; ?>
         </td>
-        <td class="text-center">
+        <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
             <button class="btn edit-btn" data-id="<?= $order["id"] ?>">編集</button>
           <?php endif; ?>

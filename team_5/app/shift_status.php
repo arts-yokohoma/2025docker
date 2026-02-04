@@ -187,7 +187,7 @@ foreach ($slots as $s) {
                             <div class="p-3 bg-light rounded-3 h-100">
                                 <div class="fw-bold mb-1">予約状況</div>
                                 <div>予約数: <?php echo h((string)$totals['used']); ?></div>
-                                <div class="fw-bold">残り: <?php echo h((string)$totals['remaining']); ?></div>
+                                <div>残り: <?php echo h((string)$totals['remaining']); ?></div>
                             </div>
                         </div>
                     </div>

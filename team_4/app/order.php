@@ -61,12 +61,12 @@ if (isset($pdo)) {
 <div class="order-page">
   <!-- LEFT : PIZZA LIST -->
   <div class="pizza-list">
-    <!-- Small Pizza -->
+    <!-- スモールピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Small Pizza">
+      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="スモールピザ">
       <div class="pizza-info">
-        <h3>Small Pizza (20cm)</h3>
-        <p>Perfect for 1-2 people</p>
+        <h3>スモールピザ (20cm)</h3>
+        <p>1～2人に最適</p>
         <div class="price-display">¥<?php echo number_format($pizza['small_price']); ?></div>
       </div>
       <div class="qty">
@@ -76,12 +76,12 @@ if (isset($pdo)) {
       </div>
     </div>
 
-    <!-- Medium Pizza -->
+    <!-- ミディアムピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Medium Pizza">
+      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="ミディアムピザ">
       <div class="pizza-info">
-        <h3>Medium Pizza (30cm)</h3>
-        <p>Great for 2-3 people</p>
+        <h3>ミディアムピザ (30cm)</h3>
+        <p>2～3人に最適</p>
         <div class="price-display">¥<?php echo number_format($pizza['medium_price']); ?></div>
       </div>
       <div class="qty">
@@ -91,12 +91,12 @@ if (isset($pdo)) {
       </div>
     </div>
 
-    <!-- Large Pizza -->
+    <!-- ラージピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="Large Pizza">
+      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="ラージピザ">
       <div class="pizza-info">
-        <h3>Large Pizza (40cm)</h3>
-        <p>Feeds 3-4 people</p>
+        <h3>ラージピザ (40cm)</h3>
+        <p>3～4人に最適</p>
         <div class="price-display">¥<?php echo number_format($pizza['large_price']); ?></div>
       </div>
       <div class="qty">

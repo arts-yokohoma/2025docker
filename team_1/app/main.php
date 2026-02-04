@@ -11,18 +11,18 @@
 <body>
     <div class="hero">
         <header>
-            <div class="logo">MINIMAL PIZZA</div>
+            <div class="logo">Pizza Mach</div>
             <nav>
-                <a href="#menu">Menu</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
+                <a href="#menu">メニュー</a>
+                <a href="#about">ピザのついて</a>
+                <a href="#contact">お問い合わせ</a>
             </nav>
         </header>
 
         <div class="content">
             <div class="content-grid">
                 <div>
-                    <h1>BEST <span class="highlight">PIZZA</span> IN TOWN</h1>
+                    <h2>一度たべたら<span class="highlight">忘れられない</span><br>ピザマッハ</h2>
                     <p class="tagline">シンプルに、美味しく、あなたのために</p>
                     <a href="index.php" class="cta-button">
                         <span>ORDER NOW</span>

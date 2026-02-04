@@ -23,9 +23,9 @@ $role_labels = [
   'delivery' => '配達',
 ];
 
-// Load available roles
+// Load available roles (exclude admin: only manager, kitchen, delivery can be created here)
 $roles = [];
-$roleResult = $mysqli->query("SELECT id, name FROM roles ORDER BY id");
+$roleResult = $mysqli->query("SELECT id, name FROM roles WHERE name != 'admin' ORDER BY id");
 if ($roleResult) {
   while ($role = $roleResult->fetch_assoc()) {
     $roles[] = $role;

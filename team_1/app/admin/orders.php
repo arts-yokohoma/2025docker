@@ -17,8 +17,9 @@ foreach ($orders as $order) {
     if (isset($statusCounts[$status])) {
         $statusCounts[$status]++;
     }
-    // Use order creation date (日時) for date filters
-    $orderDate = substr($order['date'], 0, 10);
+    // Prefer delivery_time (if scheduled) for date filters; fall back to create date
+    $dateSource = $order['delivery_time'] ?? $order['date'];
+    $orderDate = substr($dateSource, 0, 10);
     if ($orderDate === $todayStr) {
         $dateCounts['today']++;
     } elseif ($orderDate === $tomorrowStr) {
@@ -43,14 +44,17 @@ foreach ($orders as $order) {
   </style>
 </head>
 <body>
-
-<div class="page-header">
-  <a href="admin.php" class="btn back-btn" title="戻る">
-    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#0000F5" aria-hidden="true" focusable="false"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
-    <span class="back-text">戻る</span>
-  </a>
-  <h2 class="page-title">注文ページ</h2>
-</div>
+<a href="admin.php" class="btn-back">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 -960 960 960"
+         width="24"
+         height="24"
+         aria-hidden="true">
+        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
+    </svg>
+    戻る
+</a>
+<h2 class="page-title">注文ページ</h2>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>
@@ -81,9 +85,9 @@ foreach ($orders as $order) {
   </thead>
   <tbody>
     <?php foreach ($orders as $order): ?>
-      <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>" data-date="<?= htmlspecialchars($order["date"]) ?>">
+      <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>" data-date="<?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?>">
         <td>#<?= $order["id"] ?></td>
-        <td><?= htmlspecialchars($order["date"]) ?></td>
+        <td><?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?></td>
         <td>
           <?= $order["name"] ?><br>
           <small><?= $order["phone"] ?></small><br>

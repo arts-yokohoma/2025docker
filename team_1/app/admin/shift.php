@@ -24,9 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
 
 <body>
 <div class="box">
-  <div class="header-section">
-    <h1>シフトページ</h1>
-    <form method="post" style="display: inline;">
+  <div class="header-section" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+    <h1 style="margin: 0;">Pizza Mach</h1>
+    <h1 style="margin: 0;">シフトページ</h1>
+    <form method="post" style="display: inline; margin-left: auto;">
         <input type="hidden" name="action" value="logout">
         <button type="submit" class="logout-btn">ログアウト</button>
     </form>

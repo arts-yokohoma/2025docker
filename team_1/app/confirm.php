@@ -28,7 +28,7 @@ if ($menuRes) {
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Pizza Match | ご注文内容の確認</title>
+    <title>Pizza Mach | ご注文内容の確認</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="./assets/css/components.css">
@@ -38,8 +38,8 @@ if ($menuRes) {
 
 <header class="header">
     <div class="header-content">
-        <div class="logo">PM</div>
-        <h1 class="header-title">Pizza Match</h1>
+        <div class="logo"><img src="./assets/image/logo.png" alt="Pizza Mach logo featuring stylized pizza slice with restaurant name"></div>
+        <h1 class="header-title">Pizza Mach</h1>
     </div>
 </header>
 

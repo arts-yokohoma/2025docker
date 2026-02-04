@@ -1,8 +1,17 @@
 <?php
-session_start();
+require_once __DIR__ . '/auth.php';
+// Users page: admin, manager can view/add
+requireRoles(['admin', 'manager']);
 
-$currentUserId = $_SESSION['user_id'] ?? 2; 
-$currentUserRole = $_SESSION['role'] ?? 'user'; 
+$currentUserId = $_SESSION['admin_id'] ?? null;
+$currentUserRole = $_SESSION['admin_role'] ?? 'user'; 
+
+// Handle logout
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
 
 $users = [
 ];
@@ -17,7 +26,15 @@ $users = [
 </head>
 <body>
 
-<header><h1>ユーザー管理画面</h1></header>
+<header>
+    <div class="header-logout">
+        <form method="post" style="display: inline;">
+            <input type="hidden" name="action" value="logout">
+            <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+    </div>
+    <h1>ユーザー管理画面</h1>
+</header>
 
 <div class="container">
     <div class="searchBox">

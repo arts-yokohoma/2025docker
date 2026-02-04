@@ -36,6 +36,29 @@ body{
   color:#111827;
 }
 
+/* Logo section with logout button */
+.logo-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    background: #ef5350;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #e53935;
+}
+
 .content h1{
   margin: 100px 0 24px;
   font-size: 50px;

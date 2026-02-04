@@ -26,14 +26,18 @@ $users = [
 </head>
 <body>
 
-<header>
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e1e8ed; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+        <h1 style="margin: 0;">Pizza Mach</h1>
+        <h1 style="margin: 0; font-size: 1.1rem;">ユーザー管理画面</h1>
+    </div>
     <div class="header-logout">
         <form method="post" style="display: inline;">
             <input type="hidden" name="action" value="logout">
             <button type="submit" class="logout-btn">ログアウト</button>
         </form>
     </div>
-    <h1>ユーザー管理画面</h1>
 </header>
 
 <div class="container">

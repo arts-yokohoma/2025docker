@@ -202,7 +202,11 @@ button:hover {
 </style>
 </head>
 <body>
-<div class="container">
+<header style="position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e1e8ed; box-shadow: 0 1px 3px rgba(0,0,0,0.08); z-index: 10;">
+  <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+  <span style="font-size: 1.25rem; font-weight: 600;">Pizza Mach</span>
+</header>
+<div class="container" style="margin-top: 60px;">
     <h1>🍕 <?= $adminExists ? 'ユーザー作成' : 'セットアップ' ?></h1>
     <p class="subtitle"><?= $adminExists ? '新しいユーザーを追加してください' : '最初のアカウントを作成してください' ?></p>
 

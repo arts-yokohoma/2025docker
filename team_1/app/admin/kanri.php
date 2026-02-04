@@ -471,9 +471,10 @@ if ($res) {
 <body>
 
 <div class="layout">
-    <div class="logo-section">
-        <h2 class="logo">管理パネル</h2>
-        <form method="post" style="display: inline;">
+    <div class="logo-section" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+        <h2 class="logo" style="margin: 0;">Pizza Mach - 管理パネル</h2>
+        <form method="post" style="display: inline; margin-left: auto;">
             <input type="hidden" name="action" value="logout">
             <button type="submit" class="logout-btn">ログアウト</button>
         </form>

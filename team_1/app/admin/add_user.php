@@ -99,9 +99,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e1e8ed;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+    <span style="font-size: 1.25rem; font-weight: 600;">Pizza Mach</span>
+  </div>
+  <a href="user.php" class="back-link">← 戻る</a>
+</header>
+
 <div class="wrap">
 
-  <!-- Back link -->
+  <!-- Back link (in content) -->
   <a href="user.php" class="back-link">← 戻る</a>
 
   <h1>ユーザー作成</h1>

@@ -41,7 +41,8 @@ body {
 }
 
 .logo-img {
-  height: 70px;
+  height: 170px;  
+  width: auto;
 }
 
 /* Navigation Links (Desktop) */

@@ -1,6 +1,8 @@
 <?php
 require_once dirname(dirname(__FILE__)) . '/config/db.php';
 
+date_default_timezone_set('Asia/Tokyo');
+
 // Fetch orders from database with order items and customer details
 $query = "
 SELECT 
@@ -46,10 +48,11 @@ while ($row = $result->fetch_assoc()) {
     if ($deliveryRaw && strtotime($deliveryRaw) !== false) {
         $delivery = date('Y-m-d H:i', strtotime($deliveryRaw));
     }
+    $createTime = date('Y-m-d H:i', strtotime($row['date']));
 
     $orders[] = [
         "id" => $row["id"],
-        "date" => date('Y-m-d H:i', strtotime($row["date"])),
+        "date" => $createTime,
         "delivery_time" => $delivery,
         "name" => $row["name"] ?? "Unknown",
         "phone" => $row["phone"] ?? "N/A",

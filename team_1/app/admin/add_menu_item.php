@@ -107,46 +107,40 @@ $savedPriceL = $_POST['price_l'] ?? '';
             <div class="flash err"><?= h($flashErr) ?></div>
         <?php endif; ?>
 
-        <section class="card">
-            <form method="post" enctype="multipart/form-data">
-                <div style="margin-bottom: 20px;">
-                    <label for="name">商品名 <span style="color: var(--danger);">*</span></label>
-                    <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100">
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label>価格設定 <span style="color: var(--danger);">*</span> <span style="font-size: 13px; color: var(--muted);">(少なくとも1つ必須)</span></label>
-                    <div class="row" style="margin-top: 8px;">
-                        <div>
-                            <label for="price_s" style="font-size: 13px;">Sサイズ (円)</label>
-                            <input type="number" name="price_s" id="price_s" value="<?= h($savedPriceS) ?>" min="0" step="1">
-                        </div>
-                        <div>
-                            <label for="price_m" style="font-size: 13px;">Mサイズ (円)</label>
-                            <input type="number" name="price_m" id="price_m" value="<?= h($savedPriceM) ?>" min="0" step="1">
-                        </div>
-                        <div>
-                            <label for="price_l" style="font-size: 13px;">Lサイズ (円)</label>
-                            <input type="number" name="price_l" id="price_l" value="<?= h($savedPriceL) ?>" min="0" step="1">
+        <section class="card card-pizza-create">
+            <form method="post" enctype="multipart/form-data" class="pizza-create-form">
+                <div class="pizza-create-row">
+                    <div class="pizza-field pizza-field-name">
+                        <label for="name">商品名 <span class="required">*</span></label>
+                        <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100" placeholder="例: マルゲリータ">
+                    </div>
+                    <div class="pizza-field pizza-field-price">
+                        <label for="price_s">S (円)</label>
+                        <input type="number" name="price_s" id="price_s" value="<?= h($savedPriceS) ?>" min="0" step="1" placeholder="0">
+                    </div>
+                    <div class="pizza-field pizza-field-price">
+                        <label for="price_m">M (円)</label>
+                        <input type="number" name="price_m" id="price_m" value="<?= h($savedPriceM) ?>" min="0" step="1" placeholder="0">
+                    </div>
+                    <div class="pizza-field pizza-field-price">
+                        <label for="price_l">L (円)</label>
+                        <input type="number" name="price_l" id="price_l" value="<?= h($savedPriceL) ?>" min="0" step="1" placeholder="0">
+                    </div>
+                    <div class="pizza-field pizza-field-photo">
+                        <label for="photo">画像 <span class="required">*</span></label>
+                        <input type="file" name="photo" id="photo" accept="image/*" required class="input-file">
+                    </div>
+                    <div class="pizza-field pizza-field-active">
+                        <label class="label-inline">表示</label>
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" name="active" id="active_new" checked>
+                            <label for="active_new">ON</label>
                         </div>
                     </div>
                 </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label for="photo">商品画像 <span style="color: var(--danger);">*</span></label>
-                    <input type="file" name="photo" id="photo" accept="image/*" required
-                           style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid var(--line); border-radius: var(--radius2);">
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="checkbox-item">
-                        <input type="checkbox" name="active" id="active_new" checked>
-                        <label for="active_new">表示（アクティブ）</label>
-                    </div>
-                </div>
-
+                <p class="pizza-create-hint">価格は少なくとも1つ入力してください。</p>
                 <div class="form-footer">
-                    <a href="kanri.php" class="btn-save" style="text-decoration: none; display: inline-block; background: var(--muted); border-color: var(--muted);">キャンセル</a>
+                    <a href="kanri.php" class="btn-cancel">キャンセル</a>
                     <button type="submit" class="btn-save">保存</button>
                 </div>
             </form>

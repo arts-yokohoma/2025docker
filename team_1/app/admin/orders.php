@@ -1,16 +1,19 @@
-<?php 
+<?php
 require_once __DIR__ . '/auth.php';
 // Orders: admin, manager, kitchen, delivery can view
 requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
 
-include __DIR__ . "/mock_orders.php"; 
+date_default_timezone_set('Asia/Tokyo');
 
-// Count orders by status and by date (今日/明日/明後日)
+include __DIR__ . "/mock_orders.php";
+
+// Count orders by status and by date (今日/明日/明後日) in Asia/Tokyo
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];
 $dateCounts = ['today' => 0, 'tomorrow' => 0, 'dayafter' => 0];
-$todayStr = (new DateTime('now'))->format('Y-m-d');
-$tomorrowStr = (new DateTime('tomorrow'))->format('Y-m-d');
-$dayafterStr = (new DateTime('tomorrow +1 day'))->format('Y-m-d');
+$now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
+$todayStr = $now->format('Y-m-d');
+$tomorrowStr = (clone $now)->modify('+1 day')->format('Y-m-d');
+$dayafterStr = (clone $now)->modify('+2 days')->format('Y-m-d');
 
 foreach ($orders as $order) {
     $status = $order["status"];
@@ -64,9 +67,9 @@ foreach ($orders as $order) {
     <button class="tab-btn" data-status="Canceled" onclick="filterByStatus(this)">❌ Canceled <span class="count"><?= $statusCounts['Canceled'] ?></span></button>
 
     <!-- Date filters -->
-    <button class="tab-btn" data-date="today" onclick="filterByStatus(this)">今日 <span class="count"><?= $dateCounts['today'] ?></span></button>
-    <button class="tab-btn" data-date="tomorrow" onclick="filterByStatus(this)">明日 <span class="count"><?= $dateCounts['tomorrow'] ?></span></button>
-    <button class="tab-btn" data-date="dayafter" onclick="filterByStatus(this)">明後日 <span class="count"><?= $dateCounts['dayafter'] ?></span></button>
+    <button class="tab-btn" data-date="today" data-target-date="<?= $todayStr ?>" onclick="filterByStatus(this)">今日 <span class="count"><?= $dateCounts['today'] ?></span></button>
+    <button class="tab-btn" data-date="tomorrow" data-target-date="<?= $tomorrowStr ?>" onclick="filterByStatus(this)">明日 <span class="count"><?= $dateCounts['tomorrow'] ?></span></button>
+    <button class="tab-btn" data-date="dayafter" data-target-date="<?= $dayafterStr ?>" onclick="filterByStatus(this)">明後日 <span class="count"><?= $dateCounts['dayafter'] ?></span></button>
   </div>
 </div>
 

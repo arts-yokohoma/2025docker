@@ -1,0 +1,172 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+header, footer {
+    background-color: #222;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem;
+    text-align: center;
+}
+
+
+
+* --- Delivery Time Picker Container --- */
+.delivery-time-picker-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 600px; /* Adjust max-width as needed for the form context */
+    margin: 40px auto;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #fcfcfc;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    color: #333;
+    text-align: center;
+    position: relative; /* Needed if popup should be relative to this container */
+}
+
+.delivery-time-picker-container h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+.time-input-wrapper {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.time-input-wrapper label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #34495e;
+}
+
+.time-input-wrapper .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1.1em;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer; /* Indicate it's clickable */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Include padding/border in element's total width/height */
+}
+
+.time-input-wrapper .form-control:hover,
+.time-input-wrapper .form-control:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* --- Time Slots Popup / Overlay --- */
+.time-slots-popup-overlay {
+    position: fixed; /* Fixed to cover the whole viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black overlay */
+    display: none; /* Hidden by default, shown by JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    opacity: 0; /* For fade-in animation */
+    transition: opacity 0.3s ease-in-out;
+}
+
+.time-slots-popup-overlay.show {
+    display: flex; /* Show the overlay */
+    opacity: 1; /* Fade in */
+}
+
+.time-slots-popup-content {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    width: 90%;
+    max-width: 700px; /* Max width for the popup content */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px); /* For slide-up animation */
+    transition: transform 0.3s ease-in-out;
+    max-height: 90vh; /* Make content scrollable if too many slots */
+    overflow-y: auto; /* Enable scrolling for many slots */
+}
+
+.time-slots-popup-overlay.show .time-slots-popup-content {
+    transform: translateY(0); /* Slide into place */
+}
+
+.time-slots-popup-content h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.time-slots-popup-content .capacity-info {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.9em;
+}
+
+/* --- Time Slots Grid (Re-use previous styles) --- */
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Slightly smaller minmax for popup */
+    gap: 12px; /* Slightly smaller gap for popup */
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.time-slot {
+    background-color: #f8f8f8;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 8px; /* Slightly smaller padding */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70px; /* Slightly smaller min-height */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* Re-use .time-slot:hover, .time-text, .status-text and all status-specific classes (.available, .busy, .full, .past, .selected) from previous CSS */
+/* Just copy them over or ensure they are present in your style.css */
+
+/* --- Close Button --- */
+.close-popup-btn {
+    background-color: #e74c3c; /* Red color for close */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 20px;
+}
+
+.close-popup-btn:hover {
+    background-color: #c0392b;
+}

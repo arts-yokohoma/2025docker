@@ -179,6 +179,26 @@ CREATE TABLE IF NOT EXISTS store_hours (
 ";
 
 /* =========================
+   8) shifts table
+   Weekly shift assignments: user_id per day, time_slot, role (kitchen/delivery)
+   ========================= */
+$queries[] = "
+CREATE TABLE IF NOT EXISTS shifts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  day_of_week TINYINT NOT NULL COMMENT '0=Mon, 6=Sun',
+  time_slot VARCHAR(20) NOT NULL COMMENT 'e.g. 9:00-15:00, 15:00-23:00',
+  role VARCHAR(30) NOT NULL COMMENT 'キッチン or ドライバー',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_shift_slot (day_of_week, time_slot, role),
+  INDEX idx_shifts_user (user_id),
+  CONSTRAINT fk_shifts_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+";
+
+/* =========================
    Initial Data
    ========================= */
 

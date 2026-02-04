@@ -1,43 +1,56 @@
 function filterByStatus(btn) {
   const status = btn.getAttribute('data-status');
-  console.log('Button clicked, filtering by:', status);
-  
+  const dateFilter = btn.getAttribute('data-date');
   // Get all rows and buttons
   const rows = document.querySelectorAll('tbody tr');
   const buttons = document.querySelectorAll('.tab-btn');
-  
-  console.log('Total rows:', rows.length);
-  
+
   // Remove active class from all buttons
-  buttons.forEach(b => {
-    b.classList.remove('active');
-  });
-  
+  buttons.forEach(b => b.classList.remove('active'));
   // Add active class to clicked button
   btn.classList.add('active');
-  console.log('Active button set');
-  
-  // Filter and show/hide rows
+
+  if (dateFilter) {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (dateFilter === 'tomorrow') target.setDate(target.getDate() + 1);
+    else if (dateFilter === 'dayafter') target.setDate(target.getDate() + 2);
+
+    const y = target.getFullYear();
+    const m = String(target.getMonth() + 1).padStart(2, '0');
+    const d = String(target.getDate()).padStart(2, '0');
+    const targetStr = `${y}-${m}-${d}`;
+    console.log('Filtering by date:', dateFilter, '=>', targetStr);
+
+    let visibleCount = 0;
+    rows.forEach((row, idx) => {
+      const rowDateStr = (row.getAttribute('data-date') || '').trim();
+      // Extract YYYY-MM-DD robustly (handles 'YYYY-MM-DD', 'YYYY-MM-DD HH:MM', 'YYYY-MM-DDTHH:MM:SS')
+      const m = rowDateStr.match(/(\d{4}-\d{2}-\d{2})/);
+      const rowDatePart = m ? m[1] : '';
+      console.debug(`Row ${idx}: data-date="${rowDateStr}" -> datePart="${rowDatePart}" (target=${targetStr})`);
+      if (rowDatePart === targetStr) {
+        row.style.display = 'table-row';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    console.log('Date filter visible rows:', visibleCount);
+    if (visibleCount === 0) console.warn('Date filter matched 0 rows - check `data-date` attributes and delivery_time values.');
+    return;
+  }
+
+  // Status filter (including 'all')
   rows.forEach(row => {
     const rowStatus = row.getAttribute('data-status');
-    console.log('Row status:', rowStatus, 'Filter:', status);
-    
-    if (status === 'all') {
-      // Show all rows
+    if (status === 'all' || rowStatus === status) {
       row.style.display = 'table-row';
-      console.log('Showing row (all)');
-    } else if (rowStatus === status) {
-      // Show matching rows
-      row.style.display = 'table-row';
-      console.log('Showing row (match)');
     } else {
-      // Hide non-matching rows
       row.style.display = 'none';
-      console.log('Hiding row');
     }
   });
-  
-  console.log('Filter complete');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -8,6 +8,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./team_3/front-end/client/build:/usr/share/nginx/html/team_3/frontend/client
+      - ./team_3/front-end/dashboard/build:/usr/share/nginx/html/team_3/frontend/dashboard  
     depends_on:
       - apache_server
       - team_3_app
@@ -63,26 +65,40 @@ services:
   team_3_app:
     image: python:3.9
     container_name: team_3_python
+    build:
+      context: ./team_3/pizza-backend
+      dockerfile: Dockerfile
     working_dir: /app
+    ports:
+      - "8000:8000"
     volumes:
-      - ./team_3/app:/app
-    command: >
-      bash -c "pip install fastapi uvicorn psycopg2-binary &&
-               uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+      - ./team_3/pizza-backend:/app
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/fastapi_db
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: a4d1f3cbe87c9e46bca2a22c93f5eafd9f54b621a03b4c1b5891d5f84c209a3c
+      JWT_ALGORITHM: HS256
+      EXPIRES_DELTA: 1
+      CORS: http://localhost,http://localhost:3000,http://localhost:3001
+      PASSWORD_DEFAULT: 123456
+      RESEND_API_KEY: re_HuFFybww_4gz2HhgTyAnHUUoVDPZ3S5Su
+      DISCORD_BOT_TOKEN: https://discord.com/api/webhooks/1400040703966318644/ZfLaOB38q3T-buCIlsNil6wHQPAJQxo-8dodzARdk599btZbn4RhvrT0L269Z1ylrJF5
     depends_on:
       - team_3_db
     networks:
       - teams-network
 
   team_3_db:
-    image: postgres:13
+    image: postgres:15
     container_name: team_3_postgres
     environment:
-      POSTGRES_DB: team_3_db
-      POSTGRES_USER: team_3
-      POSTGRES_PASSWORD: team3pass
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fastapi_db
     volumes:
       - team_3_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - teams-network
 

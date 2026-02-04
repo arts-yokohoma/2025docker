@@ -95,7 +95,10 @@ $savedPriceL = $_POST['price_l'] ?? '';
 <body>
 
 <div class="layout">
-    <h2 class="logo">管理パネル</h2>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+        <h2 class="logo" style="margin: 0;">Pizza Mach - 管理パネル</h2>
+    </div>
 
     <main class="content">
         <h1>新規商品追加</h1>

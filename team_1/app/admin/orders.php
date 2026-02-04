@@ -1,11 +1,31 @@
-<?php include __DIR__ . "/mock_orders.php"; 
+<?php 
+require_once __DIR__ . '/auth.php';
+// Orders: admin, manager, kitchen, delivery can view
+requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
 
-// Count orders by status
+include __DIR__ . "/mock_orders.php"; 
+
+// Count orders by status and by date (今日/明日/明後日)
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];
+$dateCounts = ['today' => 0, 'tomorrow' => 0, 'dayafter' => 0];
+$todayStr = (new DateTime('now'))->format('Y-m-d');
+$tomorrowStr = (new DateTime('tomorrow'))->format('Y-m-d');
+$dayafterStr = (new DateTime('tomorrow +1 day'))->format('Y-m-d');
+
 foreach ($orders as $order) {
     $status = $order["status"];
     if (isset($statusCounts[$status])) {
         $statusCounts[$status]++;
+    }
+    // Prefer delivery_time (if scheduled) for date filters; fall back to create date
+    $dateSource = $order['delivery_time'] ?? $order['date'];
+    $orderDate = substr($dateSource, 0, 10);
+    if ($orderDate === $todayStr) {
+        $dateCounts['today']++;
+    } elseif ($orderDate === $tomorrowStr) {
+        $dateCounts['tomorrow']++;
+    } elseif ($orderDate === $dayafterStr) {
+        $dateCounts['dayafter']++;
     }
 }
 ?>
@@ -22,52 +42,18 @@ foreach ($orders as $order) {
     .tab-btn[data-status="Completed"].active { color: #28a745 !important; }
     .tab-btn[data-status="Completed"].active::after { background: #28a745 !important; }
   </style>
-  <script>
-    function filterByStatus(btn) {
-      const status = btn.getAttribute('data-status');
-      console.log('Button clicked, filtering by:', status);
-      
-      // Get all rows and buttons
-      const rows = document.querySelectorAll('tbody tr');
-      const buttons = document.querySelectorAll('.tab-btn');
-      
-      console.log('Total rows:', rows.length);
-      
-      // Remove active class from all buttons
-      buttons.forEach(b => {
-        b.classList.remove('active');
-      });
-      
-      // Add active class to clicked button
-      btn.classList.add('active');
-      console.log('Active button set');
-      
-      // Filter and show/hide rows
-      rows.forEach(row => {
-        const rowStatus = row.getAttribute('data-status');
-        console.log('Row status:', rowStatus, 'Filter:', status);
-        
-        if (status === 'all') {
-          // Show all rows
-          row.style.display = 'table-row';
-          console.log('Showing row (all)');
-        } else if (rowStatus === status) {
-          // Show matching rows
-          row.style.display = 'table-row';
-          console.log('Showing row (match)');
-        } else {
-          // Hide non-matching rows
-          row.style.display = 'none';
-          console.log('Hiding row');
-        }
-      });
-      
-      console.log('Filter complete');
-    }
-  </script>
 </head>
 <body>
-
+<a href="admin.php" class="btn-back">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 -960 960 960"
+         width="24"
+         height="24"
+         aria-hidden="true">
+        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
+    </svg>
+    戻る
+</a>
 <h2 class="page-title">注文ページ</h2>
 <div class="filter-container">
   <div class="filter-tabs">
@@ -76,6 +62,11 @@ foreach ($orders as $order) {
     <button class="tab-btn" data-status="In Progress" onclick="filterByStatus(this)"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0000F5"><path d="M177-560q14-36 4.5-64T149-680q-33-40-43.5-75.5T102-840h78q-8 38-2.5 62t28.5 52q38 46 48.5 81.5t.5 84.5h-78Zm160 0q14-36 5-64t-32-56q-33-40-44-75.5t-4-84.5h78q-8 38-2.5 62t28.5 52q38 46 48.5 81.5t.5 84.5h-78Zm160 0q14-36 5-64t-32-56q-33-40-44-75.5t-4-84.5h78q-8 38-2.5 62t28.5 52q38 46 48.5 81.5t.5 84.5h-78ZM200-160q-50 0-85-35t-35-85v-200h561q5-34 27-59.5t54-36.5l185-62 25 76-185 62q-12 4-19.5 14.5T720-462v182q0 50-35 85t-85 35H200Zm0-80h400q17 0 28.5-11.5T640-280v-120H160v120q0 17 11.5 28.5T200-240Zm200-80Z"/></svg>In Progress <span class="count"><?= $statusCounts['In Progress'] ?></span></button>
     <button class="tab-btn" data-status="Completed" onclick="filterByStatus(this)">✅ Completed <span class="count"><?= $statusCounts['Completed'] ?></span></button>
     <button class="tab-btn" data-status="Canceled" onclick="filterByStatus(this)">❌ Canceled <span class="count"><?= $statusCounts['Canceled'] ?></span></button>
+
+    <!-- Date filters -->
+    <button class="tab-btn" data-date="today" onclick="filterByStatus(this)">今日 <span class="count"><?= $dateCounts['today'] ?></span></button>
+    <button class="tab-btn" data-date="tomorrow" onclick="filterByStatus(this)">明日 <span class="count"><?= $dateCounts['tomorrow'] ?></span></button>
+    <button class="tab-btn" data-date="dayafter" onclick="filterByStatus(this)">明後日 <span class="count"><?= $dateCounts['dayafter'] ?></span></button>
   </div>
 </div>
 
@@ -94,9 +85,9 @@ foreach ($orders as $order) {
   </thead>
   <tbody>
     <?php foreach ($orders as $order): ?>
-      <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>">
+      <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>" data-date="<?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?>">
         <td>#<?= $order["id"] ?></td>
-        <td><?= $order["date"] ?></td>
+        <td><?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?></td>
         <td>
           <?= $order["name"] ?><br>
           <small><?= $order["phone"] ?></small><br>

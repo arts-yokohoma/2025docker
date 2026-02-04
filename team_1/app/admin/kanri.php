@@ -1,4 +1,15 @@
 <?php
+require_once __DIR__ . '/auth.php';
+// Store settings (kanri): only admin, manager can manage
+requireRoles(['admin', 'manager']);
+
+// Handle logout
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
 /**
  * Admin panel - Store management page
  * 
@@ -460,7 +471,14 @@ if ($res) {
 <body>
 
 <div class="layout">
-    <h2 class="logo">管理パネル</h2>
+    <div class="logo-section" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
+        <h2 class="logo" style="margin: 0;">Pizza Mach - 管理パネル</h2>
+        <form method="post" style="display: inline; margin-left: auto;">
+            <input type="hidden" name="action" value="logout">
+            <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+    </div>
 
     <main class="content">
         <h1>設定</h1>

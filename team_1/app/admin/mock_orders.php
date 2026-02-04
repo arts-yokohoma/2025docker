@@ -6,6 +6,7 @@ $query = "
 SELECT 
   o.id,
   o.create_time as date,
+  o.delivery_time,
   c.name,
   c.phone,
   c.address,
@@ -16,7 +17,7 @@ FROM orders o
 LEFT JOIN customer c ON o.customer_id = c.id
 LEFT JOIN order_items oi ON o.id = oi.order_id
 LEFT JOIN menu m ON oi.menu_id = m.id
-GROUP BY o.id, o.create_time, c.id, c.name, c.phone, c.address, o.status
+GROUP BY o.id, o.create_time, o.delivery_time, c.id, c.name, c.phone, c.address, o.status
 ORDER BY o.create_time DESC
 ";
 
@@ -40,9 +41,16 @@ while ($row = $result->fetch_assoc()) {
         $status = 'New';
     }
     
+    $deliveryRaw = $row['delivery_time'] ?? null;
+    $delivery = null;
+    if ($deliveryRaw && strtotime($deliveryRaw) !== false) {
+        $delivery = date('Y-m-d H:i', strtotime($deliveryRaw));
+    }
+
     $orders[] = [
         "id" => $row["id"],
         "date" => date('Y-m-d H:i', strtotime($row["date"])),
+        "delivery_time" => $delivery,
         "name" => $row["name"] ?? "Unknown",
         "phone" => $row["phone"] ?? "N/A",
         "address" => $row["address"] ?? "N/A",

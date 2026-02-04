@@ -1,0 +1,426 @@
+/* --- GENERAL RESET & BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    background-color: #fff8f0;
+    color: #333;
+    font-size: 18px; /* Large font for readability */
+    line-height: 1.6;
+}
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+.header-wrapper {
+  background-color: #FFCC66;
+  padding: 10px 20px;
+}
+
+/* Top part: logo + title */
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* vertical alignment */
+  gap: 15px;  
+    flex-wrap: wrap;           /* space between logo and text */
+}
+
+.logo-left {
+  width: 100px;  /* adjust size */
+  height: auto;
+}
+
+.header-text h1 {
+text-align: center;  
+  font-size: 50px;
+  margin-bottom: 5px;
+}
+
+.header-text .subtitle {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Sub-header */
+.sub-header {
+  background-color: #f4a261; /* warm, visible color */
+  margin-top: 10px;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;       /* wrap buttons if screen is small */
+  justify-content: center;
+  gap: 10px;             /* space between buttons */
+}
+
+.sub-header .header-btn {
+  
+  display: inline-block;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #e76f51;
+  text-decoration: none;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sub-header .header-btn:hover {
+  background-color: #d65a3f;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .header-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .logo-left {
+    margin-bottom: 5px;
+  }
+}
+
+/* --- HEADER & FOOTER --- */
+header, footer {
+    background-color: #FFCC66;
+    color: #333;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+   
+}
+/* Header Button */
+
+
+footer{
+   position: sticky; 
+    bottom: 0;        
+    left: 0;         
+    width: 100%; 
+}
+footer p {
+    font-size: 16px;
+     
+}
+/* --- MAIN CONTAINER --- */
+main {
+    flex:1;
+    padding: 20px;
+    padding-bottom: 80px;
+}
+
+/* --- MENU GRID --- */
+.menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    flex: 3;
+}
+
+.menu-item {
+    background-color: #fff3e0;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.menu-item h3 {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.menu-item img {
+    width: 100%;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.menu-item img:hover {
+    transform: scale(1.05);
+}
+
+/* --- SELECT & INPUT --- */
+select, input[type="number"], input[type="text"], textarea {
+    font-size: 18px;
+    padding: 10px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+input, textarea {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+    padding: 8px;
+  }
+/* --- BUTTONS --- */
+button, .add-btn, .edit-btn, .delete-btn, .finish-btn, .pickup-btn, .delivered-btn {
+    background-color: #FF9966;
+    color: #fff;
+    font-size: 20px;
+    padding: 12px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+button:hover, .add-btn:hover, .edit-btn:hover, .delete-btn:hover, .finish-btn:hover, .pickup-btn:hover, .delivered-btn:hover {
+    background-color: #FF7744;
+}
+/* Sold-out pizza card */
+.menu-item.sold-out-item {
+    opacity: 0.5;           /* faded */
+    pointer-events: none;    /* cannot click buttons inside */
+    position: relative;
+}
+
+/* Label on top of image */
+.menu-item.sold-out-item .sold-out-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: red;
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+/* --- CART SIDEBAR --- */
+.cart-box {
+    background-color: #FFF3E0;
+    padding: 20px;
+    border-radius: 15px;
+    width: 300px;
+    flex: 1;
+    margin-left: 20px;
+}
+
+.cart-box h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#cart-items li {
+    margin: 8px 0;
+    font-size: 18px;
+}
+
+#cart-total {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* --- ORDER STATUS & DASHBOARD --- */
+.order-status-container, .kitchen-container, .driver-container, .menu-admin-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.order-box, .menu-delete-container, .menu-add-container, .menu-edit-container {
+    background-color: #fff3e0;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.order-box h2, .order-box h3, .order-box h4 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.order-box p {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+/* --- TABLES (Manager Menu Admin) --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+table th {
+    background-color: #FFCC66;
+}
+
+/* --- RESPONSIVE --- */
+@media screen and (max-width: 768px){
+    .menu-container {
+        flex-direction: column;
+    }
+    .cart-box {
+        width: 100%;
+        margin-left: 0;
+    }
+    table {
+        font-size: 16px;
+    }
+    button {
+        font-size: 18px;
+        padding: 10px;
+    }
+}
+
+
+
+
+
+.pizza-progress-container {
+    font-family: Arial, sans-serif;
+    max-width: 900px; /* Adjust as needed */
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 30px;
+    /* REVERTED: Remove the custom padding and add margin to give space inside the container */
+    padding: 0; /* No internal padding for the steps container itself */
+    margin: 0 28px; /* Margin to push the whole line+steps inwards from the container edge */
+    /* 28px = half circle width (25px) + border (3px) */
+}
+
+/* --- CORRECTED PROGRESS LINE ALIGNMENT --- */
+.progress-line {
+    position: absolute;
+    top: 25px; /* Adjust to align with circle center (half of circle height) */
+    /* Now, left and right should be 0 relative to its parent (.progress-steps) */
+    /* Its parent (.progress-steps) has the margin that pushes it in, so the line starts/ends at the circles */
+    left: 0;
+    right: 0;
+    height: 8px; /* Increased line thickness */
+    background-color: #e0e0e0; /* Default background for the inactive part of the line */
+    z-index: 0;
+    border-radius: 4px; /* Slightly rounded ends for the line */
+}
+
+.progress-line-active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%; /* Same height as the parent .progress-line */
+    width: 0%; /* Initially no active line, controlled by JS */
+    background-color: #4CAF50; /* Attractive active color (vibrant green) */
+    z-index: 1; /* Above the inactive line */
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out; /* Smooth transition for width change */
+}
+
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2; /* Ensure circles are above both lines */
+    flex: 1; /* Distribute steps evenly */
+    text-align: center;
+}
+
+.step .circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e0e0e0; /* Default background for inactive circles */
+    border: 3px solid #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.step .circle img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.step.active .circle {
+    background-color: #fff;
+    border-color: #4CAF50; /* Green border for active circle */
+}
+
+.step.active .circle img {
+    display: block;
+    opacity: 1;
+}
+
+.step .label {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #555;
+    font-size: 1em;
+}
+
+.step .sub-label {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.step.active .label,
+.step.active .sub-label {
+    color: #333;
+}

@@ -12,7 +12,7 @@ if (empty($_SESSION['admin_id'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>注文</title>
+    <title>管理メニュー</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -68,6 +68,9 @@ if (empty($_SESSION['admin_id'])) {
         <div class="row justify-content-center">
             <div class="col-12 col-md-4 container_def_button m-4 fs-1">
                 <a href="admin_customer_contacts.php" class="text-decoration-none text-dark d-block">顧客<br>連絡先</a>
+            </div>
+            <div class="col-12 col-md-4 container_def_button m-4 fs-1">
+                <a href="admin_contact_inquiries.php" class="text-decoration-none text-dark d-block">お問い合わせ<br>一覧</a>
             </div>
         </div>
         <div class="text-center mt-4">

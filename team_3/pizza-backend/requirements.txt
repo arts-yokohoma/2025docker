@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+psycopg2-binary
+sqlalchemy
+python-dotenv
+argon2-cffi
+passlib
+python-jose
+# Pydantic v2
+pydantic
+pydantic[email]
+slowapi
+resend
+redis
+httpx

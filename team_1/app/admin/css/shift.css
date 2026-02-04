@@ -1,0 +1,97 @@
+/* ====== HEADER ====== */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* ====== LOGOUT BUTTON ====== */
+.logout-btn {
+    background: #ef5350;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #e53935;
+}
+
+/* ====== BASIC ====== */
+body {
+    font-family: Arial, sans-serif;
+    background: grey;
+    padding: 20px;
+}
+
+.box {
+    max-width: 1100px;
+    margin: auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+h1 {
+    margin: 0 0 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* ====== FORM ====== */
+.form {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+input, select, button {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+button {
+    background: #5b6dff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+/* ====== TABLE ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th, td {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #f5f7fb;
+}
+
+.time {
+    font-weight: bold;
+    color: #4f46e5;
+    white-space: nowrap;
+}
+
+.empty {
+    color: #aa1106;
+    font-style: italic;
+}

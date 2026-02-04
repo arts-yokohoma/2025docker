@@ -1,265 +1,258 @@
 <?php
 /**
- * First-time setup page - Create the first admin user
- * This page should be accessible only when no admin exists
- * After creating admin, this page will redirect to login
+ * User creation page
+ * - First-time setup: anyone can create the first admin
+ * - After setup: only admin users can create new users
  */
 
 require_once __DIR__ . '/../config/db.php';
 
-// Check if admin already exists (staff_users + roles by code)
+// Check if admin exists
 $adminCheck = $mysqli->query("
     SELECT COUNT(*) as count 
-    FROM staff_users u 
+    FROM users u 
     JOIN roles r ON u.role_id = r.id 
-    WHERE r.code = 'admin' AND r.active = 1 AND u.active = 1
+    WHERE r.name = 'admin'
 ");
 $adminExists = $adminCheck && (int)$adminCheck->fetch_assoc()['count'] > 0;
 
-// If admin exists, redirect to login
+// If admin exists, check permission
 if ($adminExists) {
-    header('Location: login.php');
-    exit;
+    session_start();
+    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true || $_SESSION['admin_role'] !== 'admin') {
+        header('Location: login.php');
+        exit;
+    }
 }
 
 $message = '';
 $error = '';
 $success = false;
 
-// Handle form submission (staff_users: login, password_hash, first_name, last_name, role_id)
+// Load available roles
+$roles = [];
+$roleResult = $mysqli->query("SELECT id, name FROM roles ORDER BY id");
+if ($roleResult) {
+    while ($role = $roleResult->fetch_assoc()) {
+        $roles[] = $role;
+    }
+    $roleResult->free();
+} else {
+    $error = 'ロールを読み込めません: ' . $mysqli->error;
+}
+
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $login = trim($_POST['login'] ?? '');
-    $first_name = trim($_POST['first_name'] ?? '');
-    $last_name = trim($_POST['last_name'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $password_confirm = trim($_POST['password_confirm'] ?? '');
+    $role_id = (int)($_POST['role_id'] ?? 0);
 
-    if (empty($login) || empty($first_name) || empty($last_name) || empty($password)) {
+    if (empty($username) || empty($email) || empty($password) || $role_id === 0) {
         $error = 'すべてのフィールドを入力してください';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = '有効なメールアドレスを入力してください';
     } elseif (strlen($password) < 6) {
         $error = 'パスワードは6文字以上である必要があります';
     } elseif ($password !== $password_confirm) {
         $error = 'パスワードが一致しません';
+    } elseif (strlen($username) < 3) {
+        $error = 'ユーザー名は3文字以上である必要があります';
     } else {
-        // Get admin role (roles.code = 'admin'); create role if table is empty
-        $roleResult = $mysqli->query("SELECT id FROM roles WHERE code = 'admin' AND active = 1 LIMIT 1");
-        if (!$roleResult || !$role = $roleResult->fetch_assoc()) {
-            $mysqli->query("INSERT IGNORE INTO roles (code, role_name, sort_order, active) VALUES ('admin', 'Administrator', 1, 1)");
-            $roleResult = $mysqli->query("SELECT id FROM roles WHERE code = 'admin' LIMIT 1");
-            $role = $roleResult ? $roleResult->fetch_assoc() : null;
-        }
-        if (!$role) {
-            $error = '管理者ロールが見つかりません。roles に code=admin を追加してください。';
+        // Verify role exists
+        $roleCheck = $mysqli->prepare("SELECT id FROM roles WHERE id = ?");
+        if (!$roleCheck) {
+            $error = 'データベースエラー: ' . $mysqli->error;
         } else {
-            $role_id = (int)$role['id'];
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $mysqli->prepare("INSERT INTO staff_users (login, password_hash, first_name, last_name, role_id, active) VALUES (?, ?, ?, ?, ?, 1)");
-            $stmt->bind_param("ssssi", $login, $password_hash, $first_name, $last_name, $role_id);
-
-            if ($stmt->execute()) {
-                $success = true;
-                $message = '管理者アカウントが正常に作成されました！3秒後にログインページにリダイレクトします...';
-                header("refresh:3;url=login.php");
+            $roleCheck->bind_param("i", $role_id);
+            $roleCheck->execute();
+            $roleCheckResult = $roleCheck->get_result();
+            
+            if (!$roleCheckResult->fetch_assoc()) {
+                $error = 'ロールが見つかりません';
             } else {
-                if ($mysqli->errno === 1062) {
-                    $error = 'このログインは既に使用されています';
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $mysqli->prepare("INSERT INTO users (username, email, password, role_id, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())");
+                
+                if (!$stmt) {
+                    $error = 'データベースエラー: ' . $mysqli->error;
                 } else {
-                    $error = 'エラーが発生しました: ' . $mysqli->error;
+                    $stmt->bind_param("sssi", $username, $email, $password_hash, $role_id);
+                    
+                    if ($stmt->execute()) {
+                        $success = true;
+                        $message = 'ユーザー「' . htmlspecialchars($username, ENT_QUOTES, 'UTF-8') . '」を作成しました';
+                        $_POST = [];
+                    } else {
+                        if ($mysqli->errno === 1062) {
+                            $error = 'このユーザー名またはメールアドレスは既に使用されています';
+                        } else {
+                            $error = 'エラー: ' . $mysqli->error;
+                        }
+                    }
+                    $stmt->close();
                 }
             }
+            $roleCheck->close();
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>初期設定 - 管理者アカウント作成</title>
-<link rel="stylesheet" href="css/login.css">
+<title><?= $adminExists ? 'ユーザー作成' : '初期設定' ?></title>
 <style>
-.setup-container {
-    max-width: 500px;
-    margin: 50px auto;
-    padding: 40px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.setup-header {
+.container {
+    max-width: 500px;
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+}
+h1 {
     text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+}
+.subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
     margin-bottom: 30px;
 }
-.setup-header h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 28px;
-}
-.setup-header p {
-    color: #7f8c8d;
-    font-size: 14px;
+.info-box {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #1565c0;
 }
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
-.form-group label {
+label {
     display: block;
-    margin-bottom: 8px;
     font-weight: 500;
-    color: #555;
+    color: #333;
+    margin-bottom: 6px;
     font-size: 14px;
 }
-.form-group input {
+input, select {
     width: 100%;
-    padding: 12px 14px;
-    border: 2px solid #ecf0f1;
-    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-size: 14px;
-    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
 }
-.form-group input:focus {
+input:focus, select:focus {
     outline: none;
-    border-color: #4816dc;
-    box-shadow: 0 0 0 3px rgba(72, 22, 220, 0.1);
-}
-.btn-submit {
-    width: 100%;
-    padding: 12px;
-    background: #4816dc;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.btn-submit:hover {
-    background: #353ee7;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(75, 5, 238, 0.3);
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 .msg {
     padding: 12px;
-    border-radius: 8px;
+    border-radius: 6px;
     margin-bottom: 20px;
     font-size: 14px;
 }
 .msg.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: #c8e6c9;
+    color: #2e7d32;
+    border-left: 4px solid #4caf50;
 }
 .msg.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: #ffcdd2;
+    color: #c62828;
+    border-left: 4px solid #f44336;
 }
-.info-box {
-    background: #e7f3ff;
-    border: 1px solid #b3d9ff;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: #004085;
+button {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
 }
-.info-box strong {
-    display: block;
-    margin-bottom: 5px;
+button:hover {
+    background: #5568d3;
 }
 </style>
 </head>
 <body>
-<div class="setup-container">
-    <div class="setup-header">
-        <h1>🍕 初期設定</h1>
-        <p>最初の管理者アカウントを作成してください</p>
-    </div>
+<div class="container">
+    <h1>🍕 <?= $adminExists ? 'ユーザー作成' : 'セットアップ' ?></h1>
+    <p class="subtitle"><?= $adminExists ? '新しいユーザーを追加してください' : '最初のアカウントを作成してください' ?></p>
 
     <?php if ($success): ?>
-        <div class="msg success">
-            <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
-        </div>
-    <?php else: ?>
-        <?php if ($error): ?>
-            <div class="msg error">
-                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="info-box">
-            <strong>ℹ️ 重要情報</strong>
-            これは初回セットアップページです。管理者アカウントを作成した後、このページは自動的にログインページにリダイレクトされます。
-        </div>
-
-        <form method="post" autocomplete="off">
-            <div class="form-group">
-                <label for="login">ログイン *</label>
-                <input 
-                    type="text" 
-                    id="login" 
-                    name="login" 
-                    value="<?= htmlspecialchars($_POST['login'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                    required 
-                    autofocus
-                    placeholder="ログイン名を入力"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="first_name">名 *</label>
-                <input 
-                    type="text" 
-                    id="first_name" 
-                    name="first_name" 
-                    value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                    required
-                    placeholder="名"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="last_name">姓 *</label>
-                <input 
-                    type="text" 
-                    id="last_name" 
-                    name="last_name" 
-                    value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                    required
-                    placeholder="姓"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="password">パスワード *</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required
-                    minlength="6"
-                    placeholder="6文字以上"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirm">パスワード（確認） *</label>
-                <input 
-                    type="password" 
-                    id="password_confirm" 
-                    name="password_confirm" 
-                    required
-                    minlength="6"
-                    placeholder="パスワードを再入力"
-                >
-            </div>
-
-            <button type="submit" class="btn-submit">管理者アカウントを作成</button>
-        </form>
+        <div class="msg success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
+
+    <?php if ($error): ?>
+        <div class="msg error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php endif; ?>
+
+    <?php if (!$adminExists): ?>
+        <div class="info-box">初回セットアップです。最初の管理者アカウントを作成してください。</div>
+    <?php endif; ?>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="username">ユーザー名</label>
+            <input type="text" id="username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required minlength="3" placeholder="3文字以上">
+        </div>
+
+        <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required placeholder="user@example.com">
+        </div>
+
+        <div class="form-group">
+            <label for="role_id">ロール</label>
+            <select id="role_id" name="role_id" required>
+                <option value="">-- ロールを選択 --</option>
+                <?php foreach ($roles as $role): ?>
+                    <option value="<?= $role['id'] ?>" <?= ((int)($_POST['role_id'] ?? 0) === (int)$role['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8') ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required minlength="6" placeholder="6文字以上">
+        </div>
+
+        <div class="form-group">
+            <label for="password_confirm">パスワード（確認）</label>
+            <input type="password" id="password_confirm" name="password_confirm" required minlength="6" placeholder="パスワードを再入力">
+        </div>
+
+        <button type="submit">ユーザーを作成</button>
+    </form>
 </div>
 </body>
 </html>

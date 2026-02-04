@@ -10,7 +10,30 @@ button.link-btn:hover, a.link-btn:hover {
      background:#a5ad5d; 
      color:#fff;
      transition:0.3s;
+}
 
-    }
+/* Logout button styles */
+header {
+    position: relative;
+}
 
-    
+.header-logout {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.logout-btn {
+    background: #ef5350;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #e53935;
+}

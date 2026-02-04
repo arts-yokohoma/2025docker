@@ -1,79 +1,36 @@
+<?php
+require_once __DIR__ . '/auth.php';
+// Shifts: admin, manager (RW), kitchen, delivery (read-only)
+requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+
+$userRole = $_SESSION['admin_role'] ?? 'user';
+$canEdit = in_array($userRole, ['admin', 'manager']); // Only admin/manager can edit
+
+// Handle logout
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <title>シフトページ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-/* ====== BASIC ====== */
-body{
-  font-family: Arial, sans-serif;
-    background:grey;
-  padding: 20px;
-}
-.box{
-  max-width:1100px;
-  margin:auto;
-  background:#fff;
-  border-radius:16px;
-  padding:24px;
-}
-h1{
-  margin:0 0 20px;
-  border-bottom:2px solid #eee;
-  padding-bottom:10px;
-}
-
-/* ====== FORM ====== */
-.form{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr 1fr auto;
-  gap:10px;
-  margin-bottom:24px;
-}
-input,select,button{
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
-button{
-  background:#5b6dff;
-  color:#fff;
-  border:none;
-  cursor:pointer;
-}
-button:hover{opacity:.9}
-
-/* ====== TABLE ====== */
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px;
-}
-th,td{
-  border-bottom:1px solid #eee;
-  padding:10px;
-  text-align:center;
-}
-th{
-  background:#f5f7fb;
-}
-.time{
-  font-weight:bold;
-  color:#4f46e5;
-  white-space:nowrap;
-}
-.empty{
-  color: #aa1106;
-  font-style:italic;
-}
-</style>
+<link rel="stylesheet" href="css/shift.css">
 </head>
 
 <body>
 <div class="box">
-  <h1>シフトページ</h1>
+  <div class="header-section">
+    <h1>シフトページ</h1>
+    <form method="post" style="display: inline;">
+        <input type="hidden" name="action" value="logout">
+        <button type="submit" class="logout-btn">ログアウト</button>
+    </form>
+  </div>
 
   <!-- ===== FORM ===== -->
   <div class="form">

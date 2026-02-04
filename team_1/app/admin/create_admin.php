@@ -7,12 +7,12 @@
 
 require_once __DIR__ . '/../config/db.php';
 
-// Check if admin already exists (staff_users + roles by code)
+// Check if admin already exists (users + roles by name)
 $adminCheck = $mysqli->query("
     SELECT COUNT(*) as count 
-    FROM staff_users u 
+    FROM users u 
     JOIN roles r ON u.role_id = r.id 
-    WHERE r.code = 'admin' AND r.active = 1 AND u.active = 1
+    WHERE r.name = 'admin' AND u.active = 1
 ");
 $adminExists = $adminCheck && (int)$adminCheck->fetch_assoc()['count'] > 0;
 
@@ -26,35 +26,31 @@ $message = '';
 $error = '';
 $success = false;
 
-// Handle form submission (staff_users: login, password_hash, first_name, last_name, role_id)
+// Handle form submission (users: username, email, password, role_id)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $login = trim($_POST['login'] ?? '');
-    $first_name = trim($_POST['first_name'] ?? '');
-    $last_name = trim($_POST['last_name'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $password_confirm = trim($_POST['password_confirm'] ?? '');
 
-    if (empty($login) || empty($first_name) || empty($last_name) || empty($password)) {
+    if (empty($username) || empty($email) || empty($password)) {
         $error = 'すべてのフィールドを入力してください';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = '有効なメールアドレスを入力してください';
     } elseif (strlen($password) < 6) {
         $error = 'パスワードは6文字以上である必要があります';
     } elseif ($password !== $password_confirm) {
         $error = 'パスワードが一致しません';
     } else {
-        // Get admin role (roles.code = 'admin'); create role if table is empty
-        $roleResult = $mysqli->query("SELECT id FROM roles WHERE code = 'admin' AND active = 1 LIMIT 1");
+        // Get admin role (roles.name = 'admin')
+        $roleResult = $mysqli->query("SELECT id FROM roles WHERE name = 'admin' LIMIT 1");
         if (!$roleResult || !$role = $roleResult->fetch_assoc()) {
-            $mysqli->query("INSERT IGNORE INTO roles (code, role_name, sort_order, active) VALUES ('admin', 'Administrator', 1, 1)");
-            $roleResult = $mysqli->query("SELECT id FROM roles WHERE code = 'admin' LIMIT 1");
-            $role = $roleResult ? $roleResult->fetch_assoc() : null;
-        }
-        if (!$role) {
-            $error = '管理者ロールが見つかりません。roles に code=admin を追加してください。';
+            $error = '管理者ロールが見つかりません。install_schema.php を実行して roles テーブルを作成してください。';
         } else {
             $role_id = (int)$role['id'];
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $mysqli->prepare("INSERT INTO staff_users (login, password_hash, first_name, last_name, role_id, active) VALUES (?, ?, ?, ?, ?, 1)");
-            $stmt->bind_param("ssssi", $login, $password_hash, $first_name, $last_name, $role_id);
+            $stmt = $mysqli->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, 1)");
+            $stmt->bind_param("sssi", $username, $email, $password_hash, $role_id);
 
             if ($stmt->execute()) {
                 $success = true;
@@ -62,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("refresh:3;url=login.php");
             } else {
                 if ($mysqli->errno === 1062) {
-                    $error = 'このログインは既に使用されています';
+                    $error = 'このユーザー名またはメールアドレスは既に使用されています';
                 } else {
                     $error = 'エラーが発生しました: ' . $mysqli->error;
                 }
@@ -197,39 +193,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="post" autocomplete="off">
             <div class="form-group">
-                <label for="login">ログイン *</label>
+                <label for="username">ユーザー名 *</label>
                 <input 
                     type="text" 
-                    id="login" 
-                    name="login" 
-                    value="<?= htmlspecialchars($_POST['login'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
+                    id="username" 
+                    name="username" 
+                    value="<?= htmlspecialchars($_POST['username'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
                     required 
                     autofocus
-                    placeholder="ログイン名を入力"
+                    placeholder="ユーザー名を入力"
                 >
             </div>
 
             <div class="form-group">
-                <label for="first_name">名 *</label>
+                <label for="email">メールアドレス *</label>
                 <input 
-                    type="text" 
-                    id="first_name" 
-                    name="first_name" 
-                    value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
                     required
-                    placeholder="名"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="last_name">姓 *</label>
-                <input 
-                    type="text" 
-                    id="last_name" 
-                    name="last_name" 
-                    value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                    required
-                    placeholder="姓"
+                    placeholder="admin@example.com"
                 >
             </div>
 

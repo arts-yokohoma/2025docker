@@ -4,7 +4,7 @@
  * 
  * Provides functions for checking user authentication and role-based access.
  * All protected admin pages must require this file and call requireAdmin() or requireRoles().
- * Session is validated against DB (staff_users + roles by code); inactive users are logged out.
+ * Session is validated against DB (users + roles by name); inactive users are logged out.
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -47,17 +47,17 @@ function isAdmin(): bool {
     $userId = $_SESSION['user_id'];
     
     $stmt = $mysqli->prepare("
-        SELECT r.code 
-        FROM staff_users u 
+        SELECT r.name 
+        FROM users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1 AND r.active = 1
+        WHERE u.id = ? AND u.active = 1
     ");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($row = $result->fetch_assoc()) {
-        return $row['code'] === 'admin';
+        return $row['name'] === 'admin';
     }
     
     return false;
@@ -65,12 +65,21 @@ function isAdmin(): bool {
 
 /**
  * Require authentication - redirects to login if not logged in
+ * Alias for requireLogin()
  */
 function requireAuth(): void {
     if (!isLoggedIn()) {
         header('Location: login.php');
         exit;
     }
+}
+
+/**
+ * Require login - redirects to login if not logged in
+ * Same as requireAuth() - more intuitive name
+ */
+function requireLogin(): void {
+    requireAuth();
 }
 
 /**
@@ -86,7 +95,7 @@ function requireAdmin(): void {
 
 /**
  * Check if logged in user has one of the specified roles
- * @param array $allowedRoles Array of role names (e.g., ['admin', 'manager'])
+ * @param array $allowedRoles Array of role names (e.g., ['admin', 'moderator'])
  * @return bool True if user has one of the allowed roles
  */
 function hasRole(array $allowedRoles): bool {
@@ -101,10 +110,10 @@ function hasRole(array $allowedRoles): bool {
     $placeholders = str_repeat('?,', count($allowedRoles) - 1) . '?';
     
     $stmt = $mysqli->prepare("
-        SELECT r.code 
-        FROM staff_users u 
+        SELECT r.name 
+        FROM users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1 AND r.active = 1 AND r.code IN ($placeholders)
+        WHERE u.id = ? AND u.active = 1 AND r.name IN ($placeholders)
     ");
     
     $types = 'i' . str_repeat('s', count($allowedRoles));
@@ -141,10 +150,10 @@ function getCurrentUser(): ?array {
     $userId = $_SESSION['user_id'];
     
     $stmt = $mysqli->prepare("
-        SELECT u.id, u.login, u.first_name, u.last_name, r.code as role_code, r.role_name
-        FROM staff_users u 
+        SELECT u.id, u.username, u.email, r.name as role_name
+        FROM users u 
         JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1 AND r.active = 1
+        WHERE u.id = ? AND u.active = 1
     ");
     $stmt->bind_param("i", $userId);
     $stmt->execute();

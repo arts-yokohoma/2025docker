@@ -83,7 +83,49 @@ body{
 }
 
 .logout-btn:hover {
-    background: #e53935;
+    background: #b71c1c;
+}
+
+/* add_menu_item.php header */
+.add-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.add-menu-logo { height: 40px; width: auto; }
+
+.add-menu-back {
+    margin-left: auto;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.add-menu-back:hover {
+    background: #e0e0e0;
+    color: #111;
+}
+
+.add-menu-logout {
+    padding: 8px 16px;
+    background: #d32f2f;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.add-menu-logout:hover {
+    background: #b71c1c;
+    color: #fff;
 }
 
 .content h1{

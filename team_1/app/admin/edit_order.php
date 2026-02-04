@@ -139,18 +139,14 @@ foreach ($menuItems as $m) {
         .btn-back svg { fill: #0000F5 !important; }
     </style>
 </head>
-<body> 
-<a href="orders.php" class="btn-back">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 -960 960 960"
-         width="24"
-         height="24"
-         aria-hidden="true">
-        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
-    </svg>
-    戻る
-</a>
- 
+<body>
+<header class="edit-order-header">
+    <img src="../assets/image/logo.png" alt="Pizza Mach" class="edit-order-logo">
+    <span class="edit-order-title">注文編集</span>
+    <a href="orders.php" class="edit-order-back">戻る</a>
+    <a href="logout.php" class="edit-order-logout">ログアウト</a>
+</header>
+
     <div class="container">
         <!-- Header -->
         <div class="header">

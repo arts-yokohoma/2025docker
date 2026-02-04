@@ -16,8 +16,63 @@
 body{
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
+  margin: 0;
   padding: 20px;
   color: #222;
+}
+
+/* Header: logo, title, 戻る, ログアウト */
+.orders-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  margin-bottom: 16px;
+  background: #fff;
+  border-radius: var(--rounded);
+  padding: 12px 16px;
+  box-shadow: var(--surface-shadow);
+  border: 1px solid #eee;
+}
+
+.orders-page-logo { height: 40px; width: auto; }
+
+.orders-page-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.orders-page-back {
+  margin-left: auto;
+  padding: 8px 14px;
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.orders-page-back:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+.orders-page-logout {
+  padding: 8px 16px;
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.orders-page-logout:hover {
+  background: #b71c1c;
 }
 
 .menu{ display:flex; justify-content:center; }

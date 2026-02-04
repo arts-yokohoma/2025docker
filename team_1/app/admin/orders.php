@@ -47,17 +47,22 @@ foreach ($orders as $order) {
   </style>
 </head>
 <body>
-<a href="admin.php" class="btn-back">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 -960 960 960"
-         width="24"
-         height="24"
-         aria-hidden="true">
-        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
-    </svg>
-    戻る
-</a>
-<h2 class="page-title">注文ページ</h2>
+<header class="orders-page-header">
+    <img src="../assets/image/logo.png" alt="Pizza Mach" class="orders-page-logo">
+    <span class="orders-page-title">注文ページ</span>
+    <a href="admin.php" class="orders-page-back">戻る</a>
+    <form method="post" style="margin: 0;">
+        <input type="hidden" name="action" value="logout">
+        <button type="submit" class="orders-page-logout">ログアウト</button>
+    </form>
+</header>
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+?>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>

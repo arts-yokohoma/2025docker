@@ -27,11 +27,18 @@ function clearSessionAndRedirectToLogin(): void {
 }
 
 /**
- * Check if user is logged in (session has user_id)
- * Does not validate against DB — use requireAuth() / requireAdmin() for that
+ * Check if user is logged in (session has admin_id)
+ * Does not validate against DB — use requireAuth() / requireRoles() for that
  */
 function isLoggedIn(): bool {
-    return isset($_SESSION['user_id']) && isset($_SESSION['username']);
+    return isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true && isset($_SESSION['admin_id']);
+}
+
+/**
+ * Get current user's role
+ */
+function getUserRole(): ?string {
+    return $_SESSION['admin_role'] ?? null;
 }
 
 /**
@@ -39,33 +46,11 @@ function isLoggedIn(): bool {
  * Returns true if user is admin, false otherwise
  */
 function isAdmin(): bool {
-    if (!isLoggedIn()) {
-        return false;
-    }
-    
-    global $mysqli;
-    $userId = $_SESSION['user_id'];
-    
-    $stmt = $mysqli->prepare("
-        SELECT r.name 
-        FROM users u 
-        JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1
-    ");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        return $row['name'] === 'admin';
-    }
-    
-    return false;
+    return isLoggedIn() && getUserRole() === 'admin';
 }
 
 /**
  * Require authentication - redirects to login if not logged in
- * Alias for requireLogin()
  */
 function requireAuth(): void {
     if (!isLoggedIn()) {
@@ -75,89 +60,20 @@ function requireAuth(): void {
 }
 
 /**
- * Require login - redirects to login if not logged in
- * Same as requireAuth() - more intuitive name
- */
-function requireLogin(): void {
-    requireAuth();
-}
-
-/**
- * Require admin role - redirects to login if not admin.
- * Clears session if user exists but is inactive or not admin (avoids redirect loop).
- */
-function requireAdmin(): void {
-    requireAuth();
-    if (!isAdmin()) {
-        clearSessionAndRedirectToLogin();
-    }
-}
-
-/**
- * Check if logged in user has one of the specified roles
- * @param array $allowedRoles Array of role names (e.g., ['admin', 'moderator'])
- * @return bool True if user has one of the allowed roles
- */
-function hasRole(array $allowedRoles): bool {
-    if (!isLoggedIn()) {
-        return false;
-    }
-    
-    global $mysqli;
-    $userId = $_SESSION['user_id'];
-    
-    // Create placeholders for IN clause
-    $placeholders = str_repeat('?,', count($allowedRoles) - 1) . '?';
-    
-    $stmt = $mysqli->prepare("
-        SELECT r.name 
-        FROM users u 
-        JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1 AND r.name IN ($placeholders)
-    ");
-    
-    $types = 'i' . str_repeat('s', count($allowedRoles));
-    $params = array_merge([$userId], $allowedRoles);
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    return $result->num_rows > 0;
-}
-
-/**
- * Require one of the specified roles - redirects to login if user doesn't have any of them.
- * Clears session when access denied (e.g. user deactivated) to avoid redirect loop.
+ * Require one of the specified roles - redirects to login if user doesn't have any of them
  * @param array $allowedRoles Array of role names (e.g., ['admin', 'manager', 'driver'])
  */
 function requireRoles(array $allowedRoles): void {
     requireAuth();
-    if (!hasRole($allowedRoles)) {
+    $userRole = getUserRole();
+    if (!in_array($userRole, $allowedRoles)) {
         clearSessionAndRedirectToLogin();
     }
 }
 
 /**
- * Get current user info
- * Returns array with user data or null if not logged in
+ * Require admin role - redirects to login if not admin
  */
-function getCurrentUser(): ?array {
-    if (!isLoggedIn()) {
-        return null;
-    }
-    
-    global $mysqli;
-    $userId = $_SESSION['user_id'];
-    
-    $stmt = $mysqli->prepare("
-        SELECT u.id, u.username, u.email, r.name as role_name
-        FROM users u 
-        JOIN roles r ON u.role_id = r.id 
-        WHERE u.id = ? AND u.active = 1
-    ");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    return $result->fetch_assoc() ?: null;
+function requireAdmin(): void {
+    requireRoles(['admin']);
 }

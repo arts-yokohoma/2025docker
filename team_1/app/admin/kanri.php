@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/auth.php';
+// Store settings (kanri): only admin, manager can manage
+requireRoles(['admin', 'manager']);
+
 /**
  * Admin panel - Store management page
  * 

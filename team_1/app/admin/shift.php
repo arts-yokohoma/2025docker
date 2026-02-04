@@ -1,4 +1,12 @@
-<!DOCTYPE html>
+<?php
+require_once __DIR__ . '/auth.php';
+// Shifts: admin, manager (RW), kitchen, delivery (read-only)
+requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+
+$userRole = $_SESSION['admin_role'] ?? 'user';
+$canEdit = in_array($userRole, ['admin', 'manager']); // Only admin/manager can edit
+?>
+<!DOCTYPE html>>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">

@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+<?php
+require_once __DIR__ . '/auth.php';
+requireAuth(); // All logged-in users can see admin panel
+?>
+<!DOCTYPE html>>>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">

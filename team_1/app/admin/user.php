@@ -1,8 +1,10 @@
 <?php
-session_start();
+require_once __DIR__ . '/auth.php';
+// Users page: admin, manager can view/add
+requireRoles(['admin', 'manager']);
 
-$currentUserId = $_SESSION['user_id'] ?? 2; 
-$currentUserRole = $_SESSION['role'] ?? 'user'; 
+$currentUserId = $_SESSION['admin_id'] ?? null;
+$currentUserRole = $_SESSION['admin_role'] ?? 'user'; 
 
 $users = [
 ];

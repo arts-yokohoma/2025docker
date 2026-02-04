@@ -1,4 +1,9 @@
-<?php include __DIR__ . "/mock_orders.php"; 
+<?php 
+require_once __DIR__ . '/auth.php';
+// Orders: admin, manager, kitchen, delivery can view
+requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+
+include __DIR__ . "/mock_orders.php"; 
 
 // Count orders by status and by date (今日/明日/明後日)
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];

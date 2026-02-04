@@ -42,27 +42,6 @@ body{
 } 
 
 /* Page title alignment: align with table cell content */
-.page-header{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:12px;
-}
-
-.page-header .back-btn{ 
-  background:none; 
-  border:0; 
-  padding:8px 10px; 
-  color:var(--primary); 
-  text-decoration:none; 
-  display:inline-flex; 
-  align-items:center;
-  gap:8px;
-  border-radius:8px;
-}
-
-.page-header .back-text{ font-weight:700; color:inherit; }
-
 h2.page-title{
   margin: 0 0 12px;
   padding-left: 12px; /* match .orders td left padding */
@@ -316,4 +295,34 @@ tbody tr:not(.visible) {
 @media (max-width:720px){
   .filter-tabs{ gap:8px; }
   .orders th, .orders td{ padding:10px; }
+}
+
+.btn-back {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    background: #fff;
+    color: #000;
+    text-decoration: none;
+
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.btn-back svg {
+    fill: #0000F5;
+}
+
+.btn-back:hover {
+    background: #f5f7ff;
 }

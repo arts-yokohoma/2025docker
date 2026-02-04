@@ -117,8 +117,40 @@ foreach ($menuItems as $m) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>注文編集 - <?= htmlspecialchars($orderToEdit['id']) ?></title>
     <link rel="stylesheet" href="css/order_edit.css">
+    <style>
+        /* Ensure back button visible and positioned correctly */
+        .btn-back {
+            position: fixed !important;
+            top: 16px !important;
+            right: 16px !important;
+            z-index: 9999 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 6px 10px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+            background: #fff !important;
+            color: #000 !important;
+            text-decoration: none !important;
+            font-size: 14px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+        }
+        .btn-back svg { fill: #0000F5 !important; }
+    </style>
 </head>
-<body>
+<body> 
+<a href="orders.php" class="btn-back">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 -960 960 960"
+         width="24"
+         height="24"
+         aria-hidden="true">
+        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
+    </svg>
+    戻る
+</a>
+ 
     <div class="container">
         <!-- Header -->
         <div class="header">

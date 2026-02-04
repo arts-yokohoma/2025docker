@@ -23,9 +23,12 @@ function filterByStatus(btn) {
     console.log('Filtering by date:', dateFilter, '=>', targetStr);
 
     let visibleCount = 0;
-    rows.forEach(row => {
-      const rowDateStr = row.getAttribute('data-date') || '';
-      const rowDatePart = rowDateStr.slice(0, 10);
+    rows.forEach((row, idx) => {
+      const rowDateStr = (row.getAttribute('data-date') || '').trim();
+      // Extract YYYY-MM-DD robustly (handles 'YYYY-MM-DD', 'YYYY-MM-DD HH:MM', 'YYYY-MM-DDTHH:MM:SS')
+      const m = rowDateStr.match(/(\d{4}-\d{2}-\d{2})/);
+      const rowDatePart = m ? m[1] : '';
+      console.debug(`Row ${idx}: data-date="${rowDateStr}" -> datePart="${rowDatePart}" (target=${targetStr})`);
       if (rowDatePart === targetStr) {
         row.style.display = 'table-row';
         visibleCount++;

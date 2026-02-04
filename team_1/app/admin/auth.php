@@ -61,7 +61,7 @@ function requireAuth(): void {
 
 /**
  * Require one of the specified roles - redirects to login if user doesn't have any of them
- * @param array $allowedRoles Array of role names (e.g., ['admin', 'manager', 'driver'])
+ * @param array $allowedRoles Array of role names (e.g., ['admin', 'manager', 'delivery'])
  */
 function requireRoles(array $allowedRoles): void {
     requireAuth();

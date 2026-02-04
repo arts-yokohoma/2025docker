@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS shifts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 ");
 
-// Load users with role kitchen or delivery/driver (staff that can be assigned to shifts)
+// Load users with role kitchen or delivery (staff that can be assigned to shifts)
 $staffList = [];
 $res = $mysqli->query("
   SELECT u.id, u.username
   FROM users u
   JOIN roles r ON u.role_id = r.id
-  WHERE r.name IN ('kitchen', 'delivery', 'driver') AND u.active = 1
+  WHERE r.name IN ('kitchen', 'delivery') AND u.active = 1
   ORDER BY u.username
 ");
 if ($res) {

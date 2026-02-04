@@ -206,9 +206,9 @@ CREATE TABLE IF NOT EXISTS shifts (
 $queries[] = "
 INSERT IGNORE INTO roles (name) VALUES 
   ('admin'),
-  ('user'),
-  ('moderator'),
-  ('guest')
+  ('manager'),
+  ('kitchen'),
+  ('driver')
 ";
 
 // Insert default store hours if not exists

@@ -35,7 +35,7 @@ if (isset($pdo)) {
 <header class="main-header">
   <div class="header-content">
     <a href="#" class="logo-link">
-       <img src="image/8.png" alt="Pizza Match Logo" class="logo-img">
+       <img src="image/8e.png" alt="Pizza Match Logo" class="logo-img">
     </a>
 
     <nav id="nav-menu">

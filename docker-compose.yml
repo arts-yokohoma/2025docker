@@ -9,7 +9,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./team_3/front-end/client/build:/usr/share/nginx/html/team_3/frontend/client
-      - ./team_3/pizza-backend:/usr/share/nginx/html/team_3/frontend/dashboard
+      - ./team_3/front-end/dashboard/build:/usr/share/nginx/html/team_3/frontend/dashboard  
     depends_on:
       - apache_server
       - team_3_app

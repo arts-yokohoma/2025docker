@@ -1,5 +1,5 @@
 <?php
-// customer/order_form.php
+// customer/order_form_logic.php
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -27,34 +27,31 @@ if (file_exists($config_file)) {
     }
 }
 
-// (C) System Capacity Calculation (Logic ပြင်ဆင်ထားသည်)
-// ယခင်: Kitchen Load ကိုပဲ စစ်ခဲ့သည်။
-// ယခု: တဆိုင်လုံးရှိ အော်ဒါအရေအတွက် (Total Load) ကို စစ်ပါမည်။
+// (C) System Capacity Calculation
+// ဒီနေရာမှာ အရေးကြီးဆုံး ပြင်ဆင်မှုပါ
+// Limit = Rider အရေအတွက် (၁ ယောက်ကို ၁ ခုနှုန်း) 
+// သို့မဟုတ် ၂ ခုနှုန်း (အောက်က $d_staff * 1 ကို လိုသလိုပြင်နိုင်သည်)
+$rider_limit = $d_staff * 1; 
 
-// ၁။ ဆိုင်တစ်ခုလုံး လက်ခံနိုင်သော အမြင့်ဆုံးပမာဏ (Max Capacity)
-// Kitchen (၁ ယောက် ၄ ခု) + Rider (၁ ယောက် ၂ ခု) ဟု တွက်ဆလိုက်မည်
-$system_limit = ($k_staff * 4) + ($d_staff * 2); 
-
-// ၂။ လက်ရှိ ဆိုင်ထဲတွင် ရှိနေသမျှ အော်ဒါများ (Pending + Cooking + Delivering)
-// Delivering ကိုပါ ထည့်တွက်မှ Rider မအားရင် System Busy ဖြစ်မည်
+// Active Load = Pending + Cooking + Delivering
+// အော်ဒါဝင်လာတာနဲ့ ချက်ချင်း Load တက်မည်
 $sql_load = "SELECT COUNT(*) as total FROM orders WHERE status IN ('Pending', 'Cooking', 'Delivering')";
 $res_load = $conn->query($sql_load);
 $current_load = $res_load->fetch_assoc()['total'] ?? 0;
 
-// (D) Logic Check: Load များနေရင် Distance စစ်မည်
+// (D) Logic Check
 $base_time = 30; 
 $estimated_time = $base_time;
 $is_system_busy = false;
-$near_distance_threshold = 2.0; // 2 km
+$near_distance_threshold = 2.0; 
 
-// အကယ်၍ လက်ရှိအော်ဒါပေါင်းက Limit ထက်ကျော်နေရင် (သို့) ညီနေရင်
-if ($current_load >= $system_limit) {
-    // Capacity ပြည့်နေပြီ (Busy)
+// လက်ရှိအော်ဒါက Rider Limit ထက်များနေရင် (Rider မအားတော့ရင်)
+if ($current_load >= $rider_limit) {
     if ($distance_km <= $near_distance_threshold) {
-        // နီးရင် လက်ခံမယ်၊ အချိန်တိုးမယ်
+        // နီးရင် အချိန်တိုး လက်ခံ
         $estimated_time = 50; 
     } else {
-        // ဝေးရင် လုံးဝလက်မခံတော့ပါ (Busy Overlay ပြမည်)
+        // ဝေးရင် လုံးဝလက်မခံ (Busy)
         $is_system_busy = true;
         $estimated_time = 60; 
     }
@@ -67,6 +64,7 @@ if (file_exists($traffic_file) && trim(file_get_contents($traffic_file)) == '1')
     $is_heavy_traffic = true;
     $estimated_time += 15;
 }
+?>
 ?>
 
 <!DOCTYPE html>

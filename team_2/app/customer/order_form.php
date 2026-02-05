@@ -28,15 +28,31 @@ $res_active = $conn->query($sql_active);
 $row_active = $res_active->fetch_assoc();
 $current_active_orders = $row_active['active_count'] ?? 0;
 
-// Busy Logic
-$max_capacity = ((int)$k_staff + (int)$d_staff);
-$is_system_busy = ($current_active_orders >= $max_capacity);
+// --- DYNAMIC TIME CALCULATION (Fix Bug Here) ---
+// တွက်နည်း: (စားဖိုမှူး + ပို့ဆောင်သူ) x 2 = တပြိုင်နက် လုပ်နိုင်သော အရေအတွက်
+$max_capacity = ((int)$k_staff + (int)$d_staff) * 2;
+if ($max_capacity < 1) $max_capacity = 5; // Default safety
+
+$base_time = 30; // ပုံမှန်ကြာချိန်
+$estimated_time = $base_time;
+$is_system_busy = false;
+
+// Capacity ကျော်နေရင် အချိန်တိုးမယ်
+if ($current_active_orders >= $max_capacity) {
+    $is_system_busy = true;
+    // Capacity တစ်ဆ ကျော်တိုင်း မိနစ် ၃၀ ပေါင်းမယ်
+    $overload_ratio = floor($current_active_orders / $max_capacity);
+    $estimated_time = $base_time + ($overload_ratio * 30);
+}
 
 // Traffic Logic
 $is_heavy_traffic = false;
 if (file_exists('../admin/traffic_status.txt')) {
     $status = file_get_contents('../admin/traffic_status.txt');
-    if (trim($status) == '1') $is_heavy_traffic = true;
+    if (trim($status) == '1') {
+        $is_heavy_traffic = true;
+        $estimated_time += 15; // Traffic ဖြစ်နေရင် ၁၅ မိနစ် ထပ်ပေါင်းမယ်
+    }
 }
 ?>
 
@@ -72,7 +88,7 @@ if (file_exists('../admin/traffic_status.txt')) {
         <div id="busy-overlay">
             <div class="warning-box">
                 <h2 style="color: #dc3545;">⚠️ ဆိုင်အလုပ်များနေပါသည်</h2>
-                <p>လက်ရှိအော်ဒါများပြားနေသဖြင့် ပို့ဆောင်ချိန် <b>၄၅ မိနစ် - ၁ နာရီခန့်</b> ကြာနိုင်ပါသည်။</p>
+                <p>လက်ရှိအော်ဒါများပြားနေသဖြင့် ပို့ဆောင်ချိန် <b><?php echo $estimated_time; ?> မိနစ်ခန့်</b> ကြာနိုင်ပါသည်။</p>
                 <p><b>စောင့်ဆိုင်းပြီး မှာယူလိုပါသလား?</b></p>
                 <a href="index.php" class="btn-leave">မမှာတော့ပါ</a>
                 <button onclick="document.getElementById('busy-overlay').style.display='none'" class="btn-wait">ရပါတယ်၊ စောင့်မယ်</button>
@@ -83,7 +99,11 @@ if (file_exists('../admin/traffic_status.txt')) {
     <div class="container">
         <?php if ($is_heavy_traffic): ?>
             <div style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                <i class="fas fa-traffic-light"></i> ယာဉ်ကြောပိတ်ဆို့နေပါသည် (ပို့ဆောင်ချိန် ပိုကြာနိုင်သည်)
+                <i class="fas fa-traffic-light"></i> ယာဉ်ကြောပိတ်ဆို့နေပါသည် (ကြာချိန်: <?php echo $estimated_time; ?> မိနစ်)
+            </div>
+        <?php elseif ($is_system_busy): ?>
+            <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffeeba;">
+                <i class="fas fa-clock"></i> အော်ဒါများနေသဖြင့် <b><?php echo $estimated_time; ?> မိနစ်</b> ခန့် ကြာပါမည်။
             </div>
         <?php else: ?>
             <div style="background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -134,6 +154,9 @@ if (file_exists('../admin/traffic_status.txt')) {
             var size = document.getElementById('size').value;
             var qty = document.getElementById('quantity').value;
             
+            // PHP မှ တွက်ထားသောအချိန်ကို JS သို့ ယူခြင်း
+            var estimatedTime = "<?php echo $estimated_time; ?>";
+
             // Price Calculation
             var price = (size === 'S') ? 1000 : (size === 'M' ? 2000 : 3000);
             var total = price * qty;
@@ -144,6 +167,7 @@ if (file_exists('../admin/traffic_status.txt')) {
                     <div style="text-align: left;">
                         <b>Address:</b> ${city} ${detail} <br>
                         <b>Pizza:</b> ${size} x ${qty} <br>
+                        <b>Est. Time:</b> <span style="color:red; font-weight:bold;">${estimatedTime} mins</span> <br>
                         <hr>
                         <b>Total:</b> <span style="color:green; font-weight:bold;">¥${total}</span>
                     </div>

@@ -1,36 +1,60 @@
 <?php
-ob_start(); // Header error မတက်အောင် အပေါ်ဆုံးမှာ ထည့်ရပါမည်
+// customer/check_order.php
+ob_start(); 
 session_start();
 
 // ၁။ အချိန်ဇုန် ညှိခြင်း
 date_default_timezone_set('Asia/Tokyo');
 include '../database/db_conn.php';
-
-// Functions ဖိုင်ရှိရင် ချိတ်မယ် (မရှိရင် ကျော်သွားမယ်)
-if (file_exists('../database/functions.php')) {
-    include '../database/functions.php';
-}
+// Functions ဖိုင် မဖြစ်မနေ လိုအပ်ပါသည် (အကွာအဝေးတွက်ရန်)
+require_once '../database/functions.php';
 
 $order = null;
 
-// ၂။ Customer Confirm Logic (Rider အားစေရန် အရေးကြီးသည်)
+// ၂။ Customer Confirm Logic (Rider Return Time Calculation)
 if (isset($_POST['confirm_receive'])) {
     $order_id = intval($_POST['order_id']);
-    // Status Completed ပြောင်းခြင်းဖြင့် Admin ဘက်မှာ Rider Slot အားသွားပါမည်
+
+    // (A) အရင်ဆုံး ဒီ Order ရဲ့ Location နဲ့ Rider ID ကို ဆွဲထုတ်မယ်
+    $qry = $conn->query("SELECT assigned_slot_id, latitude, longitude FROM orders WHERE id = $order_id");
+    $row = $qry->fetch_assoc();
+    $slot_id = $row['assigned_slot_id'] ?? 0;
+    
+    // (B) ပြန်ချိန် တွက်ချက်ခြင်း (Smart Logic)
+    $return_minutes = 15; // Default (Lat/Lng မရှိရင် ၁၅ မိနစ်ထားမယ်)
+
+    if (!empty($row['latitude']) && !empty($row['longitude'])) {
+        // ဆိုင်တည်နေရာ (functions.php ထဲက SHOP_LAT Constants)
+        $dist = calculateDistance(SHOP_LAT, SHOP_LNG, $row['latitude'], $row['longitude']);
+        
+        // ၁ ကီလိုမီတာ = ၃ မိနစ် + Buffer ၅ မိနစ်
+        $return_minutes = ceil($dist * 3) + 5;
+    }
+    
+    // Rider ပြန်ရောက်မည့်အချိန်
+    $back_time = date('Y-m-d H:i:s', strtotime("+$return_minutes minutes"));
+
+    // (C) Order Status Update (Completed)
     $stmt = $conn->prepare("UPDATE orders SET status = 'Completed', return_time = NOW() WHERE id = ?");
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     
+    // (D) Rider Slot Update (Next Available Time သတ်မှတ်ခြင်း)
+    if ($slot_id > 0) {
+        // delivery_slots table ရှိမရှိ အရင်စစ်တာ ကောင်းပါတယ်၊ သို့သော် admin.php မှာ ဆောက်ထားပြီးဖြစ်လို့ တန်း Update ပါမယ်
+        $sql_slot = "UPDATE delivery_slots SET next_available_time = '$back_time' WHERE slot_id = $slot_id";
+        $conn->query($sql_slot);
+    }
+
     // Refresh Page
     header("Location: ?id=" . $order_id); 
     exit();
 }
 
-// ၃။ Data ဆွဲထုတ်ခြင်း
+// ၃။ Data ဆွဲထုတ်ခြင်း (လုံခြုံရေး မြှင့်ထားသည်)
 if (isset($_POST['checkphonenumber'])) {
     $phone = $_POST['checkphonenumber'];
     
-    // Security Fix: Prepared Statement အသုံးပြုခြင်း
     $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ? ORDER BY id DESC LIMIT 1");
     $stmt->bind_param("s", $phone);
     $stmt->execute();
@@ -41,7 +65,6 @@ if (isset($_POST['checkphonenumber'])) {
         echo "<script>alert('❌ ဒီဖုန်းနံပါတ်နှင့် အော်ဒါမရှိပါ'); window.location.href='index.php';</script>";
         exit();
     }
-    // ID ရရင် GET method နဲ့ ပြန်ခေါ်မယ် (Refresh လုပ်ရင် Form resubmit မဖြစ်အောင်)
     header("Location: ?id=" . $order['id']);
     exit();
 

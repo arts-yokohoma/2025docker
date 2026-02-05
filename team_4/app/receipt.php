@@ -277,18 +277,7 @@ $qr_code_url_alt = "https://api.qrserver.com/v1/create-qr-code/?size={$qr_size}&
           </button>
         </div>
       </div>
-      
-      <!-- Order Status -->
-      <div class="status-box">
-        <h3 style="margin-top: 0;">注文ステータス</h3>
-        <div class="status">
-          <i class="fas fa-check-circle"></i> 確認済み
-        </div>
-        <p style="margin-top: 10px; font-size: 14px; color: #666;">
-          配達準備中です。お支払いは商品到着時にお願いします。
-        </p>
-      </div>
-      
+    
       <!-- Contact Info -->
       <div class="contact-box">
         <h3 style="margin-top: 0;">お問い合わせ</h3>

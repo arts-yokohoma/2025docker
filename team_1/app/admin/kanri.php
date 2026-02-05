@@ -1,4 +1,16 @@
 <?php
+declare(strict_types=1);
+require_once __DIR__ . '/auth.php';
+// Store settings (kanri): only admin, manager can manage
+requireRoles(['admin', 'manager']);
+
+// Handle logout
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+
 /**
  * Admin panel - Store management page
  * 
@@ -14,8 +26,6 @@
  * - Image upload with preview
  * - Soft deletion (deleted flag) for menu items
  */
-declare(strict_types=1);
-session_start();
 
 require_once __DIR__ . '/../config/db.php';
 
@@ -460,7 +470,15 @@ if ($res) {
 <body>
 
 <div class="layout">
-    <h2 class="logo">管理パネル</h2>
+    <div class="logo-section kanri-header">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" class="kanri-logo">
+        <h2 class="logo" style="margin: 0;">Pizza Mach - 店舗設定</h2>
+        <a href="admin.php" class="kanri-back">戻る</a>
+        <form method="post" style="margin: 0;">
+            <input type="hidden" name="action" value="logout">
+            <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+    </div>
 
     <main class="content">
         <h1>設定</h1>
@@ -565,8 +583,11 @@ if ($res) {
         </section>
 
         <!-- 商品設定 -->
-        <section class="card">
-            <h2>商品設定</h2>
+        <section class="card card-menu-section">
+            <div class="card-menu-header">
+                <h2>商品設定</h2>
+                <a href="add_menu_item.php" class="btn-add">＋ 追加</a>
+            </div>
 
             <table>
                 <thead>
@@ -631,8 +652,6 @@ if ($res) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-
-            <a href="add_menu_item.php" class="btn-add" style="text-decoration: none; display: inline-block;">＋ 追加</a>
         </section>
 
     </main>

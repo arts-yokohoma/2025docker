@@ -36,7 +36,7 @@ $customer = $_SESSION['customer'] ?? [];
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>注文</title>
+    <title>住所入力</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -220,7 +220,6 @@ $customer = $_SESSION['customer'] ?? [];
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
-                        <li class="list-inline-item"><a href="/admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>

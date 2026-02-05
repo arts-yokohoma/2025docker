@@ -1,43 +1,47 @@
 function filterByStatus(btn) {
   const status = btn.getAttribute('data-status');
-  console.log('Button clicked, filtering by:', status);
-  
+  const dateFilter = btn.getAttribute('data-date');
   // Get all rows and buttons
   const rows = document.querySelectorAll('tbody tr');
   const buttons = document.querySelectorAll('.tab-btn');
-  
-  console.log('Total rows:', rows.length);
-  
+
   // Remove active class from all buttons
-  buttons.forEach(b => {
-    b.classList.remove('active');
-  });
-  
+  buttons.forEach(b => b.classList.remove('active'));
   // Add active class to clicked button
   btn.classList.add('active');
-  console.log('Active button set');
-  
-  // Filter and show/hide rows
+
+  if (dateFilter) {
+    // Use server-provided date (Asia/Tokyo) so filter matches PHP counts
+    const targetStr = btn.getAttribute('data-target-date') || '';
+    if (!targetStr) {
+      rows.forEach(row => { row.style.display = 'table-row'; });
+      return;
+    }
+
+    let visibleCount = 0;
+    rows.forEach((row) => {
+      const rowDateStr = (row.getAttribute('data-date') || '').trim();
+      const match = rowDateStr.match(/(\d{4}-\d{2}-\d{2})/);
+      const rowDatePart = match ? match[1] : '';
+      if (rowDatePart === targetStr) {
+        row.style.display = 'table-row';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    return;
+  }
+
+  // Status filter (including 'all')
   rows.forEach(row => {
     const rowStatus = row.getAttribute('data-status');
-    console.log('Row status:', rowStatus, 'Filter:', status);
-    
-    if (status === 'all') {
-      // Show all rows
+    if (status === 'all' || rowStatus === status) {
       row.style.display = 'table-row';
-      console.log('Showing row (all)');
-    } else if (rowStatus === status) {
-      // Show matching rows
-      row.style.display = 'table-row';
-      console.log('Showing row (match)');
     } else {
-      // Hide non-matching rows
       row.style.display = 'none';
-      console.log('Hiding row');
     }
   });
-  
-  console.log('Filter complete');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

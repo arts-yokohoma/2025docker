@@ -8,6 +8,7 @@ require_once __DIR__ . '/db_config.php';
 
 $tz = new DateTimeZone('Asia/Tokyo');
 $today = (new DateTime('now', $tz))->format('Y-m-d');
+$now = new DateTime('now', $tz);
 
 try {
     // Aggregate used orders per time_slot for today (JST).
@@ -38,9 +39,19 @@ try {
         if ($capacity <= 0) {
             continue;
         }
+
+        // Disable slots that have already started (JST).
+        $slotStartRaw = (string)($row['slot_start'] ?? '');
+        $slotStartTime = substr($slotStartRaw, 0, 8);
+        if ($slotStartTime === '') {
+            $slotStartTime = '00:00:00';
+        }
+        $slotStartDt = new DateTime($today . ' ' . $slotStartTime, $tz);
+        $hasStarted = $slotStartDt <= $now;
+
         $used = $usedMap[$label] ?? 0;
         $remaining = $capacity - $used;
-        $isActive = filter_var($row['available'], FILTER_VALIDATE_BOOLEAN) && $remaining > 0;
+        $isActive = filter_var($row['available'], FILTER_VALIDATE_BOOLEAN) && $remaining > 0 && !$hasStarted;
 
         $slots[] = [
             'label' => $label,
@@ -48,6 +59,7 @@ try {
             'used' => $used,
             'remaining' => $remaining,
             'active' => $isActive,
+            'has_started' => $hasStarted,
         ];
     }
 } catch (Exception $e) {
@@ -60,7 +72,7 @@ try {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>注文</title>
+    <title>時間帯選択</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -102,6 +114,7 @@ try {
                         $label = (string)$slot['label'];
                         $active = (bool)$slot['active'];
                         $remaining = (int)$slot['remaining'];
+                        $hasStarted = (bool)($slot['has_started'] ?? false);
                         ?>
                         <div class="col-6 col-md-3">
                             <button
@@ -115,7 +128,11 @@ try {
                                     <span class="small">残り <?php echo htmlspecialchars((string)$remaining); ?></span>
                                 <?php else: ?>
                                     <span class="fs-3 fw-bold"><?php echo htmlspecialchars($label); ?></span><br>
-                                    <span class="text-danger">満席</span>
+                                    <?php if ($hasStarted): ?>
+                                        <span class="text-muted">終了</span>
+                                    <?php else: ?>
+                                        <span class="text-danger">満席</span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </button>
                         </div>
@@ -180,7 +197,6 @@ try {
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline mb-0 footer-links">
                         <li class="list-inline-item"><a href="/index.php">ホーム</a></li>
-                        <li class="list-inline-item"><a href="admin_login.php">Login</a></li>
                         <li class="list-inline-item"><a href="contact.php">お問い合わせ</a></li>
                     </ul>
                 </div>

@@ -36,6 +36,98 @@ body{
   color:#111827;
 }
 
+/* Logo section: logo, title, 戻る, ログアウト */
+.logo-section.kanri-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.kanri-logo {
+    height: 40px;
+    width: auto;
+}
+
+.kanri-back {
+    margin-left: auto;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.kanri-back:hover {
+    background: #e0e0e0;
+    color: #111;
+}
+
+.logo-section .logout-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+}
+
+.logout-btn {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #b71c1c;
+}
+
+/* add_menu_item.php header */
+.add-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.add-menu-logo { height: 40px; width: auto; }
+
+.add-menu-back {
+    margin-left: auto;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.add-menu-back:hover {
+    background: #e0e0e0;
+    color: #111;
+}
+
+.add-menu-logout {
+    padding: 8px 16px;
+    background: #d32f2f;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.add-menu-logout:hover {
+    background: #b71c1c;
+    color: #fff;
+}
+
 .content h1{
   margin: 100px 0 24px;
   font-size: 50px;
@@ -139,16 +231,40 @@ input:focus, select:focus{
 }
 .btn-save:hover{ background: var(--primary2); border-color: var(--primary2); }
 
+/* 商品設定: タイトルと「＋ 追加」を1行に */
+.card-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-menu-header h2 {
+  margin: 0;
+}
+
 .btn-add{
-  margin-top: 16px;
+  flex-shrink: 0;
+  margin: 0;
   background: #ffffff;
-  border: 1px solid rgba(37,99,235,.4);
+  border: 2px solid rgba(37,99,235,.5);
   color: var(--primary);
-  padding: 14px 20px;
+  padding: 12px 20px;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   font-size: 16px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-add:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }
 
 .btn-save-mini{
@@ -398,6 +514,148 @@ tbody tr:last-child td{ border-bottom:none; }
   flex-wrap: nowrap;
   height: 100%;
   min-height: 44px;
+}
+
+/* ===== Pizza creation block (add_menu_item) – one line ===== */
+.card.card-pizza-create {
+  padding: 28px 32px;
+}
+
+.pizza-create-form {
+  width: 100%;
+}
+
+.pizza-create-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.pizza-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pizza-field-name {
+  flex: 1 1 180px;
+  min-width: 140px;
+}
+
+.pizza-field-name input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 14px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius2);
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.pizza-field-price {
+  flex: 0 0 90px;
+}
+
+.pizza-field-price label,
+.pizza-field-name label,
+.pizza-field-photo label,
+.pizza-field-active .label-inline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.pizza-field-price input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 10px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius2);
+  font-size: 15px;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.pizza-field-photo {
+  flex: 0 0 200px;
+}
+
+.pizza-field-photo .input-file {
+  height: 48px;
+  padding: 10px 12px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius2);
+  font-size: 13px;
+  background: #fff;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pizza-field-active {
+  flex: 0 0 auto;
+  align-items: flex-start;
+}
+
+.pizza-field-active .checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+}
+
+.pizza-field-active .checkbox-wrap input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.pizza-field-active .checkbox-wrap label {
+  margin: 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pizza-create-hint {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pizza-create-form .btn-cancel {
+  background: var(--muted);
+  border: 2px solid var(--muted);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--radius2);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.pizza-create-form .btn-cancel:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .pizza-create-row {
+    gap: 12px;
+  }
+  .pizza-field-name { flex: 1 1 100%; }
+  .pizza-field-price { flex: 0 0 80px; }
+  .pizza-field-photo { flex: 1 1 100%; }
+  .pizza-field-active { flex: 0 0 auto; }
+}
+
+@media (max-width: 520px) {
+  .pizza-field-price { flex: 1 1 70px; }
 }
 
 /* flash messages */

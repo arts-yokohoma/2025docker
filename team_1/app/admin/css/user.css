@@ -1,16 +1,208 @@
-body { font-family: Arial; margin:0; background:#f4f4f4; }
-header { background:#35424a; color:#fff; padding:15px; text-align:center; }
-.container { max-width:1000px; margin:20px auto; background:#fff; padding:20px; border-radius:8px; }
-.searchBox { margin-bottom:15px; display:flex; justify-content:center; gap:10px; }
-.searchBox input { width:300px; padding:8px; }
-.link-btn { padding:8px 14px; background:#eee; border-radius:6px; text-decoration:none; color:#000; border:none; cursor:pointer; }
-table { width:100%; border-collapse:collapse; margin-top:15px; }
-th, td { border:1px solid #ccc; padding:8px; text-align:center; }
-button.link-btn:hover, a.link-btn:hover {
-     background:#a5ad5d; 
-     color:#fff;
-     transition:0.3s;
+@charset "UTF-8";
 
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
 
-    
+/* ===== Header: logo, title, 戻る, ログアウト ===== */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #333;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
+}
+
+.header .h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.back-btn {
+  margin-left: auto;
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.back-btn:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+.header .logout-btn {
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header .logout-btn:hover {
+  background: #b71c1c;
+}
+
+/* ===== Container ===== */
+.container {
+  max-width: 920px;
+  margin: 24px auto;
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+
+.flash-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: #ffebee;
+  border: 1px solid #ef5350;
+  border-left: 4px solid #c62828;
+  border-radius: 8px;
+  color: #b71c1c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.flash-error-icon { font-size: 22px; flex-shrink: 0; }
+
+.flash-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: #e8f5e9;
+  border: 1px solid #81c784;
+  border-left: 4px solid #2e7d32;
+  border-radius: 8px;
+  color: #1b5e20;
+  font-size: 14px;
+}
+
+.flash-success-icon { font-size: 18px; font-weight: bold; }
+
+.searchBox {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.searchBox input {
+  padding: 10px 14px;
+  width: 280px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.add-btn {
+  background: #1976d2;
+  color: #fff;
+  padding: 10px 18px;
+  text-decoration: none;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.add-btn:hover {
+  background: #1565c0;
+  color: #fff;
+}
+
+.link-btn {
+  padding: 6px 12px;
+  background: #f5f5f5;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.link-btn:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+.link-btn-danger {
+  background: #ffebee;
+  color: #c62828;
+  border-color: #ef5350;
+}
+
+.link-btn-danger:hover {
+  background: #ef5350;
+  color: #fff;
+  border-color: #c62828;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+th {
+  background: #37474f;
+  color: #fff;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) { background: #fafafa; }
+
+tbody tr:hover { background: #f5f5f5; }
+
+td { font-size: 14px; }

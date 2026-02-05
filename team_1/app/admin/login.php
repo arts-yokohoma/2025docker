@@ -1,11 +1,62 @@
 <?php
-$user = trim($_POST['user'] ?? '');
-$pass = trim($_POST['pass'] ?? '');
+session_start();
+require_once __DIR__ . '/../config/db.php';
+
+// If already logged in, redirect to admin panel
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header('Location: admin.php');
+    exit;
+}
+
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['password'] ?? '');
 $submitted = $_SERVER['REQUEST_METHOD'] === 'POST';
-$ok = $submitted && $user === 'pizza' && $pass === 'maha';
 $msg = '';
+$ok = false;
+
 if ($submitted) {
-    $msg = $ok ? 'ログイン成功' : 'ログイン失敗';
+    if (empty($username) || empty($password)) {
+        $msg = 'ユーザー名とパスワードを入力してください';
+    } else {
+        // Check against users table with role
+        $stmt = $mysqli->prepare("
+            SELECT u.id, u.username, u.password, r.name as role 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id 
+            WHERE u.username = ?
+        ");
+        
+        if (!$stmt) {
+            $msg = 'データベースエラー: ' . $mysqli->error;
+        } else {
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result && $user_row = $result->fetch_assoc()) {
+                if (password_verify($password, $user_row['password'])) {
+                    // Only admin, manager, kitchen, delivery can login
+                    $allowed_roles = ['admin', 'manager', 'kitchen', 'delivery'];
+                    if (!in_array($user_row['role'], $allowed_roles)) {
+                        $msg = 'このロールではログインできません';
+                    } else {
+                        $_SESSION['admin_logged_in'] = true;
+                        $_SESSION['admin_id'] = $user_row['id'];
+                        $_SESSION['admin_username'] = $user_row['username'];
+                        $_SESSION['admin_role'] = $user_row['role'];
+                        $ok = true;
+                        $msg = 'ログイン成功';
+                        header("refresh:2;url=admin.php");
+                    }
+                } else {
+                    $msg = 'ユーザー名またはパスワードが正しくありません';
+                }
+            } else {
+                $msg = 'ユーザー名またはパスワードが正しくありません';
+            }
+            $stmt->close();
+        }
+    }
 }
 ?>
 
@@ -25,10 +76,9 @@ if ($submitted) {
 </div>
 <form method="post" autocomplete="off">
 <label>ユーザー名：</label>
-<input type="text" name="user" value="<?= htmlspecialchars($user, ENT_QUOTES, 'UTF-8') ?>" required>
+<input type="text" name="username" value="<?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>" required>
 <label>パスワード：</label>
-<input type="password" name="pass" required>
-<a href="admin.php">
+<input type="password" name="password" required>
 <button type="submit">ログイン</button>
 </form>
 <?php if ($submitted): ?>

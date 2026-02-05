@@ -222,8 +222,8 @@ if ($show_timer) {
                 </div>
             </div>
 
+            <a href="index.php" class="btn btn-home">ပင်မစာမျက်နှာသို့</a>
             <?php if ($order['status'] !== 'Delivering'): ?>
-                <a href="index.php" class="btn btn-home">ပင်မစာမျက်နှာသို့</a>
             <?php endif; ?>
 
         <?php endif; ?>

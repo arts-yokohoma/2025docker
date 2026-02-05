@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($check['status'] === 'out_of_area') {
 
             $msg = '🚫 ' . $check['msg'];
-            $msg_type = 'warning'; // Warning အရောင်ပြောင်းမယ်
+            $msg_type = 'warning'; 
             // Suggestion ပါလာရင် ယူမယ်
             if (isset($check['suggestions'])) {
                 $suggestions = $check['suggestions'];
@@ -53,8 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            // SUCCESS AREA
+            // ✅ SUCCESS AREA
             $found_address = $check['address'];
+            // (FIX) Capture Distance for Kitchen Logic
+            $distance_km = isset($check['km']) ? $check['km'] : 0; 
+            
             $traffic_status = getTrafficStatus();
 
             /* ---------- Traffic Warning Check ---------- */
@@ -96,9 +99,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit; // Warning ပြပြီးရင် ကုဒ်ကို ဒီမှာ ရပ်မယ်
             }
 
-            // ✅ Redirect to order_form.php
+            // ✅ Redirect to order_form.php with Distance
             $encoded_address = urlencode($found_address);
-            header("Location: order_form.php?code=$postal_code&address=$encoded_address");
+            // (FIX) Added &dist=$distance_km
+            header("Location: order_form.php?code=$postal_code&address=$encoded_address&dist=$distance_km");
             exit();
         }
     }

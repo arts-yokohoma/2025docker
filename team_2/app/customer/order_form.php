@@ -1,58 +1,71 @@
 <?php
 // customer/order_form.php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include '../database/db_conn.php';
+require_once '../database/db_conn.php';
 
-// (A) Postal Code မပါလာရင် index ကို ပြန်မောင်းထုတ်မယ်
+// (A) Check Inputs
 if (!isset($_GET['code'])) {
     header("Location: index.php");
     exit();
 }
 
 $postal_code = htmlspecialchars($_GET['code']);
-$found_address = isset($_GET['address']) ? urldecode($_GET['address']) : '';
+$found_address = isset($_GET['address']) ? htmlspecialchars(urldecode($_GET['address'])) : '';
+$distance_km = isset($_GET['dist']) ? floatval($_GET['dist']) : 0; 
 
-// (B) System Status Calculation (Admin Config & Active Orders)
-$k_staff = 3; $d_staff = 2; 
-if (file_exists('../admin/staff_config.txt')) {
-    $staff_data = file_get_contents('../admin/staff_config.txt');
+// (B) Staff Config Load
+$k_staff = 3; 
+$d_staff = 2;
+$config_file = '../admin/staff_config.txt';
+
+if (file_exists($config_file)) {
+    $staff_data = file_get_contents($config_file);
     if(strpos($staff_data, ',') !== false) {
         list($k_staff, $d_staff) = explode(',', $staff_data);
     }
 }
 
-// Active Orders (Pending, Cooking, Delivering)
-$sql_active = "SELECT COUNT(*) as active_count FROM orders WHERE status IN ('Pending', 'Cooking', 'Delivering')";
-$res_active = $conn->query($sql_active);
-$row_active = $res_active->fetch_assoc();
-$current_active_orders = $row_active['active_count'] ?? 0;
+// (C) System Capacity Calculation (Logic ပြင်ဆင်ထားသည်)
+// ယခင်: Kitchen Load ကိုပဲ စစ်ခဲ့သည်။
+// ယခု: တဆိုင်လုံးရှိ အော်ဒါအရေအတွက် (Total Load) ကို စစ်ပါမည်။
 
-// --- DYNAMIC TIME CALCULATION (Fix Bug Here) ---
-// တွက်နည်း: (စားဖိုမှူး + ပို့ဆောင်သူ) x 2 = တပြိုင်နက် လုပ်နိုင်သော အရေအတွက်
-$max_capacity = ((int)$k_staff + (int)$d_staff) * 2;
-if ($max_capacity < 1) $max_capacity = 5; // Default safety
+// ၁။ ဆိုင်တစ်ခုလုံး လက်ခံနိုင်သော အမြင့်ဆုံးပမာဏ (Max Capacity)
+// Kitchen (၁ ယောက် ၄ ခု) + Rider (၁ ယောက် ၂ ခု) ဟု တွက်ဆလိုက်မည်
+$system_limit = ($k_staff * 4) + ($d_staff * 2); 
 
-$base_time = 30; // ပုံမှန်ကြာချိန်
+// ၂။ လက်ရှိ ဆိုင်ထဲတွင် ရှိနေသမျှ အော်ဒါများ (Pending + Cooking + Delivering)
+// Delivering ကိုပါ ထည့်တွက်မှ Rider မအားရင် System Busy ဖြစ်မည်
+$sql_load = "SELECT COUNT(*) as total FROM orders WHERE status IN ('Pending', 'Cooking', 'Delivering')";
+$res_load = $conn->query($sql_load);
+$current_load = $res_load->fetch_assoc()['total'] ?? 0;
+
+// (D) Logic Check: Load များနေရင် Distance စစ်မည်
+$base_time = 30; 
 $estimated_time = $base_time;
 $is_system_busy = false;
+$near_distance_threshold = 2.0; // 2 km
 
-// Capacity ကျော်နေရင် အချိန်တိုးမယ်
-if ($current_active_orders >= $max_capacity) {
-    $is_system_busy = true;
-    // Capacity တစ်ဆ ကျော်တိုင်း မိနစ် ၃၀ ပေါင်းမယ်
-    $overload_ratio = floor($current_active_orders / $max_capacity);
-    $estimated_time = $base_time + ($overload_ratio * 30);
+// အကယ်၍ လက်ရှိအော်ဒါပေါင်းက Limit ထက်ကျော်နေရင် (သို့) ညီနေရင်
+if ($current_load >= $system_limit) {
+    // Capacity ပြည့်နေပြီ (Busy)
+    if ($distance_km <= $near_distance_threshold) {
+        // နီးရင် လက်ခံမယ်၊ အချိန်တိုးမယ်
+        $estimated_time = 50; 
+    } else {
+        // ဝေးရင် လုံးဝလက်မခံတော့ပါ (Busy Overlay ပြမည်)
+        $is_system_busy = true;
+        $estimated_time = 60; 
+    }
 }
 
-// Traffic Logic
+// (E) Traffic Logic
+$traffic_file = '../admin/traffic_status.txt';
 $is_heavy_traffic = false;
-if (file_exists('../admin/traffic_status.txt')) {
-    $status = file_get_contents('../admin/traffic_status.txt');
-    if (trim($status) == '1') {
-        $is_heavy_traffic = true;
-        $estimated_time += 15; // Traffic ဖြစ်နေရင် ၁၅ မိနစ် ထပ်ပေါင်းမယ်
-    }
+if (file_exists($traffic_file) && trim(file_get_contents($traffic_file)) == '1') {
+    $is_heavy_traffic = true;
+    $estimated_time += 15;
 }
 ?>
 
@@ -68,12 +81,8 @@ if (file_exists('../admin/traffic_status.txt')) {
         body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; padding: 20px; }
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         
-        /* Busy Overlay CSS */
-        #busy-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.96); z-index: 9999;
-            display: flex; justify-content: center; align-items: center; text-align: center;
-        }
+        /* Busy Overlay */
+        #busy-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.96); z-index: 9999; display: flex; justify-content: center; align-items: center; text-align: center; }
         .warning-box { border: 2px solid #dc3545; padding: 30px; background: white; border-radius: 10px; max-width: 90%; }
         
         input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
@@ -88,10 +97,11 @@ if (file_exists('../admin/traffic_status.txt')) {
         <div id="busy-overlay">
             <div class="warning-box">
                 <h2 style="color: #dc3545;">⚠️ ဆိုင်အလုပ်များနေပါသည်</h2>
-                <p>လက်ရှိအော်ဒါများပြားနေသဖြင့် ပို့ဆောင်ချိန် <b><?php echo $estimated_time; ?> မိနစ်ခန့်</b> ကြာနိုင်ပါသည်။</p>
-                <p><b>စောင့်ဆိုင်းပြီး မှာယူလိုပါသလား?</b></p>
+                <p>လက်ရှိ အော်ဒါများပြည့်နေပါသည် (Current Orders: <?= $current_load ?>)</p>
+                <p>လူကြီးမင်း၏ နေရာသည် ဆိုင်နှင့် အနည်းငယ်ဝေးကွာသောကြောင့် လက်ရှိအချိန်တွင် ပို့ဆောင်ရန် ခက်ခဲနေပါသည်။</p>
+                
                 <a href="index.php" class="btn-leave">မမှာတော့ပါ</a>
-                <button onclick="document.getElementById('busy-overlay').style.display='none'" class="btn-wait">ရပါတယ်၊ စောင့်မယ်</button>
+                <button onclick="document.getElementById('busy-overlay').style.display='none'" class="btn-wait">စောင့်မှာမယ်</button>
             </div>
         </div>
     <?php endif; ?>
@@ -102,12 +112,12 @@ if (file_exists('../admin/traffic_status.txt')) {
                 <i class="fas fa-traffic-light"></i> ယာဉ်ကြောပိတ်ဆို့နေပါသည် (ကြာချိန်: <?php echo $estimated_time; ?> မိနစ်)
             </div>
         <?php elseif ($is_system_busy): ?>
-            <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffeeba;">
-                <i class="fas fa-clock"></i> အော်ဒါများနေသဖြင့် <b><?php echo $estimated_time; ?> မိနစ်</b> ခန့် ကြာပါမည်။
+             <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                <i class="fas fa-clock"></i> အော်ဒါများနေသဖြင့် <b><?= $estimated_time ?> မိနစ်</b> ခန့် ကြာပါမည်။
             </div>
         <?php else: ?>
             <div style="background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-                <i class="fas fa-check-circle"></i> မိနစ် ၃၀ အတွင်း အရောက်ပို့ဆောင်ပါမည်။
+                <i class="fas fa-check-circle"></i> မိနစ် <?= $estimated_time ?> အတွင်း အရောက်ပို့ဆောင်ပါမည်။ (အကွာအဝေး: <?= $distance_km ?> km)
             </div>
         <?php endif; ?>
 
@@ -147,17 +157,9 @@ if (file_exists('../admin/traffic_status.txt')) {
     <script>
         function finalCheck(event) {
             event.preventDefault(); 
-            
-            var name = document.getElementById('name').value;
-            var city = document.getElementById('address_city').value;
-            var detail = document.getElementById('address_detail').value;
             var size = document.getElementById('size').value;
             var qty = document.getElementById('quantity').value;
-            
-            // PHP မှ တွက်ထားသောအချိန်ကို JS သို့ ယူခြင်း
-            var estimatedTime = "<?php echo $estimated_time; ?>";
-
-            // Price Calculation
+            var estimatedTime = "<?= $estimated_time; ?>";
             var price = (size === 'S') ? 1000 : (size === 'M' ? 2000 : 3000);
             var total = price * qty;
 
@@ -165,7 +167,6 @@ if (file_exists('../admin/traffic_status.txt')) {
                 title: 'Confirm Order?',
                 html: `
                     <div style="text-align: left;">
-                        <b>Address:</b> ${city} ${detail} <br>
                         <b>Pizza:</b> ${size} x ${qty} <br>
                         <b>Est. Time:</b> <span style="color:red; font-weight:bold;">${estimatedTime} mins</span> <br>
                         <hr>

@@ -5,72 +5,82 @@ session_start();
 // ၁။ အချိန်ဇုန် ညှိခြင်း
 date_default_timezone_set('Asia/Tokyo');
 include '../database/db_conn.php';
-@include '../database/functions.php';
+
+// Functions ဖိုင်ရှိရင် ချိတ်မယ် (မရှိရင် ကျော်သွားမယ်)
+if (file_exists('../database/functions.php')) {
+    include '../database/functions.php';
+}
 
 $order = null;
 
-// ၂။ Customer Confirm Logic
+// ၂။ Customer Confirm Logic (Rider အားစေရန် အရေးကြီးသည်)
 if (isset($_POST['confirm_receive'])) {
     $order_id = intval($_POST['order_id']);
-    // Status Completed ပြောင်းမယ်၊ Received Time မှတ်မယ်
-    $conn->query("UPDATE orders SET status = 'Completed', return_time = NOW() WHERE id = $order_id");
+    // Status Completed ပြောင်းခြင်းဖြင့် Admin ဘက်မှာ Rider Slot အားသွားပါမည်
+    $stmt = $conn->prepare("UPDATE orders SET status = 'Completed', return_time = NOW() WHERE id = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
     
-    // Refresh
+    // Refresh Page
     header("Location: ?id=" . $order_id); 
     exit();
 }
 
 // ၃။ Data ဆွဲထုတ်ခြင်း
 if (isset($_POST['checkphonenumber'])) {
-    $phone = mysqli_real_escape_string($conn, $_POST['checkphonenumber']);
-    $query = "SELECT * FROM orders WHERE phonenumber = '$phone' ORDER BY id DESC LIMIT 1";
-    $result = $conn->query($query);
+    $phone = $_POST['checkphonenumber'];
+    
+    // Security Fix: Prepared Statement အသုံးပြုခြင်း
+    $stmt = $conn->prepare("SELECT * FROM orders WHERE phonenumber = ? ORDER BY id DESC LIMIT 1");
+    $stmt->bind_param("s", $phone);
+    $stmt->execute();
+    $result = $stmt->get_result();
     $order = $result->fetch_assoc();
     
     if (!$order) {
-        echo "<script>alert('❌ ဒီဖုန်းနံပါတ်နှင့် အော်ဒါမရှိပါ'); window.location.href='../customer/index.php';</script>";
+        echo "<script>alert('❌ ဒီဖုန်းနံပါတ်နှင့် အော်ဒါမရှိပါ'); window.location.href='index.php';</script>";
         exit();
     }
+    // ID ရရင် GET method နဲ့ ပြန်ခေါ်မယ် (Refresh လုပ်ရင် Form resubmit မဖြစ်အောင်)
+    header("Location: ?id=" . $order['id']);
+    exit();
+
 } elseif (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $query = "SELECT * FROM orders WHERE id = $id";
-    $result = $conn->query($query);
-    $order = $result->fetch_assoc();
+    $stmt = $conn->prepare("SELECT * FROM orders WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $order = $stmt->get_result()->fetch_assoc();
 } else {
-    header("Location: ../customer/index.php");
+    header("Location: index.php");
     exit();
 }
 
-// ၄။ Variable များ ညှိနှိုင်းခြင်း
-$c_name = $order['customer_name'] ?? $order['name'] ?? '-';
-$c_phone = $order['phonenumber'] ?? $order['phone'] ?? '-';
-// လိပ်စာ အပြည့်အစုံရရန်
-$c_address = $order['address'] ?? '';
-if(empty($c_address) && isset($order['address_city'])) {
-    $c_address = $order['address_city'] . ' ' . ($order['address_detail'] ?? '');
+if (!$order) {
+    die("❌ Error: Order Not Found");
 }
 
-$c_size = $order['pizza_type'] ?? $order['size'] ?? 'M';
+// ၄။ Variable များ ညှိနှိုင်းခြင်း
+$c_name = htmlspecialchars($order['customer_name'] ?? $order['name'] ?? '-');
+$c_phone = htmlspecialchars($order['phonenumber'] ?? $order['phone'] ?? '-');
+$c_address = htmlspecialchars($order['address'] ?? ($order['address_city'] . ' ' . $order['address_detail']) ?? '-');
+$c_size = $order['pizza_type'] ?? 'M';
 $c_qty = intval($order['quantity'] ?? 1);
 
 // ၅။ ဈေးနှုန်း တွက်ချက်ခြင်း
-$unit_price = 0;
-if ($c_size == 'S') $unit_price = 1000;
-elseif ($c_size == 'M') $unit_price = 2000;
-elseif ($c_size == 'L') $unit_price = 3000;
-
+$unit_price = ($c_size == 'S') ? 1000 : (($c_size == 'M') ? 2000 : 3000);
 $total_price = $unit_price * $c_qty;
 
 // ၆။ Status Logic
 $status_text = "";
 $status_color = "";
-$show_timer = false; // Default false
+$show_timer = false;
 
 switch ($order['status']) {
     case 'Pending':
         $status_text = "⏳ အော်ဒါ လက်ခံရရှိထားပါသည် (Waiting)";
         $status_color = "#f39c12"; // Orange
-        $show_timer = false; // Pending ဖြစ်နေတုန်း Timer မပြသေးပါ
+        $show_timer = false;
         break;
     case 'Cooking':
         $status_text = "👨‍🍳 စားဖိုမှူး ချက်ပြုတ်နေပါသည် (Cooking)";
@@ -97,23 +107,13 @@ switch ($order['status']) {
         $status_color = "grey";
 }
 
-// ၇။ Timer Calculation (မိနစ် ၃၀)
-// ၇။ Timer Calculation (FIXED)
+// ၇။ Timer Calculation
 $remaining_seconds = 0;
-
 if ($show_timer) {
-    // Plan A: start_time (ချက်ပြုတ်ချိန်) ရှိရင် ယူမယ်
-    // Plan B: မရှိရင် order_date (အော်ဒါတင်ချိန်) ကို ယူမယ်
+    // start_time ရှိရင် start_time ကိုသုံး၊ မရှိရင် order_date ကိုသုံး
     $time_string = !empty($order['start_time']) ? $order['start_time'] : $order['order_date'];
-    
-    $base_time = strtotime($time_string);
-    $target_time = $base_time + (30 * 60); // 30 Minutes
-    
-    $current_time = time(); 
-    $remaining_seconds = $target_time - $current_time;
-    
-    // အချိန်လွန်သွားရင် 0 ပဲ ပြမယ်
-    if ($remaining_seconds < 0) $remaining_seconds = 0;
+    $target_time = strtotime($time_string) + (30 * 60); // 30 Minutes
+    $remaining_seconds = max(0, $target_time - time());
 }
 ?>
 
@@ -124,42 +124,20 @@ if ($show_timer) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Status #<?php echo $order['id']; ?></title>
     
-    <?php if($order['status'] == 'Cooking' || $order['status'] == 'Delivering' || $order['status'] == 'Pending'): ?>
+    <?php if($order['status'] != 'Completed' && $order['status'] != 'Rejected'): ?>
         <meta http-equiv="refresh" content="15">
     <?php endif; ?>
 
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
         .card { background: white; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        .status-box { 
-            background-color: <?php echo $status_color; ?>; 
-            color: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            margin-bottom: 20px; 
-            font-size: 1.1em;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
+        .status-box { background-color: <?php echo $status_color; ?>; color: white; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .timer-box { font-size: 2.5em; font-weight: bold; color: #333; margin: 10px 0; }
         .details { text-align: left; margin-top: 20px; line-height: 1.8; border-top: 1px solid #ddd; padding-top: 15px; }
-        
-        .price-row { 
-            display: flex; justify-content: space-between; 
-            font-size: 1.3em; font-weight: bold; color: #2c3e50; 
-            border-top: 2px dashed #ccc; padding-top: 10px; margin-top: 10px; 
-        }
-        
+        .price-row { display: flex; justify-content: space-between; font-size: 1.3em; font-weight: bold; color: #2c3e50; border-top: 2px dashed #ccc; padding-top: 10px; margin-top: 10px; }
         .btn { display: inline-block; padding: 12px 25px; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
         .btn-home { background: #555; width: auto; margin-top: 15px; }
-
-        .reject-box {
-            background-color: #f8d7da; color: #721c24; 
-            padding: 15px; border: 1px solid #f5c6cb; 
-            border-radius: 5px; margin-bottom: 15px;
-        }
+        .reject-box { background-color: #f8d7da; color: #721c24; padding: 15px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -176,7 +154,7 @@ if ($show_timer) {
                     "<?php echo htmlspecialchars($order['reject_reason'] ?? 'ဆိုင်မှ ပယ်ဖျက်လိုက်ပါသည်'); ?>"
                 </p>
             </div>
-            <a href="../customer/index.php" class="btn btn-home">နောက်တစ်ကြိမ် ပြန်မှာရန်</a>
+            <a href="index.php" class="btn btn-home">နောက်တစ်ကြိမ် ပြန်မှာရန်</a>
 
         <?php else: ?>
             <div class="status-box">
@@ -202,25 +180,28 @@ if ($show_timer) {
                     <button type="submit" name="confirm_receive" class="btn" style="background: #27ae60;">
                         ✅ လက်ခံရရှိပါပြီ (Received)
                     </button>
+                    <p style="font-size: 12px; color: red; margin-top: 5px;">
+                        * ပစ္စည်းရရှိပါက နှိပ်ပေးရန် မေတ္တာရပ်ခံပါသည်။
+                    </p>
                 </form>
             <?php endif; ?>
 
             <div class="details">
                 <h4 style="margin-top:0;">အော်ဒါ အချက်အလက်များ</h4>
-                <p><strong>👤 အမည်:</strong> <?php echo htmlspecialchars($c_name); ?></p>
-                <p><strong>📞 ဖုန်း:</strong> <?php echo htmlspecialchars($c_phone); ?></p>
-                <p><strong>🏠 လိပ်စာ:</strong> <?php echo htmlspecialchars($c_address); ?></p>
-                <p><strong>🍕 ပီဇာ:</strong> Size <?php echo htmlspecialchars($c_size); ?> (x<?php echo $c_qty; ?>)</p>
+                <p><strong>👤 အမည်:</strong> <?php echo $c_name; ?></p>
+                <p><strong>📞 ဖုန်း:</strong> <?php echo $c_phone; ?></p>
+                <p><strong>🏠 လိပ်စာ:</strong> <?php echo $c_address; ?></p>
+                <p><strong>🍕 ပီဇာ:</strong> Size <?php echo $c_size; ?> (x<?php echo $c_qty; ?>)</p>
 
                 <div class="price-row">
                     <span>စုစုပေါင်း:</span>
                     <span style="color: green;">¥<?php echo number_format($total_price); ?></span>
                 </div>
             </div>
-                <a href="../customer/index.php" class="btn btn-home" style="margin-top: 15px;">ပင်မစာမျက်နှာသို့</a>
-            <!--<?php if ($order['status'] !== 'Delivering'): ?>
-                <a href="../customer/index.php" class="btn btn-home">ပင်မစာမျက်နှာသို့</a>
-            <?php endif; ?>-->
+
+            <?php if ($order['status'] !== 'Delivering'): ?>
+                <a href="index.php" class="btn btn-home">ပင်မစာမျက်နှာသို့</a>
+            <?php endif; ?>
 
         <?php endif; ?>
     </div>
@@ -238,13 +219,14 @@ if ($show_timer) {
             }
             let minutes = Math.floor(timeLeft / 60);
             let seconds = timeLeft % 60;
-            let mStr = minutes < 10 ? "0" + minutes : minutes;
-            let sStr = seconds < 10 ? "0" + seconds : seconds;
+            // 0:5 အစား 0:05 ဖြစ်အောင် String Pad လုပ်ခြင်း
+            let mStr = minutes.toString().padStart(2, '0');
+            let sStr = seconds.toString().padStart(2, '0');
+            
             timerElement.innerHTML = mStr + ":" + sStr;
             timeLeft--;
         }
         
-        // Start immediately and update every second
         updateTimer(); 
         setInterval(updateTimer, 1000);
     </script>

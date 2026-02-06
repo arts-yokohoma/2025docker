@@ -30,6 +30,10 @@ if (!$result) {
 }
 
 $orders = [];
+$nowTs = time();
+$todayStr = date('Y-m-d', $nowTs);
+$tomorrowStr = date('Y-m-d', strtotime('+1 day', $nowTs));
+
 while ($row = $result->fetch_assoc()) {
     // Normalize status to proper case (New, In Progress, Completed, Canceled)
     $status = strtolower($row["status"] ?? "new");
@@ -42,18 +46,44 @@ while ($row = $result->fetch_assoc()) {
     } else {
         $status = 'New';
     }
-    
+
     $deliveryRaw = $row['delivery_time'] ?? null;
     $delivery = null;
+    $createTs = strtotime($row['date']);
     if ($deliveryRaw && strtotime($deliveryRaw) !== false) {
         $delivery = date('Y-m-d H:i', strtotime($deliveryRaw));
     }
-    $createTime = date('Y-m-d H:i', strtotime($row['date']));
+    $createTime = date('Y-m-d H:i', $createTs);
+
+    // Expected delivery: delivery_time if set, else create_time + 40 minutes
+    $expectedDeliveryTs = $deliveryRaw ? strtotime($deliveryRaw) : ($createTs + 40 * 60);
+    $expectedDeliveryFormatted = date('m/d H:i', $expectedDeliveryTs);
+    $expectedDate = date('Y-m-d', $expectedDeliveryTs);
+    if ($expectedDate === $tomorrowStr) {
+        $expectedDeliveryFormatted = '明日 ' . date('H:i', $expectedDeliveryTs);
+    } elseif ($expectedDate === $todayStr) {
+        $expectedDeliveryFormatted = '今日 ' . date('H:i', $expectedDeliveryTs);
+    }
+
+    // For incomplete orders: remaining minutes until expected delivery (negative = overdue)
+    $nokoriMinutes = null;
+    $nokoriLabel = '';
+    if ($status !== 'Completed' && $status !== 'Canceled') {
+        $nokoriMinutes = (int) round(($expectedDeliveryTs - $nowTs) / 60);
+        if ($nokoriMinutes > 0) {
+            $nokoriLabel = 'のこり ' . $nokoriMinutes . '分';
+        } else {
+            $nokoriLabel = abs($nokoriMinutes) . '分すぎ';
+        }
+    }
 
     $orders[] = [
         "id" => $row["id"],
         "date" => $createTime,
         "delivery_time" => $delivery,
+        "expected_delivery" => $expectedDeliveryFormatted,
+        "expected_delivery_ts" => $expectedDeliveryTs,
+        "nokori_label" => $nokoriLabel,
         "name" => $row["name"] ?? "Unknown",
         "phone" => $row["phone"] ?? "N/A",
         "address" => $row["address"] ?? "N/A",

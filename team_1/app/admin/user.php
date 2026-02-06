@@ -120,7 +120,7 @@ if ($flashError) unset($_SESSION['flash_error']);
                 <td><?= htmlspecialchars($user['phone']) ?></td>
                 <td>
                     <a href="add_user.php?edit=<?= (int)$user['id'] ?>" class="link-btn">編集</a>
-                    <?php if ($currentUserRole === 'admin' && $currentUserId != $user['id']): ?>
+                    <?php if ($currentUserRole === 'admin' && $currentUserId != $user['id'] && $user['role'] !== 'admin'): ?>
                         <a href="user_delete.php?id=<?= (int)$user['id'] ?>" class="link-btn link-btn-danger" onclick="return confirm('本当に削除しますか？');">削除</a>
                     <?php endif; ?>
                 </td>

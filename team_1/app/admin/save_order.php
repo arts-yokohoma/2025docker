@@ -7,13 +7,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = $_POST['phone'];
     $address = $_POST['address'];
     $status = $_POST['status'];
-    
+
+    // Delivery time from form (hidden sends "Y-m-d H:i:s" from time-block UI)
+    $deliveryTimeValue = trim($_POST['delivery_time'] ?? '');
+    $deliveryTimeDb = null;
+    if ($deliveryTimeValue !== '') {
+        $ts = strtotime($deliveryTimeValue);
+        if ($ts !== false) {
+            $deliveryTimeDb = date('Y-m-d H:i:s', $ts);
+        }
+    }
+
+    // Validate delivery time is not after shop closing
+    if ($deliveryTimeDb !== null) {
+        $storeHours = ['open_time' => '11:00', 'close_time' => '22:00', 'last_order_offset_min' => 30];
+        $res = $mysqli->query("SELECT open_time, close_time, last_order_offset_min FROM store_hours WHERE id=1 AND active=1 LIMIT 1");
+        if ($res && $row = $res->fetch_assoc()) {
+            $storeHours['open_time'] = substr((string)$row['open_time'], 0, 5);
+            $storeHours['close_time'] = substr((string)$row['close_time'], 0, 5);
+            $storeHours['last_order_offset_min'] = (int)$row['last_order_offset_min'];
+            $res->free();
+        }
+        $deliveryTimeOnly = date('H:i', strtotime($deliveryTimeDb));
+        $closeTime = $storeHours['close_time'];
+        if ($deliveryTimeOnly > $closeTime) {
+            header('Location: edit_order.php?id=' . (int)$_POST['id'] . '&error=delivery_after_close');
+            exit;
+        }
+        $lastOrderMinutes = (int)substr($closeTime, 0, 2) * 60 + (int)substr($closeTime, 3, 2) - $storeHours['last_order_offset_min'];
+        $deliveryMinutes = (int)substr($deliveryTimeOnly, 0, 2) * 60 + (int)substr($deliveryTimeOnly, 3, 2);
+        if ($deliveryMinutes > $lastOrderMinutes) {
+            header('Location: edit_order.php?id=' . (int)$_POST['id'] . '&error=delivery_after_close');
+            exit;
+        }
+    }
+
     // Validate status
     $validStatuses = ['New', 'In Progress', 'Completed', 'Canceled'];
     if (!in_array($status, $validStatuses)) {
         die('Invalid status');
     }
-    
+
     // Get customer ID from order
     $getCustomerQuery = "SELECT customer_id FROM orders WHERE id = ?";
     $stmt = $mysqli->prepare($getCustomerQuery);
@@ -23,18 +57,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $row = $result->fetch_assoc();
     $customerId = $row['customer_id'];
     $stmt->close();
-    
+
     // Update customer details (including address)
     $updateCustomerQuery = "UPDATE customer SET name = ?, phone = ?, address = ? WHERE id = ?";
     $stmt = $mysqli->prepare($updateCustomerQuery);
     $stmt->bind_param('sssi', $name, $phone, $address, $customerId);
     $stmt->execute();
     $stmt->close();
-    
-    // Update order status
-    $updateOrderQuery = "UPDATE orders SET status = ? WHERE id = ?";
-    $stmt = $mysqli->prepare($updateOrderQuery);
-    $stmt->bind_param('si', $status, $orderId);
+
+    // Update order status and delivery_time
+    if ($deliveryTimeDb !== null) {
+        $updateOrderQuery = "UPDATE orders SET status = ?, delivery_time = ? WHERE id = ?";
+        $stmt = $mysqli->prepare($updateOrderQuery);
+        $stmt->bind_param('ssi', $status, $deliveryTimeDb, $orderId);
+    } else {
+        $updateOrderQuery = "UPDATE orders SET status = ?, delivery_time = NULL WHERE id = ?";
+        $stmt = $mysqli->prepare($updateOrderQuery);
+        $stmt->bind_param('si', $status, $orderId);
+    }
     $stmt->execute();
     $stmt->close();
     

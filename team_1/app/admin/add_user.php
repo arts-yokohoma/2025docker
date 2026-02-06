@@ -53,36 +53,26 @@ $role_labels = [
   'delivery' => '配達',
 ];
 
-// Load available roles (exclude admin: only manager, kitchen, delivery can be created here)
-$roles = [];
-$roleResult = $mysqli->query("SELECT id, name FROM roles WHERE name != 'admin' ORDER BY id");
-if ($roleResult) {
-  while ($role = $roleResult->fetch_assoc()) {
-    $roles[] = $role;
-  }
-  $roleResult->free();
-} else {
-  $error = 'ロールを読み込めません。roles テーブルがあるか確認し、<a href="../data/setup_roles.php">setup_roles.php</a> を実行してください。(' . htmlspecialchars($mysqli->error, ENT_QUOTES, 'UTF-8') . ')';
-}
-
 // Load user for edit mode so the form shows existing data when you click "Edit"
 $editUser = null;
+$editUserRole = null;
 if ($editId > 0) {
-  // Try full columns first (name, surname, phone)
-  $st = $mysqli->prepare("SELECT id, username, email, COALESCE(name,'') AS name, COALESCE(surname,'') AS surname, COALESCE(phone,'') AS phone, role_id FROM users WHERE id = ?");
+  // Try full columns first (name, surname, phone) - also get role name
+  $st = $mysqli->prepare("SELECT u.id, u.username, u.email, COALESCE(u.name,'') AS name, COALESCE(u.surname,'') AS surname, COALESCE(u.phone,'') AS phone, u.role_id, r.name AS role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.id = ?");
   if ($st) {
     $st->bind_param('i', $editId);
     if ($st->execute()) {
       $res = $st->get_result();
       if ($res) {
         $editUser = $res->fetch_assoc();
+        $editUserRole = $editUser['role_name'] ?? null;
       }
     }
     $st->close();
   }
   // Fallback: if columns might not exist yet, load without them
   if (!$editUser) {
-    $st2 = $mysqli->prepare("SELECT id, username, email, role_id FROM users WHERE id = ?");
+    $st2 = $mysqli->prepare("SELECT u.id, u.username, u.email, u.role_id, r.name AS role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.id = ?");
     if ($st2) {
       $st2->bind_param('i', $editId);
       if ($st2->execute()) {
@@ -92,11 +82,25 @@ if ($editId > 0) {
           $row['surname'] = '';
           $row['phone'] = '';
           $editUser = $row;
+          $editUserRole = $row['role_name'] ?? null;
         }
       }
       $st2->close();
     }
   }
+}
+
+// Load available roles - exclude admin UNLESS we're editing an admin user
+$roles = [];
+$roleFilter = ($editUserRole === 'admin') ? "" : "WHERE name != 'admin'";
+$roleResult = $mysqli->query("SELECT id, name FROM roles $roleFilter ORDER BY id");
+if ($roleResult) {
+  while ($role = $roleResult->fetch_assoc()) {
+    $roles[] = $role;
+  }
+  $roleResult->free();
+} else {
+  $error = 'ロールを読み込めません。roles テーブルがあるか確認し、<a href="../data/setup_roles.php">setup_roles.php</a> を実行してください。(' . htmlspecialchars($mysqli->error, ENT_QUOTES, 'UTF-8') . ')';
 }
 
 // Handle form submission
@@ -135,6 +139,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!$roleCheckResult->fetch_assoc()) {
         $error = 'ロールが見つかりません';
       } else {
+        // Security: Prevent changing admin users' roles or downgrading them
+        if ($isEdit && $editUserRole === 'admin') {
+          // Get the new role name to verify it's still admin
+          $newRoleCheck = $mysqli->prepare("SELECT name FROM roles WHERE id = ?");
+          if ($newRoleCheck) {
+            $newRoleCheck->bind_param("i", $role_id);
+            $newRoleCheck->execute();
+            $newRoleResult = $newRoleCheck->get_result();
+            $newRoleData = $newRoleResult->fetch_assoc();
+            $newRoleCheck->close();
+            
+            if ($newRoleData && $newRoleData['name'] !== 'admin') {
+              $error = '管理者ユーザーのロールは変更できません。セキュリティ保護のため、管理者は管理者のままである必要があります。';
+            }
+          }
+        }
+        
+        // Continue only if no error occurred
+        if (empty($error)) {
         // Duplicate check (exclude current user in edit mode)
         $excludeId = $isEdit ? $editId : 0;
         $dupUser = $mysqli->prepare("SELECT 1 FROM users WHERE username = ? AND id != ? LIMIT 1");
@@ -191,6 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $stmt->close();
             }
           }
+        }
         }
       }
       $roleCheck->close();

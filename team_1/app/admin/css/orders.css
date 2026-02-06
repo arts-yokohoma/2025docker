@@ -167,6 +167,21 @@ h2.page-title{
 .orders th, .orders td {
   text-align: left;
   padding: 12px;
+}
+
+/* 配達時間: expected time + のこり/遅れ (red when order not complete) */
+.orders .td-delivery {
+  white-space: nowrap;
+}
+.orders .td-delivery .expected-time {
+  display: block;
+}
+.orders .td-delivery .nokori {
+  font-size: 13px;
+}
+.orders .td-delivery .nokori-red {
+  color: #c62828;
+  font-weight: 600;
   border-bottom: 1px solid #ddd;
 }
 
@@ -277,7 +292,7 @@ tbody tr:not(.visible) {
 
 /* Semantic color helpers */
 .btn.blue{ background:var(--primary); color:#fff; }
-.btn.blue:before{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z'/%3E%3C/svg%3E"); }
+.btn.blue.status-btn:before{ display: none; } /* Hide camera icon for status buttons - use Material Icons instead */
 
 .btn.yellow{ background:var(--warning); color:#78350f; }
 .btn.yellow:before{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b45309'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E"); }
@@ -289,10 +304,10 @@ tbody tr:not(.visible) {
 .btn.red{ background:var(--danger); color:#fff; padding:8px; border-radius:50%; width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
 .btn.red:hover:not(:disabled){ background:#dc2626; }
 
-/* Cancel button (override): grey, centered ❌ */
+/* Cancel button: bright red, centered ❌ */
 .btn.red.cancel-btn,
 .cancel-btn{
-  background:#6b7280; /* neutral grey */
+  background:#ef4444;
   color:#fff;
   padding:0;
   width:40px;
@@ -310,14 +325,14 @@ tbody tr:not(.visible) {
 .cancel-btn:before{ display:none; }
 .btn.red.cancel-btn:hover:not(:disabled),
 .cancel-btn:hover:not(:disabled){
-  background:#545b63; /* darker grey on hover */
+  background:#dc2626;
   transform:translateY(-2px);
-  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  box-shadow:0 6px 18px rgba(239,68,68,0.35);
 }
 
-/* Edit button: centered, pill-style */
+/* Edit button: bright blue, pill-style */
 .edit-btn{
-  background:#6b7280;
+  background:#2563eb;
   color:#fff;
   display:inline-flex;
   align-items:center;
@@ -339,9 +354,37 @@ tbody tr:not(.visible) {
 .edit-btn:before{ display:none; }
 
 .edit-btn:hover:not(:disabled){
-  background:#4b5563;
+  background:#1d4ed8;
   transform:translateY(-2px);
-  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  box-shadow:0 6px 18px rgba(37,99,235,0.35);
+}
+
+/* Material Symbols icons in buttons */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 20;
+  font-size: 18px;
+  vertical-align: middle;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Icon sizing for different button types */
+.btn .material-symbols-outlined {
+  font-size: 20px;
+  margin-right: 4px;
+}
+
+.cancel-btn .material-symbols-outlined {
+  font-size: 20px;
+  margin: 0;
+}
+
+.edit-btn .material-symbols-outlined {
+  font-size: 18px;
 }
 
 /* -----------------------------

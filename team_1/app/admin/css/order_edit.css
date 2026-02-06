@@ -80,23 +80,24 @@ body {
 .title {
     font-size: 28px;
     font-weight: 700;
-    color: #060606;
+    color: #334155;
     letter-spacing: -0.5px;
 }
 
 .subtitle {
-    color: #94A3B8;
+    color: #64748b;
     margin-top: 8px;
     font-size: 14px;
 }
 
-/* Card */
+/* Card - light */
 .card {
-    background: #1E293B;
-    border: 1px solid rgba(6, 6, 6, 0.08);
-    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
     padding: 24px;
     margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 .card-header {
@@ -109,7 +110,7 @@ body {
 .card-title {
     font-size: 18px;
     font-weight: 600;
-    color: #F8FAFC;
+    color: #334155;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -117,6 +118,47 @@ body {
 
 .icon {
     font-size: 20px;
+}
+
+/* Delivery time edit: date + time blocks (within store hours) */
+.delivery-time-edit {
+    margin-top: 8px;
+}
+.delivery-time-edit .input-field {
+    max-width: 280px;
+}
+.delivery-time-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    margin-top: 8px;
+}
+.delivery-date-row,
+.delivery-time-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.delivery-time-edit .block-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+.delivery-time-note {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+.alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
 }
 
 /* Status Bar */
@@ -128,7 +170,7 @@ body {
 }
 
 .status-label {
-    color: #94A3B8;
+    color: #64748b;
     font-size: 14px;
     font-weight: 500;
 }
@@ -164,18 +206,19 @@ body {
 }
 
 .status-select {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px 16px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
     cursor: pointer;
     outline: none;
 }
 
 .status-select option {
-    background: #1E293B;
+    background: #fff;
+    color: #334155;
 }
 
 /* Buttons */
@@ -189,10 +232,30 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .btn-edit:hover {
     background: rgba(59, 130, 246, 0.2);
+}
+
+/* Material Symbols icons in buttons */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 20;
+  font-size: 18px;
+  vertical-align: middle;
+  display: inline-block;
+  line-height: 1;
+}
+
+.btn-edit .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .btn-add-product {
@@ -216,7 +279,7 @@ body {
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
-    color: #343ec9;
+    color: #fff;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -229,11 +292,11 @@ body {
 }
 
 .btn-secondary {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px 20px;
-    color: #94A3B8;
+    color: #64748b;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -241,7 +304,8 @@ body {
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f8fafc;
+    border-color: #cbd5e1;
 }
 
 .btn-delete {
@@ -290,13 +354,13 @@ body {
 }
 
 .field-label {
-    color: #64748B;
+    color: #64748b;
     font-size: 12px;
     font-weight: 500;
 }
 
 .field-value {
-    color: #F8FAFC;
+    color: #334155;
     margin-top: 4px;
     font-size: 15px;
 }
@@ -317,7 +381,7 @@ body {
 
 .input-label {
     display: block;
-    color: #94A3B8;
+    color: #64748b;
     font-size: 12px;
     margin-bottom: 6px;
     font-weight: 500;
@@ -325,24 +389,24 @@ body {
 
 .input-field {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 12px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
 }
 
 .input-field:focus {
-    border-color: rgba(59, 130, 246, 0.5);
+    border-color: #3b82f6;
 }
 
-/* Product Search */
+/* Product Search - light */
 .product-search {
-    background: rgba(15, 23, 42, 0.95);
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 20px;
@@ -350,18 +414,18 @@ body {
 
 .search-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 12px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
     outline: none;
     margin-bottom: 12px;
 }
 
 .search-input:focus {
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: #8b5cf6;
 }
 
 .product-list {
@@ -377,12 +441,12 @@ body {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
 }
 
 .product-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f1f5f9;
 }
 
 .product-item.hidden {
@@ -397,18 +461,18 @@ body {
 .btn-close-search {
     width: 100%;
     margin-top: 12px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px;
-    color: #94A3B8;
+    color: #64748b;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .btn-close-search:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f8fafc;
 }
 
 /* Table */
@@ -422,29 +486,29 @@ body {
 }
 
 .items-table thead tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .items-table th {
     text-align: left;
     padding: 12px 8px;
-    color: #64748B;
+    color: #64748b;
     font-size: 12px;
     font-weight: 600;
 }
 
 .items-table tbody tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .items-table td {
     padding: 16px 8px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
 }
 
 .item-name {
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
 }
 
@@ -457,7 +521,7 @@ body {
 }
 
 .price-cell {
-    color: #94A3B8;
+    color: #64748b;
 }
 
 .subtotal-cell {
@@ -474,10 +538,10 @@ body {
 .qty-btn {
     width: 28px;
     height: 28px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 6px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 16px;
     cursor: pointer;
     display: flex;
@@ -487,23 +551,23 @@ body {
 }
 
 .qty-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #e2e8f0;
 }
 
 .qty-input {
     width: 50px;
     text-align: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 6px;
     padding: 6px;
-    color: #F8FAFC;
+    color: #334155;
     font-size: 14px;
     outline: none;
 }
 
 .qty-input:focus {
-    border-color: rgba(59, 130, 246, 0.5);
+    border-color: #3b82f6;
 }
 
 /* Remove number input arrows */
@@ -517,23 +581,23 @@ body {
     -moz-appearance: textfield;
 }
 
-/* Totals */
+/* Totals - light */
 .totals-section {
     margin-top: 24px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid #e2e8f0;
 }
 
 .total-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
-    color: #94A3B8;
+    color: #64748b;
     font-size: 14px;
 }
 
 .total-row span:last-child {
-    color: #F8FAFC;
+    color: #334155;
 }
 
 .total-final {
@@ -541,19 +605,20 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background: rgba(16, 185, 129, 0.1);
+    background: #ecfdf5;
     border-radius: 12px;
     margin-top: 8px;
+    border: 1px solid #a7f3d0;
 }
 
 .total-final span:first-child {
-    color: #F8FAFC;
+    color: #334155;
     font-size: 16px;
     font-weight: 600;
 }
 
 .total-final span:last-child {
-    color: #10B981;
+    color: #059669;
     font-size: 24px;
     font-weight: 700;
 }
@@ -567,11 +632,11 @@ body {
 }
 
 .btn-secondary-large {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 14px 32px;
-    color: #94A3B8;
+    color: #64748b;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -581,7 +646,8 @@ body {
 }
 
 .btn-secondary-large:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f8fafc;
+    border-color: #cbd5e1;
 }
 
 .btn-save-large {
@@ -602,23 +668,23 @@ body {
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
 }
 
-/* Scrollbar Styling */
+/* Scrollbar - light */
 .product-list::-webkit-scrollbar {
     width: 8px;
 }
 
 .product-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: #f1f5f9;
     border-radius: 4px;
 }
 
 .product-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: #cbd5e1;
     border-radius: 4px;
 }
 
 .product-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: #94a3b8;
 }
 
 /* Responsive Design */

@@ -8,11 +8,12 @@ if (!isset($_GET['id'])) {
 
 $orderId = (int)$_GET['id'];
 
-// Fetch order with customer and items details
+// Fetch order with customer and items details (including delivery_time for editing)
 $query = "
 SELECT 
   o.id,
   o.create_time as date,
+  o.delivery_time,
   c.name,
   c.phone,
   c.address,
@@ -61,14 +62,161 @@ while ($menuItem = $menuResult->fetch_assoc()) {
     $menuItems[] = $menuItem;
 }
 
+// Load store hours and build delivery time slots (same logic as cart)
+$storeHours = [
+    'open_time' => '11:00',
+    'close_time' => '22:00',
+    'last_order_offset_min' => 30,
+];
+$res = $mysqli->query("SELECT open_time, close_time, last_order_offset_min 
+                       FROM store_hours WHERE id=1 AND active=1 LIMIT 1");
+if ($res && $row = $res->fetch_assoc()) {
+    $storeHours['open_time'] = substr((string)$row['open_time'], 0, 5);
+    $storeHours['close_time'] = substr((string)$row['close_time'], 0, 5);
+    $storeHours['last_order_offset_min'] = (int)$row['last_order_offset_min'];
+    $res->free();
+}
+
+date_default_timezone_set('Asia/Tokyo');
+$now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
+$currentTime = $now->format('H:i');
+$currentMinutes = (int)$now->format('H') * 60 + (int)$now->format('i');
+[$openH, $openM] = explode(':', $storeHours['open_time']);
+[$closeH, $closeM] = explode(':', $storeHours['close_time']);
+$openMinutes = (int)$openH * 60 + (int)$openM;
+$closeMinutes = (int)$closeH * 60 + (int)$closeM;
+$isStoreOpen = ($currentMinutes >= $openMinutes && $currentMinutes < $closeMinutes);
+$todayClose = clone $now;
+$todayClose->setTime((int)$closeH, (int)$closeM, 0);
+$lastOrderTime = clone $todayClose;
+$lastOrderTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
+$canOrderToday = ($now < $lastOrderTime);
+$minDeliveryTime = clone $now;
+$minDeliveryTime->modify('+30 minutes');
+if (!$canOrderToday || !$isStoreOpen) {
+    $todayOpen = clone $now;
+    $todayOpen->setTime((int)$openH, (int)$openM, 0);
+    if ($todayOpen < $now) {
+        $todayOpen->modify('+1 day');
+    }
+    $minDeliveryTime = clone $todayOpen;
+    $minDeliveryTime->modify('+30 minutes');
+}
+
+$availableTimesByDate = [];
+$dates = ['today' => clone $now, 'tomorrow' => clone $now, 'day_after' => clone $now];
+$dates['tomorrow']->modify('+1 day');
+$dates['day_after']->modify('+2 days');
+$deliveryTimeMinutes = 30;
+
+foreach ($dates as $key => $date) {
+    $dayStart = clone $date;
+    $dayStart->setTime((int)$openH, (int)$openM, 0);
+    $dayEnd = clone $date;
+    $dayEnd->setTime((int)$closeH, (int)$closeM, 0);
+    $lastDeliveryTime = clone $dayEnd;
+    $lastDeliveryTime->modify('-' . $storeHours['last_order_offset_min'] . ' minutes');
+    if ($key === 'today') {
+        $dayMinTime = clone $minDeliveryTime;
+        if ($dayMinTime->format('Y-m-d') !== $date->format('Y-m-d')) {
+            continue;
+        }
+    } else {
+        $dayMinTime = clone $dayStart;
+        $dayMinTime->modify('+' . $deliveryTimeMinutes . ' minutes');
+    }
+    $times = [];
+    if ($dayMinTime > $lastDeliveryTime) {
+        continue;
+    }
+    $current = clone $dayMinTime;
+    $interval = new DateInterval('PT15M');
+    $currentMinutesVal = (int)$current->format('i');
+    $remainder = $currentMinutesVal % 15;
+    if ($remainder > 0) {
+        $roundUp = 15 - $remainder;
+        $current->modify('+' . $roundUp . ' minutes');
+    }
+    if ($current <= $lastDeliveryTime) {
+        while ($current <= $lastDeliveryTime) {
+            $times[] = $current->format('H:i');
+            $current->add($interval);
+            if (count($times) > 100) break;
+        }
+    } elseif ($dayMinTime <= $lastDeliveryTime) {
+        $times[] = $lastDeliveryTime->format('H:i');
+    }
+    if (!empty($times)) {
+        $availableTimesByDate[$key] = $times;
+    }
+}
+
+$dateLabels = ['today' => '今日', 'tomorrow' => '明日', 'day_after' => '明後日'];
+$dateOptions = [];
+foreach ($dateLabels as $key => $label) {
+    if (isset($availableTimesByDate[$key])) {
+        $dateOptions[] = [
+            'key' => $key,
+            'label' => $label,
+            'date' => $dates[$key]->format('Y-m-d'),
+        ];
+    }
+}
+
+$deliveryTime = $orderData['delivery_time'] ?? null;
+$deliveryTimeDb = $deliveryTime ? date('Y-m-d H:i:s', strtotime($deliveryTime)) : null;
+$initialDateKey = null;
+$initialTimeSlot = null;
+if ($deliveryTime && strtotime($deliveryTime) !== false) {
+    $dt = new DateTime($deliveryTime, new DateTimeZone('Asia/Tokyo'));
+    $deliveryDateStr = $dt->format('Y-m-d');
+    $deliveryTimeStr = $dt->format('H:i');
+    foreach ($dateOptions as $opt) {
+        if ($opt['date'] === $deliveryDateStr && isset($availableTimesByDate[$opt['key']])) {
+            $slots = $availableTimesByDate[$opt['key']];
+            if (in_array($deliveryTimeStr, $slots)) {
+                $initialDateKey = $opt['key'];
+                $initialTimeSlot = $deliveryTimeStr;
+                break;
+            }
+            $initialDateKey = $opt['key'];
+            $initialTimeSlot = $slots[0];
+            break;
+        }
+    }
+}
+if ($initialDateKey === null && !empty($dateOptions)) {
+    $initialDateKey = $dateOptions[0]['key'];
+    $initialTimeSlot = $availableTimesByDate[$initialDateKey][0] ?? null;
+}
+$initialDeliveryValue = '';
+if ($initialDateKey && $initialTimeSlot) {
+    $d = $dates[$initialDateKey] ?? null;
+    if ($d) {
+        $d->setTime((int)substr($initialTimeSlot, 0, 2), (int)substr($initialTimeSlot, 3, 2), 0);
+        $initialDeliveryValue = $d->format('Y-m-d H:i:s');
+    }
+}
+if ($initialDeliveryValue === '' && !empty($dateOptions)) {
+    $firstOpt = $dateOptions[0];
+    $firstSlots = $availableTimesByDate[$firstOpt['key']];
+    $t = $firstSlots[0] ?? null;
+    if ($t) {
+        $d = clone $dates[$firstOpt['key']];
+        $d->setTime((int)substr($t, 0, 2), (int)substr($t, 3, 2), 0);
+        $initialDeliveryValue = $d->format('Y-m-d H:i:s');
+    }
+}
+
 $orderToEdit = [
     'id' => $orderData['id'],
     'date' => date('Y-m-d H:i', strtotime($orderData['date'])),
+    'delivery_time' => $deliveryTime ? date('Y-m-d H:i', strtotime($deliveryTime)) : null,
     'name' => $orderData['name'] ?? 'Unknown',
     'phone' => $orderData['phone'] ?? 'N/A',
     'address' => $orderData['address'] ?? 'N/A',
     'status' => $orderData['status'] ?? 'New',
-    'customer_id' => $orderData['customer_id']
+    'customer_id' => $orderData['customer_id'],
 ];
 
 $ORDER_STATUSES = [
@@ -116,6 +264,8 @@ foreach ($menuItems as $m) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>注文編集 - <?= htmlspecialchars($orderToEdit['id']) ?></title>
+    <!-- Material Symbols for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="css/order_edit.css">
     <style>
         /* Ensure back button visible and positioned correctly */
@@ -158,9 +308,56 @@ foreach ($menuItems as $m) {
             </div>
         </div>
 
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'delivery_after_close'): ?>
+            <div class="alert alert-error">
+                配達時間は営業終了後には設定できません。営業時間内の枠を選んでください。
+            </div>
+        <?php endif; ?>
+
         <form method="POST" action="save_order.php" id="orderForm">
             <input type="hidden" name="id" value="<?= $orderToEdit['id'] ?>">
             <input type="hidden" name="customer_id" value="<?= $orderToEdit['customer_id'] ?>">
+
+            <!-- Delivery time: date + time blocks (within store hours) -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">🕐</span>
+                        配達時間
+                    </h2>
+                </div>
+                <div class="delivery-time-edit">
+                    <input type="hidden" name="delivery_time" id="deliveryTimeHidden" value="<?= htmlspecialchars($initialDeliveryValue) ?>">
+                    <label class="input-label">お届け予定日時（営業時間内の枠から選択）</label>
+                    <div class="delivery-time-blocks">
+                        <div class="delivery-date-row">
+                            <label class="block-label">日付</label>
+                            <select id="delivery-date" class="input-field delivery-date-select">
+                                <?php foreach ($dateOptions as $opt): ?>
+                                    <option value="<?= htmlspecialchars($opt['key']) ?>"
+                                            data-date="<?= htmlspecialchars($opt['date']) ?>"
+                                            <?= $initialDateKey === $opt['key'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($opt['label']) ?> (<?= $opt['date'] ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="delivery-time-row">
+                            <label class="block-label">時間</label>
+                            <select id="delivery-time-slot" class="input-field delivery-time-select">
+                                <?php
+                                $slotsForInitial = $initialDateKey ? ($availableTimesByDate[$initialDateKey] ?? []) : [];
+                                foreach ($slotsForInitial as $slot):
+                                    $sel = ($slot === $initialTimeSlot) ? ' selected' : '';
+                                ?>
+                                    <option value="<?= htmlspecialchars($slot) ?>"<?= $sel ?>><?= htmlspecialchars($slot) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="delivery-time-note">※営業終了後の時間は選択できません。</p>
+                </div>
+            </div>
 
             <!-- Status Block -->
             <div class="card">
@@ -193,7 +390,7 @@ foreach ($menuItems as $m) {
                         <span class="icon">👤</span>
                         顧客情報
                     </h2>
-                    <button type="button" class="btn-edit" id="editCustomerBtn">✏️ 編集</button>
+                    <button type="button" class="btn-edit" id="editCustomerBtn"><span class="material-symbols-outlined">edit</span> 編集</button>
                 </div>
 
                 <div id="customerView" class="customer-view">
@@ -345,7 +542,50 @@ foreach ($menuItems as $m) {
         // Menu items data for JavaScript
         var menuData = <?= json_encode($menuDataForJs) ?>;
         var ORDER_STATUSES = <?= json_encode($ORDER_STATUSES) ?>;
+        // Delivery time blocks: date key -> list of time slots (HH:MM)
+        var deliverySlotsByDate = <?= json_encode($availableTimesByDate) ?>;
+        var deliveryDateOptions = <?= json_encode(array_map(function ($o) { return ['key' => $o['key'], 'date' => $o['date']]; }, $dateOptions)) ?>;
     </script>
     <script src="./order_edit.js"></script>
+    <script>
+        (function() {
+            var dateSelect = document.getElementById('delivery-date');
+            var timeSelect = document.getElementById('delivery-time-slot');
+            var hidden = document.getElementById('deliveryTimeHidden');
+            function getSelectedDate() {
+                var opt = dateSelect.options[dateSelect.selectedIndex];
+                return opt ? opt.getAttribute('data-date') : '';
+            }
+            function setHiddenValue(dateStr, timeStr) {
+                if (dateStr && timeStr) {
+                    hidden.value = dateStr + ' ' + timeStr + ':00';
+                }
+            }
+            function fillTimeSlots(dateKey) {
+                var slots = deliverySlotsByDate[dateKey] || [];
+                var current = timeSelect.value;
+                timeSelect.innerHTML = '';
+                slots.forEach(function(t) {
+                    var o = document.createElement('option');
+                    o.value = t;
+                    o.textContent = t;
+                    timeSelect.appendChild(o);
+                });
+                if (slots.length && current && slots.indexOf(current) !== -1) {
+                    timeSelect.value = current;
+                } else if (slots.length) {
+                    timeSelect.value = slots[0];
+                }
+                setHiddenValue(getSelectedDate(), timeSelect.value);
+            }
+            dateSelect.addEventListener('change', function() {
+                var key = dateSelect.value;
+                fillTimeSlots(key);
+            });
+            timeSelect.addEventListener('change', function() {
+                setHiddenValue(getSelectedDate(), timeSelect.value);
+            });
+        })();
+    </script>
 </body>
 </html>

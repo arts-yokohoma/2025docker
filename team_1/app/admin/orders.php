@@ -37,6 +37,8 @@ foreach ($orders as $order) {
 <head>
   <meta charset="UTF-8">
   <title>注文ページ</title>
+  <!-- Material Symbols for icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <!-- Cache-busted stylesheet to force reload after CSS changes -->
   <link rel="stylesheet" href="css/orders.css?v=<?= filemtime(__DIR__ . '/css/orders.css') ?>">
   <!-- Temporary debug styles: force completed styles to confirm CSS is applied (remove after verification) -->
@@ -82,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
   <thead>
     <tr>
       <th>注文番号</th>
-      <th>日時</th>
+      <th>配達時間</th>
       <th>顧客名</th>
       <th>注文詳細</th>
       <th>合計金額</th>
@@ -92,10 +94,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
     </tr>
   </thead>
   <tbody>
-    <?php foreach ($orders as $order): ?>
+    <?php foreach ($orders as $order):
+      $isIncomplete = $order["status"] !== "Completed" && $order["status"] !== "Canceled";
+      $nokori = $order["nokori_label"] ?? '';
+    ?>
       <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>" data-date="<?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?>">
         <td>#<?= $order["id"] ?></td>
-        <td><?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?></td>
+        <td class="td-delivery">
+          <span class="expected-time"><?= htmlspecialchars($order["expected_delivery"] ?? ($order["delivery_time"] ?? $order["date"])) ?></span>
+          <?php if ($nokori !== ''): ?>
+            <br><span class="nokori <?= $isIncomplete ? 'nokori-red' : '' ?>"><?= htmlspecialchars($nokori) ?></span>
+          <?php endif; ?>
+        </td>
         <td>
           <?= $order["name"] ?><br>
           <small><?= $order["phone"] ?></small><br>
@@ -110,10 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
         </td>
         <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
-            <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル">❌</button>
+            <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル"><span class="material-symbols-outlined">close</span></button>
 
             <?php if ($order["status"] === "New"): ?>
-              <button class="btn blue status-btn" data-id="<?= $order["id"] ?>" data-next="In Progress">調理開始</button>
+              <button class="btn blue status-btn" data-id="<?= $order["id"] ?>" data-next="In Progress"><span class="material-symbols-outlined">local_pizza</span> 調理開始</button>
             <?php elseif ($order["status"] === "In Progress"): ?>
               <button class="btn yellow status-btn" data-id="<?= $order["id"] ?>" data-next="Completed">完了にする</button>
             <?php endif; ?>
@@ -121,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
         </td>
         <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
-            <button class="btn edit-btn" data-id="<?= $order["id"] ?>">編集</button>
+            <button class="btn edit-btn" data-id="<?= $order["id"] ?>"><span class="material-symbols-outlined">edit</span> 編集</button>
           <?php endif; ?>
         </td>
       </tr>

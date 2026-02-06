@@ -95,55 +95,68 @@ $savedPriceL = $_POST['price_l'] ?? '';
 <body>
 
 <div class="layout">
-    <div class="add-menu-header">
-        <img src="../assets/image/logo.png" alt="Pizza Mach" class="add-menu-logo">
+    <div class="logo-section kanri-header">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" class="kanri-logo">
         <h2 class="logo" style="margin: 0;">Pizza Mach - 新規商品追加</h2>
-        <a href="kanri.php" class="add-menu-back">戻る</a>
-        <a href="logout.php" class="add-menu-logout">ログアウト</a>
+        <a href="kanri.php" class="kanri-back">戻る</a>
+        <a href="logout.php" class="logout-btn" style="text-decoration: none;">ログアウト</a>
     </div>
 
     <main class="content">
-        <h1>新規商品追加</h1>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">新規商品追加</h1>
+                <p class="page-subtitle">Add New Menu Item</p>
+            </div>
+        </div>
 
         <?php if ($flashErr): ?>
-            <div class="flash err"><?= h($flashErr) ?></div>
+            <div class="flash err">✕ <?= h($flashErr) ?></div>
         <?php endif; ?>
 
-        <section class="card card-pizza-create">
-            <form method="post" enctype="multipart/form-data" class="pizza-create-form">
-                <div class="pizza-create-row">
-                    <div class="pizza-field pizza-field-name">
-                        <label for="name">商品名 <span class="required">*</span></label>
-                        <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100" placeholder="例: マルゲリータ">
-                    </div>
-                    <div class="pizza-field pizza-field-price">
-                        <label for="price_s">S (円)</label>
+        <section class="card">
+            <div class="card-header">
+                <h2><span class="card-icon" style="background: var(--success-alpha); color: var(--success);">➕</span> 商品情報入力</h2>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">商品名 <span style="color: var(--danger);">*</span></label>
+                    <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100" placeholder="例: マルゲリータ">
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="price_s">Sサイズ価格 (円)</label>
                         <input type="number" name="price_s" id="price_s" value="<?= h($savedPriceS) ?>" min="0" step="1" placeholder="0">
                     </div>
-                    <div class="pizza-field pizza-field-price">
-                        <label for="price_m">M (円)</label>
+                    <div class="form-group">
+                        <label for="price_m">Mサイズ価格 (円)</label>
                         <input type="number" name="price_m" id="price_m" value="<?= h($savedPriceM) ?>" min="0" step="1" placeholder="0">
                     </div>
-                    <div class="pizza-field pizza-field-price">
-                        <label for="price_l">L (円)</label>
+                    <div class="form-group">
+                        <label for="price_l">Lサイズ価格 (円)</label>
                         <input type="number" name="price_l" id="price_l" value="<?= h($savedPriceL) ?>" min="0" step="1" placeholder="0">
                     </div>
-                    <div class="pizza-field pizza-field-photo">
-                        <label for="photo">画像 <span class="required">*</span></label>
-                        <input type="file" name="photo" id="photo" accept="image/*" required class="input-file">
-                    </div>
-                    <div class="pizza-field pizza-field-active">
-                        <label class="label-inline">表示</label>
-                        <div class="checkbox-wrap">
-                            <input type="checkbox" name="active" id="active_new" checked>
-                            <label for="active_new">ON</label>
-                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo">商品画像 <span style="color: var(--danger);">*</span></label>
+                    <input type="file" name="photo" id="photo" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="active" id="active_new" checked>
+                        <label for="active_new">公開する（チェックを外すと非公開になります）</label>
                     </div>
                 </div>
-                <p class="pizza-create-hint">価格は少なくとも1つ入力してください。</p>
+
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 16px 0;">※ 価格は少なくとも1つのサイズを入力してください。</p>
+
                 <div class="form-footer">
-                    <a href="kanri.php" class="btn-cancel">キャンセル</a>
-                    <button type="submit" class="btn-save">保存</button>
+                    <a href="kanri.php" class="btn btn-cancel">キャンセル</a>
+                    <button type="submit" class="btn btn-primary">商品を追加</button>
                 </div>
             </form>
         </section>

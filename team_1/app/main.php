@@ -175,8 +175,8 @@
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.5fr 2fr;
-            gap: 4rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -184,33 +184,21 @@
         .footer-logo {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-        }
-
-        .footer-logo-img {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            object-fit: cover;
+            gap: 0.5rem;
         }
 
         .footer-brand {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
-            margin: 0;
+            margin: 0 0 0.5rem 0;
             letter-spacing: -0.5px;
         }
 
         .footer-tagline {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.7;
             margin: 0;
-        }
-
-        .footer-links {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            line-height: 1.5;
         }
 
         .footer-section h4 {
@@ -270,10 +258,6 @@
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 2rem;
-            }
-
-            .footer-links {
-                grid-template-columns: 1fr;
             }
 
             nav {
@@ -382,27 +366,24 @@
 
         <footer>
             <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="./assets/image/logo.png" alt="Pizza Mach" class="footer-logo-img">
+                <div class="footer-section footer-logo">
                     <p class="footer-brand">Pizza Mach</p>
                     <p class="footer-tagline">シンプルに、美味しく、あなたのために</p>
                 </div>
-                <div class="footer-links">
-                    <div class="footer-section">
-                        <h4>メニュー</h4>
-                        <a href="index.php">ピザメニュー</a>
-                        <a href="index.php">注文する</a>
-                    </div>
-                    <div class="footer-section">
-                        <h4>店舗情報</h4>
-                        <a href="#about">ピザマッハについて</a>
-                        <p>横浜市中区<br>11:00 - 22:00</p>
-                    </div>
-                    <div class="footer-section">
-                        <h4>お問い合わせ</h4>
-                        <a href="tel:0451234567">045-123-4567</a>
-                        <a href="mailto:hello@pizzamach.jp">hello@pizzamach.jp</a>
-                    </div>
+                <div class="footer-section">
+                    <h4>メニュー</h4>
+                    <a href="index.php">ピザメニュー</a>
+                    <a href="index.php">注文する</a>
+                </div>
+                <div class="footer-section">
+                    <h4>店舗情報</h4>
+                    <a href="#about">ピザマッハについて</a>
+                    <p>横浜市中区<br>11:00 - 22:00</p>
+                </div>
+                <div class="footer-section">
+                    <h4>お問い合わせ</h4>
+                    <a href="tel:0451234567">045-123-4567</a>
+                    <a href="mailto:hello@pizzamach.jp">hello@pizzamach.jp</a>
                 </div>
             </div>
             <div class="footer-bottom">

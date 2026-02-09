@@ -147,12 +147,13 @@ if ($menuRes) {
                     <form method="post" action="order_create.php" id="orderForm">
                         <input type="hidden" name="cart_json" id="cartJson">
                         <button type="submit" id="submitBtn" class="btn-proceed">注文を確定する</button>
+                        <div class="sidebar-card">
+                    <a href="cart.php" class="btn-back-cart">← カートへ戻る</a>
+                </div>
                     </form>
                 </div>
                 
-                <div class="sidebar-card">
-                    <a href="cart.php" class="btn-back-cart">← カートへ戻る</a>
-                </div>
+                
             </div>
         </div>
     </div>

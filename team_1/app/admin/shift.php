@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/../config/db.php';
-// Shifts: admin, manager (RW), kitchen, delivery (read-only)
-requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+// Shifts: admin, manager (RW), kitchen, driver (read-only)
+requireRoles(['admin', 'manager', 'kitchen', 'driver']);
 
 $userRole = $_SESSION['admin_role'] ?? 'user';
 $canEdit = in_array($userRole, ['admin', 'manager']);

@@ -154,7 +154,7 @@ $traffic_mode = file_exists('traffic_status.txt') ? file_get_contents('traffic_s
 </head>
 <body>
 
-    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <audio id="notifSound" src="assets/u_7xr5ffk4oq-opening-bell-421471.mp3" preload="auto"></audio>
     <div id="audioOverlay"><button class="btn-start" onclick="enableAudio()">🔊 Start Dashboard</button></div>
 
     <h2>Admin Dashboard</h2>

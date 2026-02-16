@@ -35,8 +35,8 @@ if ($submitted) {
             
             if ($result && $user_row = $result->fetch_assoc()) {
                 if (password_verify($password, $user_row['password'])) {
-                    // Only admin, manager, kitchen, delivery can login
-                    $allowed_roles = ['admin', 'manager', 'kitchen', 'delivery'];
+                    // Only admin, manager, kitchen, driver can login
+                    $allowed_roles = ['admin', 'manager', 'kitchen', 'driver'];
                     if (!in_array($user_row['role'], $allowed_roles)) {
                         $msg = 'このロールではログインできません';
                     } else {

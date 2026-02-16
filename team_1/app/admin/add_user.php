@@ -50,7 +50,7 @@ $role_labels = [
   'admin' => '管理者',
   'manager' => 'マネージャー',
   'kitchen' => 'キッチン',
-  'delivery' => '配達',
+  'driver' => '配達',
 ];
 
 // Load user for edit mode so the form shows existing data when you click "Edit"

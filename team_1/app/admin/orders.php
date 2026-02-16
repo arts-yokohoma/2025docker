@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
-// Orders: admin, manager, kitchen, delivery can view
-requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+// Orders: admin, manager, kitchen, driver can view
+requireRoles(['admin', 'manager', 'kitchen', 'driver']);
 
 date_default_timezone_set('Asia/Tokyo');
 

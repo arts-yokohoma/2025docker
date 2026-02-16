@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $name = trim($_POST['name'] ?? '');
 $phone = trim($_POST['phone'] ?? '');
 $email = trim($_POST['email'] ?? '');
+$inquiryMethod = trim($_POST['inquiry_method'] ?? '');
 $message = trim($_POST['message'] ?? '');
 
 $errors = [];
@@ -20,6 +21,10 @@ if ($phone === '') {
 }
 if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $errors[] = 'email';
+}
+
+if ($inquiryMethod !== 'email' && $inquiryMethod !== 'phone') {
+    $inquiryMethod = 'email';
 }
 if ($message === '') {
     $errors[] = 'message';
@@ -33,12 +38,14 @@ if (!empty($errors)) {
 
 try {
     // Table in repo is named `customer` (see create_contacts.sql)
-    $sql = "INSERT INTO customer (phone, name, email, message) VALUES (:phone, :name, :email, :message)";
+    $sql = "INSERT INTO customer (phone, name, email, inquiry_method, inquiry_status, message) VALUES (:phone, :name, :email, :inquiry_method, :inquiry_status, :message)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':phone' => $phone,
         ':name' => $name,
         ':email' => $email,
+        ':inquiry_method' => $inquiryMethod,
+        ':inquiry_status' => '未対応',
         ':message' => $message,
     ]);
 

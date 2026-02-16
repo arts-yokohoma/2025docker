@@ -58,6 +58,20 @@
                     <label for="email" class="form-label fw-bold" id="email">メールアドレス</label>
                     <input type="email" class="form-control" id="email" name="email" placeholder="メールアドレスを入力してください" required>
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">お問い合わせ方法</label>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="inquiry_method" id="inquiry_method_email" value="email" checked>
+                            <label class="form-check-label" for="inquiry_method_email">メール</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="inquiry_method" id="inquiry_method_phone" value="phone">
+                            <label class="form-check-label" for="inquiry_method_phone">電話</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="mb-3">
                     <label for="message" class="form-label fw-bold" id="message">内容</label>
                     <textarea class="form-control" id="message" name="message" rows="1" data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" spellcheck="false"></textarea><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local origin" style="position: absolute; contain: layout;"></grazie-editor-wrapper><grazie-editor-wrapper data-grazie-editor-id="bc98e6ae-0ff3-4cb6-bdb6-d9295361f48d" class="local visual" style="position: absolute; contain: layout;"></grazie-editor-wrapper>

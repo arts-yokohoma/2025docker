@@ -21,7 +21,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load shift history
     updateShiftHistory();
+    
+    // Set Orders Management as default active tab
+    setDefaultTab();
 });
+
+/**
+ * Set Orders Management as the default active tab on page load
+ */
+function setDefaultTab() {
+    // Remove active class from all tabs and content
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Find and activate Orders Management tab
+    document.querySelectorAll('.tab').forEach(tab => {
+        if (tab.textContent.includes('Orders Management')) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Activate orders tab content
+    const ordersTab = document.getElementById('orders-tab');
+    if (ordersTab) {
+        ordersTab.classList.add('active');
+        loadOrders();
+    }
+}
 
 /**
  * Switch between admin tabs (Shifts vs Orders)
@@ -60,9 +90,11 @@ function switchTab(tabName) {
 function updateMorningStaff(value) {
     const valueElement = document.getElementById('morningStaffValue');
     const sliderElement = document.getElementById('morningStaffSlider');
+    const selectElement = document.getElementById('morningStaffSelect');
     
     if (valueElement) valueElement.textContent = value;
     if (sliderElement) sliderElement.value = value;
+    if (selectElement) selectElement.value = value;
     
     calculateCapacity();
 }
@@ -74,9 +106,11 @@ function updateMorningStaff(value) {
 function updateEveningStaff(value) {
     const valueElement = document.getElementById('eveningStaffValue');
     const sliderElement = document.getElementById('eveningStaffSlider');
+    const selectElement = document.getElementById('eveningStaffSelect');
     
     if (valueElement) valueElement.textContent = value;
     if (sliderElement) sliderElement.value = value;
+    if (selectElement) selectElement.value = value;
     
     calculateCapacity();
 }

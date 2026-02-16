@@ -2,9 +2,6 @@
 session_start();
 require_once '../db/db.php';
 
-// This endpoint is called from admin dashboard which is already session protected
-// The dashboard.php itself requires login, so we just verify the request came from there
-
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 if ($action === 'save_shift') {

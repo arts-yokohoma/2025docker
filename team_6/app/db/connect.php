@@ -19,3 +19,6 @@ try {
     error_log($e->getMessage());
     die("Database connection failed: " . $e->getMessage());
 }
+
+
+

@@ -63,7 +63,7 @@ if (isset($pdo)) {
   <div class="pizza-list">
     <!-- スモールピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="スモールピザ">
+      <img src="image/pi2.png" alt="スモールピザ">
       <div class="pizza-info">
         <h3>スモールピザ (20cm)</h3>
         <p>1～2人に最適</p>
@@ -78,7 +78,7 @@ if (isset($pdo)) {
 
     <!-- ミディアムピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="ミディアムピザ">
+      <img src="image/pi2.png" alt="スモールピザ">
       <div class="pizza-info">
         <h3>ミディアムピザ (30cm)</h3>
         <p>2～3人に最適</p>
@@ -93,7 +93,7 @@ if (isset($pdo)) {
 
     <!-- ラージピザ -->
     <div class="pizza-item">
-      <img src="<?php echo htmlspecialchars($image_url); ?>" alt="ラージピザ">
+      <img src="image/pi2.png" alt="スモールピザ">
       <div class="pizza-info">
         <h3>ラージピザ (40cm)</h3>
         <p>3～4人に最適</p>

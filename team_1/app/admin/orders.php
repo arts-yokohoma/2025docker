@@ -7,6 +7,29 @@ date_default_timezone_set('Asia/Tokyo');
 
 include __DIR__ . "/mock_orders.php";
 
+// Sort orders by nokori_minutes (less remaining time at top)
+// Incomplete orders (with nokori_minutes) come first, sorted by time urgency
+// Completed/Canceled orders come last
+usort($orders, function($a, $b) {
+    $aIncomplete = $a['status'] !== 'Completed' && $a['status'] !== 'Canceled';
+    $bIncomplete = $b['status'] !== 'Completed' && $b['status'] !== 'Canceled';
+    
+    // Incomplete orders first
+    if ($aIncomplete !== $bIncomplete) {
+        return $aIncomplete ? -1 : 1;
+    }
+    
+    // Among incomplete orders, sort by nokori_minutes (ascending: less time first)
+    if ($aIncomplete && $bIncomplete) {
+        $aNokori = $a['nokori_minutes'] ?? PHP_INT_MAX;
+        $bNokori = $b['nokori_minutes'] ?? PHP_INT_MAX;
+        return $aNokori <=> $bNokori;
+    }
+    
+    // Completed/Canceled orders sorted by creation time (newest first)
+    return 0;
+});
+
 // Count orders by status and by date (今日/明日/明後日) in Asia/Tokyo
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];
 $dateCounts = ['today' => 0, 'tomorrow' => 0, 'dayafter' => 0];

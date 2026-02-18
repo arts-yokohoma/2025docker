@@ -2,6 +2,14 @@
 session_start();
 require __DIR__ . '/./config/db.php';
 
+// allow updating delivery time via query (used when returning from cart.php)
+if (isset($_GET['delivery_time'])) {
+    $_SESSION['delivery_time'] = $_GET['delivery_time'];
+    // redirect to clean URL and avoid resubmission
+    header('Location: confirm.php');
+    exit;
+}
+
 $user = $_SESSION['order']['user'] ?? null;
 $address = $_SESSION['order']['address'] ?? null;
 
@@ -116,13 +124,23 @@ if ($menuRes) {
                             ];
                             
                             $dateLabel = $dateLabels[$dateKey] ?? '';
-                            echo '指定時間: ' . htmlspecialchars($dateLabel . ' ' . $timeStr);
+
+                            // compute end time (15 minutes later) for display
+                            $dt = DateTime::createFromFormat('H:i', $timeStr);
+                            if ($dt) {
+                                $dt->modify('+15 minutes');
+                                $endStr = $dt->format('H:i');
+                                echo '指定時間: ' . htmlspecialchars($dateLabel . ' ' . $timeStr . ' - ' . $endStr);
+                            } else {
+                                echo '指定時間: ' . htmlspecialchars($dateLabel . ' ' . $timeStr);
+                            }
                         } else {
                             echo '指定時間: ' . htmlspecialchars($deliveryTime);
                         }
                         ?>
                     </p>
-                    <p><a href="cart.php">配達時間を変更</a></p>
+                    <?php $currentTime = $_SESSION['delivery_time'] ?? 'ASAP'; ?>
+                    <p><a href="cart.php?return=confirm&delivery_time=<?= urlencode($currentTime) ?>">配達時間を指定する</a></p>
                 </div>
             </div>
 

@@ -84,6 +84,7 @@ while ($row = $result->fetch_assoc()) {
         "expected_delivery" => $expectedDeliveryFormatted,
         "expected_delivery_ts" => $expectedDeliveryTs,
         "nokori_label" => $nokoriLabel,
+        "nokori_minutes" => $nokoriMinutes,
         "name" => $row["name"] ?? "Unknown",
         "phone" => $row["phone"] ?? "N/A",
         "address" => $row["address"] ?? "N/A",

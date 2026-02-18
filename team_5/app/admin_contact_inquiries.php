@@ -9,12 +9,61 @@ if (empty($_SESSION['admin_id'])) {
 require_once __DIR__ . '/db_config.php';
 
 $errorMessage = '';
+$successMessage = '';
 $inquiries = [];
 
+if (empty($_SESSION['admin_inquiry_csrf'])) {
+    $_SESSION['admin_inquiry_csrf'] = bin2hex(random_bytes(16));
+}
+
+$allowedStatuses = ['未対応', '対応中', '対応済み'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = (string)($_POST['action'] ?? '');
+    $csrf = (string)($_POST['csrf_token'] ?? '');
+    if ($csrf === '' || !hash_equals((string)$_SESSION['admin_inquiry_csrf'], $csrf)) {
+        $errorMessage = '更新に失敗しました。（セキュリティ検証エラー）';
+    } else {
+        $phone = trim((string)($_POST['phone'] ?? ''));
+        $returnQuery = (string)($_POST['return_query'] ?? '');
+        $status = trim((string)($_POST['inquiry_status'] ?? ''));
+        $method = trim((string)($_POST['inquiry_method'] ?? ''));
+
+        try {
+            if ($action === 'update_status') {
+                if (!in_array($status, $allowedStatuses, true)) {
+                    throw new RuntimeException('invalid status');
+                }
+                $u = $pdo->prepare('UPDATE customer SET inquiry_status = :s WHERE phone = :p');
+                $u->execute([':s' => $status, ':p' => $phone]);
+            } elseif ($action === 'update_method') {
+                if ($method !== 'email' && $method !== 'phone') {
+                    throw new RuntimeException('invalid method');
+                }
+                $u = $pdo->prepare('UPDATE customer SET inquiry_method = :m WHERE phone = :p');
+                $u->execute([':m' => $method, ':p' => $phone]);
+            }
+
+            $params = [];
+            parse_str($returnQuery, $params);
+            $params['updated'] = '1';
+            header('Location: admin_contact_inquiries.php?' . http_build_query($params));
+            exit;
+        } catch (Exception $e) {
+            $errorMessage = '更新に失敗しました。（サーバーエラー）';
+        }
+    }
+}
+
 $qRaw = trim((string)($_GET['q'] ?? ''));
+$methodRaw = trim((string)($_GET['method'] ?? ''));
 $fromRaw = trim((string)($_GET['from'] ?? ''));
 $toRaw = trim((string)($_GET['to'] ?? ''));
 $pageRaw = (string)($_GET['page'] ?? '1');
+
+if (!empty($_GET['updated'])) {
+    $successMessage = '更新しました。';
+}
 
 $perPage = 50;
 $page = (int)$pageRaw;
@@ -31,7 +80,7 @@ $normalizeDigits = static function (string $value): string {
     return preg_replace('/\D+/', '', $value) ?? '';
 };
 
-$buildWhere = static function () use ($qRaw, $fromRaw, $toRaw, $isValidDate, $normalizeDigits): array {
+$buildWhere = static function () use ($qRaw, $methodRaw, $fromRaw, $toRaw, $isValidDate, $normalizeDigits): array {
     $where = [];
     $params = [];
 
@@ -40,6 +89,11 @@ $buildWhere = static function () use ($qRaw, $fromRaw, $toRaw, $isValidDate, $no
         $where[] = '(name ILIKE :q OR email ILIKE :q OR message ILIKE :q OR phone LIKE :phone_like)';
         $params[':q'] = '%' . $qRaw . '%';
         $params[':phone_like'] = '%' . ($digits !== '' ? $digits : $qRaw) . '%';
+    }
+
+    if ($methodRaw === 'email' || $methodRaw === 'phone') {
+        $where[] = 'inquiry_method = :method';
+        $params[':method'] = $methodRaw;
     }
 
     if ($fromRaw !== '' && $isValidDate($fromRaw)) {
@@ -69,6 +123,8 @@ try {
     $sql = "SELECT phone,
                    name,
                    email,
+                 inquiry_method,
+                 inquiry_status,
                    message,
                    to_char(created_at AT TIME ZONE 'Asia/Tokyo', 'YYYY-MM-DD HH24:MI') AS created_jst
             FROM customer";
@@ -100,10 +156,11 @@ try {
     $totalPages = 1;
 }
 
-$buildQuery = static function (array $overrides = []) use ($qRaw, $fromRaw, $toRaw, $page): string {
+$buildQuery = static function (array $overrides = []) use ($qRaw, $methodRaw, $fromRaw, $toRaw, $page): string {
     $query = array_merge(
         [
             'q' => $qRaw,
+            'method' => $methodRaw,
             'from' => $fromRaw,
             'to' => $toRaw,
             'page' => (string)$page,
@@ -182,6 +239,19 @@ $h = static function (string $value): string {
                     <label for="q" class="fw-bold mb-0">検索</label>
                     <input type="text" id="q" name="q" value="<?php echo $h($qRaw); ?>" class="form-control" style="max-width: 280px;" placeholder="名前 / 電話 / メール / 内容">
 
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">方法</span>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="method" id="method_email" value="email" <?php echo $methodRaw === 'email' ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="method_email">メール</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="method" id="method_phone" value="phone" <?php echo $methodRaw === 'phone' ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="method_phone">電話</label>
+                        </div>
+                        <small class="text-muted">（未選択=すべて）</small>
+                    </div>
+
                     <label for="from" class="fw-bold mb-0">from</label>
                     <input type="date" id="from" name="from" value="<?php echo $h($fromRaw); ?>" class="form-control w-25">
 
@@ -199,6 +269,12 @@ $h = static function (string $value): string {
                 </div>
             <?php endif; ?>
 
+            <?php if ($successMessage !== ''): ?>
+                <div class="alert alert-success" role="alert">
+                    <?php echo $h($successMessage); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="alert alert-light border" role="alert">
                 全件数: <span class="fw-bold"><?php echo (int)$total; ?></span>
                 / 表示中: <span class="fw-bold"><?php echo (int)count($inquiries); ?></span>
@@ -210,6 +286,8 @@ $h = static function (string $value): string {
                     <thead class="table-light">
                         <tr>
                             <th>日時</th>
+                            <th>方法</th>
+                            <th>ステータス</th>
                             <th>名前</th>
                             <th>電話番号</th>
                             <th>メール</th>
@@ -219,21 +297,61 @@ $h = static function (string $value): string {
                     <tbody>
                         <?php if (!$inquiries): ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted">データがありません</td>
+                                <td colspan="7" class="text-center text-muted">データがありません</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($inquiries as $row): ?>
                                 <?php
+                                $phone = (string)($row['phone'] ?? '');
+                                $rowMethod = (string)($row['inquiry_method'] ?? 'email');
+                                $rowStatus = (string)($row['inquiry_status'] ?? '未対応');
+                                $rowClass = '';
+                                if ($rowStatus === '未対応') {
+                                    $rowClass = 'table-danger';
+                                } elseif ($rowStatus === '対応中') {
+                                    $rowClass = 'table-warning';
+                                } elseif ($rowStatus === '対応済み') {
+                                    $rowClass = 'table-success';
+                                }
                                 $message = (string)($row['message'] ?? '');
                                 $summary = $message;
                                 if (mb_strlen($summary, 'UTF-8') > 120) {
                                     $summary = mb_substr($summary, 0, 120, 'UTF-8') . '...';
                                 }
                                 ?>
-                                <tr>
+                                <tr class="<?php echo $h($rowClass); ?>">
                                     <td><?php echo $h((string)($row['created_jst'] ?? '')); ?></td>
+                                    <td>
+                                        <form method="post" class="d-flex gap-2 align-items-center flex-wrap">
+                                            <input type="hidden" name="action" value="update_method">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $h((string)$_SESSION['admin_inquiry_csrf']); ?>">
+                                            <input type="hidden" name="phone" value="<?php echo $h($phone); ?>">
+                                            <input type="hidden" name="return_query" value="<?php echo $h((string)($_SERVER['QUERY_STRING'] ?? '')); ?>">
+
+                                            <select name="inquiry_method" class="form-select form-select-sm" style="max-width: 120px;">
+                                                <option value="email" <?php echo $rowMethod !== 'phone' ? 'selected' : ''; ?>>メール</option>
+                                                <option value="phone" <?php echo $rowMethod === 'phone' ? 'selected' : ''; ?>>電話</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">更新</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="post" class="d-flex gap-2 align-items-center flex-wrap">
+                                            <input type="hidden" name="action" value="update_status">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $h((string)$_SESSION['admin_inquiry_csrf']); ?>">
+                                            <input type="hidden" name="phone" value="<?php echo $h($phone); ?>">
+                                            <input type="hidden" name="return_query" value="<?php echo $h((string)($_SERVER['QUERY_STRING'] ?? '')); ?>">
+
+                                            <select name="inquiry_status" class="form-select form-select-sm" style="max-width: 140px;">
+                                                <option value="未対応" <?php echo $rowStatus === '未対応' ? 'selected' : ''; ?>>未対応</option>
+                                                <option value="対応中" <?php echo $rowStatus === '対応中' ? 'selected' : ''; ?>>対応中</option>
+                                                <option value="対応済み" <?php echo $rowStatus === '対応済み' ? 'selected' : ''; ?>>対応済み</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">更新</button>
+                                        </form>
+                                    </td>
                                     <td class="fw-bold"><?php echo $h((string)($row['name'] ?? '')); ?></td>
-                                    <td><?php echo $h((string)($row['phone'] ?? '')); ?></td>
+                                    <td><?php echo $h($phone); ?></td>
                                     <td><?php echo $h((string)($row['email'] ?? '')); ?></td>
                                     <td class="message-cell">
                                         <details>

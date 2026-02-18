@@ -9,7 +9,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./team_3/front-end/client/build:/usr/share/nginx/html/team_3/frontend/client
-      - ./team_3/front-end/dashboard/build:/usr/share/nginx/html/team_3/frontend/dashboard  
+      - ./team_3/front-end/dashboard/build:/usr/share/nginx/html/team_3/frontend/dashboard
     depends_on:
       - apache_server
       - team_3_app
@@ -17,6 +17,7 @@ services:
       - team_5_app
       - team_6_app
       - team_7_app
+      - itcircle_app
     networks:
       - teams-network
 
@@ -25,11 +26,9 @@ services:
       context: .
       dockerfile: apache.Dockerfile
     container_name: apache_teams
-    # image: php:8.0-apache
     volumes:
       - ./team_1/app:/var/www/html/team_1
       - ./team_2/app:/var/www/html/team_2
-
     depends_on:
       - team_1_db
       - team_2_db
@@ -63,26 +62,19 @@ services:
       - teams-network
 
   team_3_app:
-    image: python:3.9
-    container_name: team_3_python
     build:
       context: ./team_3/pizza-backend
       dockerfile: Dockerfile
+    container_name: team_3_python
     working_dir: /app
     ports:
       - "8000:8000"
     volumes:
       - ./team_3/pizza-backend:/app
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/fastapi_db
+      DATABASE_URL: postgresql://postgres:fastapi_db@team_3_db:5432/postgres
       REDIS_URL: redis://redis:6379/0
-      JWT_SECRET: a4d1f3cbe87c9e46bca2a22c93f5eafd9f54b621a03b4c1b5891d5f84c209a3c
-      JWT_ALGORITHM: HS256
-      EXPIRES_DELTA: 1
-      CORS: http://localhost,http://localhost:3000,http://localhost:3001
-      PASSWORD_DEFAULT: 123456
-      RESEND_API_KEY: re_HuFFybww_4gz2HhgTyAnHUUoVDPZ3S5Su
-      DISCORD_BOT_TOKEN: https://discord.com/api/webhooks/1400040703966318644/ZfLaOB38q3T-buCIlsNil6wHQPAJQxo-8dodzARdk599btZbn4RhvrT0L269Z1ylrJF5
+      JWT_SECRET: your_secret
     depends_on:
       - team_3_db
     networks:
@@ -123,7 +115,6 @@ services:
       POSTGRES_PASSWORD: team4pass
     volumes:
       - team_4_pg_data:/var/lib/postgresql/data
-      - ./team_4/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - teams-network
 
@@ -201,6 +192,35 @@ services:
     networks:
       - teams-network
 
+  # ===============================
+  # NEW TEAM: itcircle (PHP + MySQL)
+  # ===============================
+
+  itcircle_app:
+    build:
+      context: .
+      dockerfile: apache.Dockerfile
+    container_name: itcircle_apache
+    volumes:
+      - ./itcircle/app:/var/www/html
+    depends_on:
+      - itcircle_db
+    networks:
+      - teams-network
+
+  itcircle_db:
+    image: mysql:8.0
+    container_name: itcircle_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: itcircle_db
+      MYSQL_USER: itcircle
+      MYSQL_PASSWORD: itcirclepass
+    volumes:
+      - itcircle_mysql_data:/var/lib/mysql
+    networks:
+      - teams-network
+
 networks:
   teams-network:
     driver: bridge
@@ -213,3 +233,4 @@ volumes:
   team_5_pg_data:
   team_6_pg_data:
   team_7_pg_data:
+  itcircle_mysql_data:

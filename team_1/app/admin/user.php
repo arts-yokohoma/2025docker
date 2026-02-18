@@ -12,7 +12,7 @@ $role_labels = [
     'admin'    => '管理者',
     'manager'  => 'マネージャー',
     'kitchen'  => 'キッチン',
-    'delivery' => '配達',
+    'driver' => '配達',
 ];
 
 // Handle logout

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Arts Playground — Presentation Summary</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body{padding:28px;background:linear-gradient(180deg,#fbfdff,#eef6ff);}
+    .card{max-width:900px;margin:28px auto;padding:28px;border-radius:14px;background:#fff;box-shadow:0 12px 30px rgba(16,24,40,0.06)}
+    h1{font-family:'Merriweather',serif;margin:0 0 6px}
+    .muted{color:#6b7280}
+    ul{margin:10px 0 20px 20px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .note{background:#f8fafc;padding:12px;border-radius:8px;border:1px solid rgba(15,23,42,0.03)}
+    footer{font-size:0.9rem;color:#6b7280;margin-top:18px}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:8px;overflow:auto}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Arts Playground — Project Summary</h1>
+    <div class="muted">A lightweight storytelling site with admin tools and image uploads</div>
+
+    <h2 style="margin-top:18px">Key Features</h2>
+    <ul>
+      <li>Public feed of stories with image support and full-story pages</li>
+      <li>Admin area: login, dashboard, create & delete stories</li>
+      <li>Image upload validation, size limit, safe filenames, uploads lock-down</li>
+      <li>Improved visuals: Google Fonts, responsive cards, admin theme</li>
+      <li>Error logging (no raw DB errors shown to users)</li>
+    </ul>
+
+    <div class="cols">
+      <div>
+        <h3>Presentation Checklist</h3>
+        <ul>
+          <li>Start XAMPP: <code>sudo /opt/lampp/lampp start</code></li>
+          <li>Open: <a href="http://localhost/artsplayground">http://localhost/artsplayground</a></li>
+          <li>Admin panel: <a href="http://localhost/artsplayground/admin/login.php">/admin/login.php</a></li>
+          <li>Use the demo admin credentials (or create a user in DB)</li>
+        </ul>
+
+        <div class="note">
+          Tip: Use full-screen browser and the large card sections for clean screenshots.
+        </div>
+      </div>
+
+      <div>
+        <h3>Security & Hardening</h3>
+        <ul>
+          <li>Uploaded files validated with <code>finfo</code> + <code>getimagesize()</code></li>
+          <li>Upload size limited to 3MB and PHP execution blocked in uploads/.htaccess</li>
+          <li>Database exceptions are logged to <code>logs/app.log</code> (not echoed)</li>
+          <li>Prepared statements used for DB inserts/queries</li>
+        </ul>
+
+        <div class="note">
+          Consider adding CSRF tokens and stricter input validation before production.
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:18px">Quick DB Schema (for demo)</h2>
+    <pre>CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  is_admin TINYINT(1) DEFAULT 0
+);
+
+CREATE TABLE stories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  image_path VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+    </pre>
+
+    <footer>Need a PDF or screenshots exported? I can generate instructions or a PDF next.</footer>
+  </div>
+</body>
+</html>

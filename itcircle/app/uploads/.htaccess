@@ -1,0 +1,5 @@
+# Prevent execution of PHP and block listing
+Options -Indexes
+<FilesMatch "\.(php|phtml|phps|php3|php4|php5|php7|phar)$">
+    Require all denied
+</FilesMatch>

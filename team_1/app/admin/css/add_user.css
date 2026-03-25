@@ -1,11 +1,61 @@
 body {
   margin: 0;
   font-family: sans-serif;
-  background: #fafafa;
+  background: #f0f2f5;
 }
-p {
-  margin: 0 0 5;
 
+p { margin: 0 0 5px; }
+
+/* ===== Header: logo, title, 戻る, ログアウト ===== */
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-page-logo {
+  height: 40px;
+  width: auto;
+}
+
+.admin-page-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-page-back {
+  margin-left: auto;
+  padding: 8px 14px;
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.admin-page-back:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+.admin-page-logout {
+  padding: 8px 16px;
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.admin-page-logout:hover {
+  background: #b71c1c;
 }
 
 /* ===== コンテナ ===== */
@@ -41,6 +91,68 @@ h1 {
   font-size: 13px;
 }
 
+/* ===== Red error boxes ===== */
+.error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 18px 22px;
+  background: #ffebee;
+  border: 2px solid #ef5350;
+  border-left: 6px solid #c62828;
+  border-radius: 8px;
+  color: #b71c1c;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.15);
+}
+
+.error-box-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.error-box-text {
+  flex: 1;
+}
+
+.error-box-text a {
+  color: #c62828;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.error-box-text a:hover {
+  color: #b71c1c;
+}
+
+.error-box-hint {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+/* In-form error (e.g. no roles) */
+.error-message {
+  margin: 10px 0;
+  padding: 14px 18px;
+  background: #ffebee;
+  border: 2px solid #ef5350;
+  border-left: 6px solid #c62828;
+  border-radius: 8px;
+  color: #b71c1c;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.12);
+}
+
+.error-message a {
+  color: #c62828;
+  font-weight: 700;
+}
+
 /* ===== フォーム ===== */
 .row {
   display: flex;
@@ -50,6 +162,27 @@ h1 {
 
 .col {
   flex: 1;
+}
+
+.col-name-surname {
+  flex: 1;
+}
+
+.name-surname-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.name-surname-row input {
+  flex: 1;
+  margin-top: 0;
+}
+
+.optional {
+  font-weight: normal;
+  color: #888;
+  font-size: 12px;
 }
 
 label {

@@ -1,16 +1,42 @@
-<?php 
+<?php
 require_once __DIR__ . '/auth.php';
-// Orders: admin, manager, kitchen, delivery can view
-requireRoles(['admin', 'manager', 'kitchen', 'delivery']);
+// Orders: admin, manager, kitchen, driver can view
+requireRoles(['admin', 'manager', 'kitchen', 'driver']);
 
-include __DIR__ . "/mock_orders.php"; 
+date_default_timezone_set('Asia/Tokyo');
 
-// Count orders by status and by date (今日/明日/明後日)
+include __DIR__ . "/mock_orders.php";
+
+// Sort orders by nokori_minutes (less remaining time at top)
+// Incomplete orders (with nokori_minutes) come first, sorted by time urgency
+// Completed/Canceled orders come last
+usort($orders, function($a, $b) {
+    $aIncomplete = $a['status'] !== 'Completed' && $a['status'] !== 'Canceled';
+    $bIncomplete = $b['status'] !== 'Completed' && $b['status'] !== 'Canceled';
+    
+    // Incomplete orders first
+    if ($aIncomplete !== $bIncomplete) {
+        return $aIncomplete ? -1 : 1;
+    }
+    
+    // Among incomplete orders, sort by nokori_minutes (ascending: less time first)
+    if ($aIncomplete && $bIncomplete) {
+        $aNokori = $a['nokori_minutes'] ?? PHP_INT_MAX;
+        $bNokori = $b['nokori_minutes'] ?? PHP_INT_MAX;
+        return $aNokori <=> $bNokori;
+    }
+    
+    // Completed/Canceled orders sorted by creation time (newest first)
+    return 0;
+});
+
+// Count orders by status and by date (今日/明日/明後日) in Asia/Tokyo
 $statusCounts = ['New' => 0, 'In Progress' => 0, 'Completed' => 0, 'Canceled' => 0];
 $dateCounts = ['today' => 0, 'tomorrow' => 0, 'dayafter' => 0];
-$todayStr = (new DateTime('now'))->format('Y-m-d');
-$tomorrowStr = (new DateTime('tomorrow'))->format('Y-m-d');
-$dayafterStr = (new DateTime('tomorrow +1 day'))->format('Y-m-d');
+$now = new DateTime('now', new DateTimeZone('Asia/Tokyo'));
+$todayStr = $now->format('Y-m-d');
+$tomorrowStr = (clone $now)->modify('+1 day')->format('Y-m-d');
+$dayafterStr = (clone $now)->modify('+2 days')->format('Y-m-d');
 
 foreach ($orders as $order) {
     $status = $order["status"];
@@ -34,6 +60,8 @@ foreach ($orders as $order) {
 <head>
   <meta charset="UTF-8">
   <title>注文ページ</title>
+  <!-- Material Symbols for icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <!-- Cache-busted stylesheet to force reload after CSS changes -->
   <link rel="stylesheet" href="css/orders.css?v=<?= filemtime(__DIR__ . '/css/orders.css') ?>">
   <!-- Temporary debug styles: force completed styles to confirm CSS is applied (remove after verification) -->
@@ -44,17 +72,22 @@ foreach ($orders as $order) {
   </style>
 </head>
 <body>
-<a href="admin.php" class="btn-back">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 -960 960 960"
-         width="24"
-         height="24"
-         aria-hidden="true">
-        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/>
-    </svg>
-    戻る
-</a>
-<h2 class="page-title">注文ページ</h2>
+<header class="orders-page-header">
+    <img src="../assets/image/logo.png" alt="Pizza Mach" class="orders-page-logo">
+    <span class="orders-page-title">注文ページ</span>
+    <a href="admin.php" class="orders-page-back">戻る</a>
+    <form method="post" style="margin: 0;">
+        <input type="hidden" name="action" value="logout">
+        <button type="submit" class="orders-page-logout">ログアウト</button>
+    </form>
+</header>
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+?>
 <div class="filter-container">
   <div class="filter-tabs">
     <button class="tab-btn active" data-status="all" onclick="filterByStatus(this)">すべて <span class="count"><?= count($orders) ?></span></button>
@@ -64,9 +97,9 @@ foreach ($orders as $order) {
     <button class="tab-btn" data-status="Canceled" onclick="filterByStatus(this)">❌ Canceled <span class="count"><?= $statusCounts['Canceled'] ?></span></button>
 
     <!-- Date filters -->
-    <button class="tab-btn" data-date="today" onclick="filterByStatus(this)">今日 <span class="count"><?= $dateCounts['today'] ?></span></button>
-    <button class="tab-btn" data-date="tomorrow" onclick="filterByStatus(this)">明日 <span class="count"><?= $dateCounts['tomorrow'] ?></span></button>
-    <button class="tab-btn" data-date="dayafter" onclick="filterByStatus(this)">明後日 <span class="count"><?= $dateCounts['dayafter'] ?></span></button>
+    <button class="tab-btn" data-date="today" data-target-date="<?= $todayStr ?>" onclick="filterByStatus(this)">今日 <span class="count"><?= $dateCounts['today'] ?></span></button>
+    <button class="tab-btn" data-date="tomorrow" data-target-date="<?= $tomorrowStr ?>" onclick="filterByStatus(this)">明日 <span class="count"><?= $dateCounts['tomorrow'] ?></span></button>
+    <button class="tab-btn" data-date="dayafter" data-target-date="<?= $dayafterStr ?>" onclick="filterByStatus(this)">明後日 <span class="count"><?= $dateCounts['dayafter'] ?></span></button>
   </div>
 </div>
 
@@ -74,7 +107,7 @@ foreach ($orders as $order) {
   <thead>
     <tr>
       <th>注文番号</th>
-      <th>日時</th>
+      <th>配達時間</th>
       <th>顧客名</th>
       <th>注文詳細</th>
       <th>合計金額</th>
@@ -84,10 +117,18 @@ foreach ($orders as $order) {
     </tr>
   </thead>
   <tbody>
-    <?php foreach ($orders as $order): ?>
+    <?php foreach ($orders as $order):
+      $isIncomplete = $order["status"] !== "Completed" && $order["status"] !== "Canceled";
+      $nokori = $order["nokori_label"] ?? '';
+    ?>
       <tr class="visible" data-status="<?= htmlspecialchars($order["status"]) ?>" data-date="<?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?>">
         <td>#<?= $order["id"] ?></td>
-        <td><?= htmlspecialchars($order["delivery_time"] ?? $order["date"]) ?></td>
+        <td class="td-delivery">
+          <span class="expected-time"><?= htmlspecialchars($order["expected_delivery"] ?? ($order["delivery_time"] ?? $order["date"])) ?></span>
+          <?php if ($nokori !== ''): ?>
+            <br><span class="nokori <?= $isIncomplete ? 'nokori-red' : '' ?>"><?= htmlspecialchars($nokori) ?></span>
+          <?php endif; ?>
+        </td>
         <td>
           <?= $order["name"] ?><br>
           <small><?= $order["phone"] ?></small><br>
@@ -102,10 +143,10 @@ foreach ($orders as $order) {
         </td>
         <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
-            <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル">❌</button>
+            <button class="btn red cancel-btn" data-id="<?= $order["id"] ?>" data-status="<?= $order["status"] ?>" title="キャンセル"><span class="material-symbols-outlined">close</span></button>
 
             <?php if ($order["status"] === "New"): ?>
-              <button class="btn blue status-btn" data-id="<?= $order["id"] ?>" data-next="In Progress">調理開始</button>
+              <button class="btn blue status-btn" data-id="<?= $order["id"] ?>" data-next="In Progress"><span class="material-symbols-outlined">local_pizza</span> 調理開始</button>
             <?php elseif ($order["status"] === "In Progress"): ?>
               <button class="btn yellow status-btn" data-id="<?= $order["id"] ?>" data-next="Completed">完了にする</button>
             <?php endif; ?>
@@ -113,7 +154,7 @@ foreach ($orders as $order) {
         </td>
         <td>
           <?php if ($order["status"] !== "Completed" && $order["status"] !== "Canceled"): ?>
-            <button class="btn edit-btn" data-id="<?= $order["id"] ?>">編集</button>
+            <button class="btn edit-btn" data-id="<?= $order["id"] ?>"><span class="material-symbols-outlined">edit</span> 編集</button>
           <?php endif; ?>
         </td>
       </tr>

@@ -11,24 +11,18 @@ function filterByStatus(btn) {
   btn.classList.add('active');
 
   if (dateFilter) {
-    const now = new Date();
-    let target = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (dateFilter === 'tomorrow') target.setDate(target.getDate() + 1);
-    else if (dateFilter === 'dayafter') target.setDate(target.getDate() + 2);
-
-    const y = target.getFullYear();
-    const m = String(target.getMonth() + 1).padStart(2, '0');
-    const d = String(target.getDate()).padStart(2, '0');
-    const targetStr = `${y}-${m}-${d}`;
-    console.log('Filtering by date:', dateFilter, '=>', targetStr);
+    // Use server-provided date (Asia/Tokyo) so filter matches PHP counts
+    const targetStr = btn.getAttribute('data-target-date') || '';
+    if (!targetStr) {
+      rows.forEach(row => { row.style.display = 'table-row'; });
+      return;
+    }
 
     let visibleCount = 0;
-    rows.forEach((row, idx) => {
+    rows.forEach((row) => {
       const rowDateStr = (row.getAttribute('data-date') || '').trim();
-      // Extract YYYY-MM-DD robustly (handles 'YYYY-MM-DD', 'YYYY-MM-DD HH:MM', 'YYYY-MM-DDTHH:MM:SS')
-      const m = rowDateStr.match(/(\d{4}-\d{2}-\d{2})/);
-      const rowDatePart = m ? m[1] : '';
-      console.debug(`Row ${idx}: data-date="${rowDateStr}" -> datePart="${rowDatePart}" (target=${targetStr})`);
+      const match = rowDateStr.match(/(\d{4}-\d{2}-\d{2})/);
+      const rowDatePart = match ? match[1] : '';
       if (rowDatePart === targetStr) {
         row.style.display = 'table-row';
         visibleCount++;
@@ -36,9 +30,6 @@ function filterByStatus(btn) {
         row.style.display = 'none';
       }
     });
-
-    console.log('Date filter visible rows:', visibleCount);
-    if (visibleCount === 0) console.warn('Date filter matched 0 rows - check `data-date` attributes and delivery_time values.');
     return;
   }
 

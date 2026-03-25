@@ -67,33 +67,70 @@ $isSupervisor = ($userRole === 'supervisor');
                         <input type="date" id="shiftDate" value="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
                     </div>
                     
-                    <div class="shift-planning-grid">
-                        <!-- Morning Shift -->
-                        <div class="shift-slot">
-                            <h4>Morning Shift (8AM - 4PM)</h4>
-                            <div class="shift-slider">
-                                <input type="range" id="morningStaffSlider" min="1" max="15" value="5" 
-                                       onchange="updateMorningStaff(this.value)">
-                                <span class="shift-value" id="morningStaffValue">5</span>
-                                <span>staff</span>
+                    <div style="display: flex; gap: 20px; align-items: flex-start;">
+                        <div class="shift-planning-grid" style="flex: 1;">
+                            <!-- Morning Shift -->
+                            <div class="shift-slot">
+                                <h4>Morning Shift (8AM - 4PM)</h4>
+                                <div class="shift-slider">
+                                    <label for="morningStaffSelect" style="font-weight: 600; color: #8B4513;">Staff Count:</label>
+                                    <select id="morningStaffSelect" onchange="updateMorningStaff(this.value)" style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; background-color: white; color: #333; font-size: 14px; cursor: pointer;">
+                                        <option value="1">1 staff</option>
+                                        <option value="2">2 staff</option>
+                                        <option value="3">3 staff</option>
+                                        <option value="4">4 staff</option>
+                                        <option value="5" selected>5 staff</option>
+                                        <option value="6">6 staff</option>
+                                        <option value="7">7 staff</option>
+                                        <option value="8">8 staff</option>
+                                        <option value="9">9 staff</option>
+                                        <option value="10">10 staff</option>
+                                        <option value="11">11 staff</option>
+                                        <option value="12">12 staff</option>
+                                        <option value="13">13 staff</option>
+                                        <option value="14">14 staff</option>
+                                        <option value="15">15 staff</option>
+                                    </select>
+                                    <span class="shift-value" id="morningStaffValue">5</span>
+                                </div>
+                                <div class="summary-label">
+                                    Capacity: <span id="morningCapacity">80</span> orders (2 orders/hour per staff)
+                                </div>
                             </div>
-                            <div class="summary-label">
-                                Capacity: <span id="morningCapacity">80</span> orders (2 orders/hour per staff)
+                            
+                            <!-- Evening Shift -->
+                            <div class="shift-slot">
+                                <h4>Evening Shift (4PM - 12AM)</h4>
+                                <div class="shift-slider">
+                                    <label for="eveningStaffSelect" style="font-weight: 600; color: #8B4513;">Staff Count:</label>
+                                    <select id="eveningStaffSelect" onchange="updateEveningStaff(this.value)" style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; background-color: white; color: #333; font-size: 14px; cursor: pointer;">
+                                        <option value="1">1 staff</option>
+                                        <option value="2">2 staff</option>
+                                        <option value="3">3 staff</option>
+                                        <option value="4">4 staff</option>
+                                        <option value="5" selected>5 staff</option>
+                                        <option value="6">6 staff</option>
+                                        <option value="7">7 staff</option>
+                                        <option value="8">8 staff</option>
+                                        <option value="9">9 staff</option>
+                                        <option value="10">10 staff</option>
+                                        <option value="11">11 staff</option>
+                                        <option value="12">12 staff</option>
+                                        <option value="13">13 staff</option>
+                                        <option value="14">14 staff</option>
+                                        <option value="15">15 staff</option>
+                                    </select>
+                                    <span class="shift-value" id="eveningStaffValue">5</span>
+                                </div>
+                                <div class="summary-label">
+                                    Capacity: <span id="eveningCapacity">80</span> orders (2 orders/hour per staff)
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Evening Shift -->
-                        <div class="shift-slot">
-                            <h4>Evening Shift (4PM - 12AM)</h4>
-                            <div class="shift-slider">
-                                <input type="range" id="eveningStaffSlider" min="1" max="15" value="5" 
-                                       onchange="updateEveningStaff(this.value)">
-                                <span class="shift-value" id="eveningStaffValue">5</span>
-                                <span>staff</span>
-                            </div>
-                            <div class="summary-label">
-                                Capacity: <span id="eveningCapacity">80</span> orders (2 orders/hour per staff)
-                            </div>
+                        <!-- Save Button Outside -->
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                            <button onclick="saveShiftSchedule()" style="background: #28a745; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 15px; white-space: nowrap;">Save Shift</button>
                         </div>
                     </div>
                     
@@ -131,7 +168,6 @@ $isSupervisor = ($userRole === 'supervisor');
                     </div>
                     
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button onclick="saveShiftSchedule()" style="background: #28a745;">Save Shift Schedule</button>
                         <button onclick="loadShiftSchedule()" style="background: #6c757d;">Load Saved Schedule</button>
                         <button onclick="calculateCapacity()" style="background: #007bff;">Recalculate</button>
                     </div>

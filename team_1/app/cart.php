@@ -1,6 +1,9 @@
 <?php
 require __DIR__ . '/./config/db.php';
 
+// track return destination (used when coming from confirm page)
+$return = $_GET['return'] ?? '';
+
 /**
  * Shopping cart page with delivery time selection
  * 
@@ -292,7 +295,14 @@ if ($menuRes) {
                         合計 ¥<span id="cart-total">0</span>
                     </div>
                 </div>
-                <a href="user_info.php" id="go-to-order" class="btn-proceed">お客様情報の入力へ進む →</a>
+                <?php
+                // if the cart was opened from the confirmation page we want to send
+                // the user straight back after updating the delivery time instead of
+                // proceeding through the normal checkout flow
+                $baseHref = ($return === 'confirm') ? 'confirm.php' : 'user_info.php';
+                $linkLabel = ($return === 'confirm') ? '配達時間を変更して確認へ戻る' : 'お客様情報の入力へ進む →';
+                ?>
+                <a href="<?= htmlspecialchars($baseHref) ?>" id="go-to-order" class="btn-proceed"><?= htmlspecialchars($linkLabel) ?></a>
                 <p style="font-size: 12px; color: #999; margin-top: 12px; text-align: center;">
                     ※注文を確定するまで、料金は発生しません。ゲスト購入として手続きを継続します。
                 </p>
@@ -306,6 +316,15 @@ if ($menuRes) {
 const menuData = <?= json_encode($menuData) ?>;
 
 const CART_KEY = 'cart';
+
+// if the cart is opened with a delivery_time query parameter (e.g. when
+// returning from confirmation) make sure we persist it in localStorage so
+// the radio buttons in the UI stay in sync.
+const initialParams = new URL(window.location.href).searchParams;
+if (initialParams.get('delivery_time')) {
+    localStorage.setItem('delivery_time', initialParams.get('delivery_time'));
+}
+
 const storeHours = {
     openTime: '<?= $storeHours['open_time'] ?>',
     closeTime: '<?= $storeHours['close_time'] ?>',
@@ -494,6 +513,16 @@ document.getElementById('go-to-order').addEventListener('click', function(e) {
     }
     
     localStorage.setItem('delivery_time', deliveryTime);
+
+    // if the return parameter is set to 'confirm', bypass the normal
+    // checkout link and redirect straight back to the confirmation page
+    const params = new URL(window.location.href).searchParams;
+    if (params.get('return') === 'confirm') {
+        e.preventDefault();
+        window.location.href = 'confirm.php?delivery_time=' + encodeURIComponent(deliveryTime);
+        return;
+    }
+
     const url = new URL(this.href);
     url.searchParams.set('delivery_time', deliveryTime);
     this.href = url.toString();

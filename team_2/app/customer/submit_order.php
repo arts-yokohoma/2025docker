@@ -2,55 +2,70 @@
 // customer/submit_order.php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-date_default_timezone_set('Asia/Tokyo'); // Timezone မှန်ဖို့လိုပါတယ်
+date_default_timezone_set('Asia/Tokyo'); 
 
 require_once '../database/db_conn.php';
+require_once '../database/functions.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // (၁) Form မှ Data များကို လက်ခံယူခြင်း
-    $name = $_POST['name'] ?? '';
-    $phone = $_POST['phone'] ?? '';
-    
-    // လိပ်စာ ၂ ခုကို ပေါင်းလိုက်ခြင်း (City + Detail)
+
+    $name = trim($_POST['name'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
     $city = $_POST['address_city'] ?? '';
     $detail = $_POST['address_detail'] ?? '';
     $full_address = trim($city . " " . $detail);
-
     $size = $_POST['size'] ?? 'M';
     $qty = intval($_POST['quantity'] ?? 1);
-    $postal_code = $_POST['postal_code'] ?? '';
+    $postal_code = preg_replace('/[^0-9]/', '', $_POST['postal_code'] ?? '');
 
-    // (၂) လိုအပ်သည်များ ပါမပါ စစ်ဆေးခြင်း
     if (empty($name) || empty($phone) || empty($full_address)) {
-        echo "<script>alert('အချက်အလက်များ ပြည့်စုံစွာ ဖြည့်သွင်းပါ'); window.history.back();</script>";
+        echo "<script>alert('Please fill all fields'); window.history.back();</script>";
         exit;
     }
 
-    // (၃) Database သို့ သိမ်းဆည်းခြင်း (Prepared Statement)
-    // SQL Injection ကာကွယ်ရန် bind_param သုံးထားပါသည်
-    $sql = "INSERT INTO orders (customer_name, phonenumber, address, pizza_type, quantity, postal_code, status, order_date) 
-            VALUES (?, ?, ?, ?, ?, ?, 'Pending', NOW())";
+    $lat = 0.0;
+    $lng = 0.0;
+    $one_way_minutes = 20; // Default
+
+    if (!empty($postal_code) && function_exists('getLatLngFromPostal')) {
+        $geo = getLatLngFromPostal($postal_code);
+        if ($geo) {
+            $lat = $geo['lat'];
+            $lng = $geo['lng'];
+            if (function_exists('calculateDistance')) {
+                $dist_km = calculateDistance(SHOP_LAT, SHOP_LNG, $lat, $lng);
+                $speed_per_min = 0.5; 
+                $one_way_minutes = ceil($dist_km / $speed_per_min);
+            }
+        }
+    }
+
+    $sql = "INSERT INTO orders (customer_name, phonenumber, address, pizza_type, quantity, postal_code, latitude, longitude, status, order_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())";
 
     if ($stmt = $conn->prepare($sql)) {
-        // s = string, i = integer
-        // types: name(s), phone(s), address(s), size(s), qty(i), postal(s)
-        $stmt->bind_param("ssssss", $name, $phone, $full_address, $size, $qty, $postal_code);
+        $stmt->bind_param("ssssisdd", $name, $phone, $full_address, $size, $qty, $postal_code, $lat, $lng);
 
         if ($stmt->execute()) {
-            // ✅ အောင်မြင်ရင် Order ID ယူပြီး Status Page ကို ပို့မယ်
             $new_order_id = $conn->insert_id;
+
+            // ✅ Use assignRiderSmart
+            if (function_exists('assignRiderSmart')) {
+                assignRiderSmart($new_order_id, $one_way_minutes);
+            }
+            
             header("Location: check_order.php?id=" . $new_order_id);
             exit();
+
         } else {
-            echo "SQL Error: " . $stmt->error;
+            echo "Save Error: " . $stmt->error;
         }
         $stmt->close();
     } else {
         echo "Database Error: " . $conn->error;
     }
+
 } else {
-    // POST မဟုတ်ဘဲ တိုက်ရိုက်ဝင်လာရင် index ကို ပြန်ပို့မယ်
     header("Location: index.php");
     exit();
 }

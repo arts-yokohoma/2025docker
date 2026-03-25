@@ -1,13 +1,13 @@
 <?php
 /**
- * Script to add missing roles (admin, manager, driver, kitchen) to the database
+ * Script to add missing roles (admin, manager, kitchen, delivery) to the database
  * Run this once if roles are missing
  * Safe to run multiple times - uses INSERT IGNORE
  */
 
 require_once __DIR__ . '/../config/db.php';
 
-$roles = ['admin', 'manager', 'driver', 'kitchen'];
+$roles = ['admin', 'manager', 'kitchen', 'delivery'];
 
 echo "<pre>";
 echo "Adding roles to database...\n\n";

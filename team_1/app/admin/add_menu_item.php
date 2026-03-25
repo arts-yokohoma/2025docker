@@ -95,59 +95,68 @@ $savedPriceL = $_POST['price_l'] ?? '';
 <body>
 
 <div class="layout">
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <img src="../assets/image/logo.png" alt="Pizza Mach" style="height: 40px; width: auto;">
-        <h2 class="logo" style="margin: 0;">Pizza Mach - 管理パネル</h2>
+    <div class="logo-section kanri-header">
+        <img src="../assets/image/logo.png" alt="Pizza Mach" class="kanri-logo">
+        <h2 class="logo" style="margin: 0;">Pizza Mach - 新規商品追加</h2>
+        <a href="kanri.php" class="kanri-back">戻る</a>
+        <a href="logout.php" class="logout-btn" style="text-decoration: none;">ログアウト</a>
     </div>
 
     <main class="content">
-        <h1>新規商品追加</h1>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">新規商品追加</h1>
+                <p class="page-subtitle">Add New Menu Item</p>
+            </div>
+        </div>
 
         <?php if ($flashErr): ?>
-            <div class="flash err"><?= h($flashErr) ?></div>
+            <div class="flash err">✕ <?= h($flashErr) ?></div>
         <?php endif; ?>
 
         <section class="card">
+            <div class="card-header">
+                <h2><span class="card-icon" style="background: var(--success-alpha); color: var(--success);">➕</span> 商品情報入力</h2>
+            </div>
+            
             <form method="post" enctype="multipart/form-data">
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <label for="name">商品名 <span style="color: var(--danger);">*</span></label>
-                    <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100">
+                    <input type="text" name="name" id="name" value="<?= h($savedName) ?>" required maxlength="100" placeholder="例: マルゲリータ">
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label>価格設定 <span style="color: var(--danger);">*</span> <span style="font-size: 13px; color: var(--muted);">(少なくとも1つ必須)</span></label>
-                    <div class="row" style="margin-top: 8px;">
-                        <div>
-                            <label for="price_s" style="font-size: 13px;">Sサイズ (円)</label>
-                            <input type="number" name="price_s" id="price_s" value="<?= h($savedPriceS) ?>" min="0" step="1">
-                        </div>
-                        <div>
-                            <label for="price_m" style="font-size: 13px;">Mサイズ (円)</label>
-                            <input type="number" name="price_m" id="price_m" value="<?= h($savedPriceM) ?>" min="0" step="1">
-                        </div>
-                        <div>
-                            <label for="price_l" style="font-size: 13px;">Lサイズ (円)</label>
-                            <input type="number" name="price_l" id="price_l" value="<?= h($savedPriceL) ?>" min="0" step="1">
-                        </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="price_s">Sサイズ価格 (円)</label>
+                        <input type="number" name="price_s" id="price_s" value="<?= h($savedPriceS) ?>" min="0" step="1" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="price_m">Mサイズ価格 (円)</label>
+                        <input type="number" name="price_m" id="price_m" value="<?= h($savedPriceM) ?>" min="0" step="1" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="price_l">Lサイズ価格 (円)</label>
+                        <input type="number" name="price_l" id="price_l" value="<?= h($savedPriceL) ?>" min="0" step="1" placeholder="0">
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <label for="photo">商品画像 <span style="color: var(--danger);">*</span></label>
-                    <input type="file" name="photo" id="photo" accept="image/*" required
-                           style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid var(--line); border-radius: var(--radius2);">
+                    <input type="file" name="photo" id="photo" accept="image/*" required>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <div class="checkbox-item">
                         <input type="checkbox" name="active" id="active_new" checked>
-                        <label for="active_new">表示（アクティブ）</label>
+                        <label for="active_new">公開する（チェックを外すと非公開になります）</label>
                     </div>
                 </div>
 
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 16px 0;">※ 価格は少なくとも1つのサイズを入力してください。</p>
+
                 <div class="form-footer">
-                    <a href="kanri.php" class="btn-save" style="text-decoration: none; display: inline-block; background: var(--muted); border-color: var(--muted);">キャンセル</a>
-                    <button type="submit" class="btn-save">保存</button>
+                    <a href="kanri.php" class="btn btn-cancel">キャンセル</a>
+                    <button type="submit" class="btn btn-primary">商品を追加</button>
                 </div>
             </form>
         </section>

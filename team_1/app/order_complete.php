@@ -37,6 +37,10 @@ if ($res && $row = $res->fetch_assoc()) {
             }
             
             $timeLabel = $dt->format('H:i');
+            // show 15‑minute window like cart/confirm pages
+            $end = clone $dt;
+            $end->modify('+15 minutes');
+            $timeLabel .= ' - ' . $end->format('H:i');
             $deliveryTimeDisplay = "お届け予定時間：{$dateLabel} {$timeLabel}";
         } catch (Exception $e) {
             // Keep default message if parsing fails

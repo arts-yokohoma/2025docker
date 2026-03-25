@@ -47,8 +47,28 @@ try {
 } catch (PDOException $e) {
     // PostgreSQL unique_violation SQLSTATE is 23505
     if ($e->getCode() === '23505') {
-        header('Location: contact.php?error=duplicate');
-        exit;
+        // Backward-compatible fallback: older schemas used `phone` as PRIMARY KEY.
+        // In that case, update the existing record so the user isn't blocked.
+        try {
+            $updateSql = "UPDATE customer
+                          SET name = :name,
+                              email = :email,
+                              message = :message,
+                              created_at = CURRENT_TIMESTAMP
+                          WHERE phone = :phone";
+            $pdo->prepare($updateSql)->execute([
+                ':phone' => $phone,
+                ':name' => $name,
+                ':email' => $email,
+                ':message' => $message,
+            ]);
+
+            header('Location: contact_success.php');
+            exit;
+        } catch (PDOException $inner) {
+            header('Location: contact.php?error=duplicate');
+            exit;
+        }
     }
     header('Location: contact.php?error=1');
     exit;
